@@ -346,3 +346,13 @@ The user answered the open questions in the conversation. Decisions recorded:
 - D19. The applied-usage survey: the user asked what it means; explained in the reply, stays open with a recommendation to do the minimal version (classify the 19 PubMed hits' methods sections) at the manuscript stage.
 
 The proposal's sections 1, 3 (row 7), 6, 7, 8, 9, and 11 were changed accordingly; STATUS.md stays at `1, proposal at stop 1`, since the Zotero update has not been announced. Committed as "Stage 1, stop 1: user's answers applied".
+
+### Stop 1, second round (2026-10-28, 19:52)
+
+- D20. Paper type: the user rules it a constructive method paper. The first message's reading (a critique) was wrong. The paper test was re-read under the constructive rules of the stage file: row 1 as the estimand and the gap the existing methods leave, row 2 as the proposed procedure, row 4 as its properties, row 6 as the comparison with the existing methods; rows 3, 5, and 7 unchanged. The proposal's sections 1, 2, 3, and 8 were rewritten; sections 4 and 5 stand, because the mechanism and the sources are the same under either reading.
+- D21. The minimal applied-usage survey is in: the methods sections of the 19 PubMed hits of query 3, classified by pooling order, as one supplementary table at the manuscript stage.
+- D22. The Statistics in Medicine condition (only if the authors write the first draft themselves) accepted.
+- D23. The NHANES decision (2013 to 2018 pooled, method check at download) accepted.
+- Open after this round: the author line (init.R waits), the argmax theorem source (after the Zotero update).
+
+Process feedback, added: 21. **The paper type in the first message.** The stage file says every idea is one type or the other and asks for the reading in the first message. This idea carries a critique (Aim 1) and a constructive procedure (Aim 2) as co-primary aims, and the first reading went the wrong way. The stage file could ask the first message to name both readings when an idea has a correction as a primary aim, with the agent's pick and a one-line reason; or `templates/` could carry an `idea.md` header line for the user to state the type. Cost: the paper test and three sections rewritten once, about 10 minutes. 22. **Journal guide fit columns.** The guide's five paper types do not include a constructive method paper; the journal choice had to rest on the scope quotations in the profiles.
