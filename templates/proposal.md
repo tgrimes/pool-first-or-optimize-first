@@ -65,13 +65,13 @@ Searches are logged in `log/01-idea-review.md`.
 
 **Code and data that exist:** [paths, or none].
 
-## 8. Impact, tier, and fit
+## 8. Impact and fit
 
-[User base; expected size of the artifact; correction or diagnostic; tier; fit with the critique or the constructive template.]
+[User base; expected size of the artifact; correction or diagnostic; fit with the critique or the constructive template.]
 
 **Target journal:** [one], **fallback:** [one], from the journal guide's worksheet.
 
-## 9. Open questions for the person
+## 9. Open questions for the user
 
 - [TO CONFIRM: ...]
 
@@ -83,4 +83,4 @@ Searches are logged in `log/01-idea-review.md`.
 
 ## 11. Revisions
 
-[Dated entries after the stop: what the person decided, what changed.]
+[Dated entries after the stop: what the user decided, what changed.]

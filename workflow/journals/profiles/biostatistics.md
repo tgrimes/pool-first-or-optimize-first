@@ -22,7 +22,7 @@ Every page below was read on the date shown. Bracketed numbers in the text point
 
 > "The objective of Biostatistics is to advance statistical science and its application to problems of human health and disease, with the ultimate goal of advancing the public's health." [3]
 
-Biostatistics publishes new statistical methods motivated by health and biomedical questions; the guidelines say papers "should focus on methods and applications" [1]. Its readers are methodologists in biostatistics, many of them working on genomics, and recent volumes carry several papers that show a common genomics workflow gives biased or invalid results and then fix it. The group's main critique paper fits well. A short note fits the journal's Notes category, which is reserved for "good biostatistical practice" [1]. Pure theory and plain applied analyses do not fit.
+Biostatistics publishes new statistical methods motivated by health and biomedical questions; the guidelines say papers "should focus on methods and applications" [1]. Its readers are methodologists in biostatistics, many of them working on genomics, and recent volumes carry several papers that show a common genomics workflow gives biased or invalid results and then fix it. Our main critique paper fits well. A short note fits the journal's Notes category, which is reserved for "good biostatistical practice" [1]. Pure theory and plain applied analyses do not fit.
 
 | Paper type | Fit | Why |
 |--------------------------------------------|----------|------------------------------------------------|
@@ -79,7 +79,7 @@ Biostatistics publishes new statistical methods motivated by health and biomedic
 
 ## Recent papers like ours
 
-1. Li T, Zhang Y, Patil P, Johnson WE (2023). Overcoming the impacts of two-step batch effect correction on gene expression estimation and inference. *Biostatistics* 24(3):635 to 652. https://doi.org/10.1093/biostatistics/kxab039. Shows that a standard preprocessing step in gene-expression analysis (two-step batch correction) distorts downstream estimates and tests, derives the induced correlation, and proposes a correction, which is the group's critique pattern.
+1. Li T, Zhang Y, Patil P, Johnson WE (2023). Overcoming the impacts of two-step batch effect correction on gene expression estimation and inference. *Biostatistics* 24(3):635 to 652. https://doi.org/10.1093/biostatistics/kxab039. Shows that a standard preprocessing step in gene-expression analysis (two-step batch correction) distorts downstream estimates and tests, derives the induced correlation, and proposes a correction, which is our critique pattern.
 2. Neufeld A, Gao LL, Popp J, Battle A, Witten D (2023). Inference after latent variable estimation for single-cell RNA sequencing data. *Biostatistics* 25(1):270 to 287. https://doi.org/10.1093/biostatistics/kxac047. Shows that the common single-cell workflow (cluster or estimate pseudotime, then test genes on the same data) loses Type 1 error control, and supplies a fix (count splitting) with simulations and real data.
 
 ## Not stated on the site, or could not be read

@@ -1,7 +1,7 @@
 ---
 title: "[FILL: card ID] pilot summary: [FILL: short topic]"
 subtitle: "A review document: the pilot, its results, the draft spec, and the decisions log"
-author: "Prepared for Tyler Grimes"
+author: "[FILL: prepared for]"
 date: today
 format:
   html:
@@ -109,7 +109,7 @@ non-statistical jargon with footnotes. Then the cohort or dataset table, with a 
 
 ### Why [FILL: the estimand]
 
-<!-- Why the group cares about the quantity. Revisit the plain-language sentence, name the
+<!-- Why the quantity matters. Revisit the plain-language sentence, name the
 estimand explicitly, and say what proposed analysis follows. -->
 
 [FILL]
@@ -166,9 +166,9 @@ $$
 
 <!-- Six to nine rows. Column 1 names the model feature with its symbols. Column 2 says why it
 may not be realistic and ties it back to the formulas. Column 3 says what should be done to
-check it, as actions. Never mention what the pilot did; the student finds that out in Methods
+check it, as actions. Never mention what the pilot did; the reader finds that out in Methods
 and Results. Always include a row for the unknown parameter values and rows for structural
-simplifications. Footnote any technique a student may not know on first use. -->
+simplifications. Footnote any technique a reader may not know on first use. -->
 
 | Feature of the model | Why it may not be realistic | What should be done to check it |
 |-----------|----------------------------------------------|---------------------------------|
@@ -306,5 +306,5 @@ cat(read_md_part("decisions.md"), "\n")
 
 {{< include ../templates/pilot-report/parts/standard-footnotes.md >}}
 
-<!-- Footnotes specific to this pilot (biology, data source, methods a student may not know) go
+<!-- Footnotes specific to this pilot (biology, data source, methods a reader may not know) go
 here. Define a term once, at its first use, in one or two plain sentences. -->

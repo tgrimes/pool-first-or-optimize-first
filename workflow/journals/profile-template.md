@@ -19,7 +19,7 @@ Every page below was read on the date shown. Bracketed numbers in the text point
 
 > "[Short quotation of the journal's own aims.]" [1]
 
-[One plain-language paragraph: what the journal actually publishes, who reads it, and which of the group's paper types fit it.]
+[One plain-language paragraph: what the journal actually publishes, who reads it, and which of our paper types fit it.]
 
 | Paper type | Fit | Why |
 |--------------------------------------------|----------|------------------------------------------------|
@@ -74,7 +74,7 @@ Every page below was read on the date shown. Bracketed numbers in the text point
 
 ## Recent papers like ours
 
-1. [Authors] ([year]). [Title]. *[Journal]*. https://doi.org/[DOI]. [One sentence on why it resembles the group's papers.]
+1. [Authors] ([year]). [Title]. *[Journal]*. https://doi.org/[DOI]. [One sentence on why it resembles our papers.]
 2. ...
 
 ## Not stated on the site, or could not be read

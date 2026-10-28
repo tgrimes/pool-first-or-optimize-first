@@ -79,9 +79,9 @@ Series C is the Royal Statistical Society's applied journal, read by statisticia
 
 ## Recent papers like ours
 
-1. Neuvial P, Randriamihamison N, Chavent M, Foissac S, Vialaneix N (2024). A two-sample tree-based test for hierarchically organized genomic signals. *JRSS Series C* 73(3):774 to 795. https://doi.org/10.1093/jrsssc/qlae011. A distance-based two-sample test for genomic matrices (Hi-C), validated by simulation and applied to real data, close to the group's PERMANOVA-type work.
+1. Neuvial P, Randriamihamison N, Chavent M, Foissac S, Vialaneix N (2024). A two-sample tree-based test for hierarchically organized genomic signals. *JRSS Series C* 73(3):774 to 795. https://doi.org/10.1093/jrsssc/qlae011. A distance-based two-sample test for genomic matrices (Hi-C), validated by simulation and applied to real data, close to our PERMANOVA-type work.
 2. Bodinier B, Filippi S, Nøst TH, Chiquet J, Chadeau-Hyam M (2023). Automated calibration for stability selection in penalised regression and graphical models. *JRSS Series C* 72(5):1375 to 1393. https://doi.org/10.1093/jrsssc/qlad058. Revisits how a widely used tool (stability selection for graphical models) is calibrated, fixes it, and applies it to transcriptomic and epigenetic networks with an R package.
-3. Momal R, Robin S, Ambroise C (2021). Accounting for Missing Actors in Interaction Network Inference from Abundance Data. *JRSS Series C* 70(5):1230 to 1258. https://doi.org/10.1111/rssc.12509. Shows that unobserved variables create apparent edges in network inference from count data and corrects for them, the same "what does this edge really mean" question the group asks.
+3. Momal R, Robin S, Ambroise C (2021). Accounting for Missing Actors in Interaction Network Inference from Abundance Data. *JRSS Series C* 70(5):1230 to 1258. https://doi.org/10.1111/rssc.12509. Shows that unobserved variables create apparent edges in network inference from count data and corrects for them, the same "what does this edge really mean" question we asks.
 
 ## Not stated on the site, or could not be read
 

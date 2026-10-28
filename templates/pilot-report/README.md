@@ -1,8 +1,8 @@
 # Pilot summary report template
 
-Carried from the grad guide's pilot rounds on 2026-10-28 with its paths adjusted to this layout (the report lives in `pilot/`, the template in `templates/pilot-report/`, the spec at the project root). Where it says "card", read `proposal.md`; where it says "worker" and "coordinator", read the agent that ran the pilot and the person. Its wording is revised at the first run of stage 2.
+Carried from earlier pilot rounds on 2026-10-28 with its paths adjusted to this layout (the report lives in `pilot/`, the template in `templates/pilot-report/`, the spec at the project root). Where it says "card", read `proposal.md`; where it says "worker" or "coordinator", read the agent. Its wording is revised at the first run of stage 2.
 
-A review report for one pilot: the idea, the model, the design, the results, the full draft spec, and the decisions log, in one self-contained HTML file. It is for the supervisor reviewing the pilot and for the student reading the project cold. The reference example is `pilots/RP2/pilot_rp2_summary.qmd`.
+A review report for one pilot: the idea, the model, the design, the results, the full draft spec, and the decisions log, in one self-contained HTML file. It is for the user reviewing the pilot and for the reader reading the project cold. The reference example is `pilots/RP2/pilot_rp2_summary.qmd`.
 
 ## Files
 
@@ -28,22 +28,22 @@ Reuse the standard parts as they are. If a pilot needs different wording, replac
 
 ## What each section must contain
 
-**Summary.** Scope (what the document is and what it was built from), Status (the card's status, in a sentence, with the pilot, card, and status footnotes), a three-row table of the pilot's three questions (answer in a few words, evidence with numbers computed at render time), and what needs the supervisor's decision.
+**Summary.** Scope (what the document is and what it was built from), Status (the status, in a sentence, with the pilot, card, and status footnotes), a three-row table of the pilot's three questions (answer in a few words, evidence with numbers computed at render time), and what needs the user's decision.
 
-**In plain language.** No formulas. One concrete example with small numbers. What is computed, where the problem comes from, when it matters. The supervisor and students read this section first, so it has to stand alone. Write it by the wording rules below: say concretely what is known and unknown, name the quantity being judged, and footnote every named method, distance, score, or package.
+**In plain language.** No formulas. One concrete example with small numbers. What is computed, where the problem comes from, when it matters. The user reads this section first, so it has to stand alone. Write it by the wording rules below: say concretely what is known and unknown, name the quantity being judged, and footnote every named method, distance, score, or package.
 
 **Potential impact.** 250 to 450 words of prose, after "In plain language" and before the Application. Four things in order: how the project fits with the existing literature (what is known, what the closest prior work does, what is new here, citing only sources opened for this report); the problem it addresses (the procedure, who uses it, what goes wrong); why it matters (what a user would do differently); and what impact it could have (which published results or workflows change, in which fields). Then point explicitly at the pilot results that show impact, by cross-reference to the figure or table and with the number computed at render time (a gain in power, a restored level, a bias removed, a diagnostic that separates the cases). If no pilot output shows impact directly, name the analysis in the spec that will show it, concretely. Added 2026-10-27; reports written before that date carry the section only for cards that passed.
 
 **Application: the study behind the data.** About 500 words of prose (up to about 650 when the citation, a table, and footnotes need the room), three subsections. State only what you verified in a source you opened, and say plainly which dataset the spec proposes when it could not be confirmed.
 - *The study:* full citation with DOI, who was sampled, sample sizes, the findings relevant to the project, and where the open copy of the data lives. The cohort or dataset table goes here, with a caption.
-- *Why [the estimand]:* why the group cares about the quantity, with the plain-language sentence revisited, the estimand named, and the proposed analysis.
+- *Why [the estimand]:* why the quantity matters, with the plain-language sentence revisited, the estimand named, and the proposed analysis.
 - *Did the original study compute it?* One paragraph, no table. Say yes, partly, or no, where in the paper, what it did not do, and why the question here is new.
 
-There is no separate "why the data suit this project" section. Do not write callouts about uncertainty: the student verifies every claim.
+There is no separate "why the data suit this project" section. Do not write callouts about uncertainty: the user verifies every claim.
 
 **In symbols.** The first sentence maps each word to the notation it defines, in parentheses. Display equations put one clause on each line, separated by `\\`. A symbol table follows (widths set by hand), then the target quantity versus the computable quantity, and the key result in words. Include one figure of the problem on made-up numbers (labelled as an illustration, not pilot output) and one from the real data.
 
-**Critiquing the model.** The standard intro, then a three-column table of six to nine rows: *Feature of the model* (named with its symbols), *Why it may not be realistic* (tied back to the formulas), *What should be done to check it* (actions). Never say what the pilot did; the student finds that out later in Methods and Results. Always include a row for the parameter values that are not known and rows for structural simplifications. Footnote any technique a student may not know (for example the delta method) at its first use.
+**Critiquing the model.** The standard intro, then a three-column table of six to nine rows: *Feature of the model* (named with its symbols), *Why it may not be realistic* (tied back to the formulas), *What should be done to check it* (actions). Never say what the pilot did; the reader finds that out later in Methods and Results. Always include a row for the parameter values that are not known and rows for structural simplifications. Footnote any technique a reader may not know (for example the delta method) at its first use.
 
 **Methods.** *Design:* a paragraph, the design diagram (`design_diagram()`; at least one lane per part of the pilot, plus the harness strip), a table of parts, factors, and replicates, and definitions of the scenarios. The diagram's caption cross-references each output so a reader can go from a design row to the figure or table it produced. *Harness checks:* the standard intro, then `harness_table()` with a known answer and a computed reading on every row.
 
@@ -57,7 +57,7 @@ There is no separate "why the data suit this project" section. Do not write call
 
 - **Numbers.** Every number in the text, tables, and figures is computed from the saved result files when the document renders. No hand-typed results.
 - **Voice.** No first person. Concise: details, but balanced. The document must flow without pointing at its own earlier sections ("as above", "see Section 3").
-- **Concrete wording.** Replace shorthand with the claim it stands for. A student should never have to guess what a phrase means.
+- **Concrete wording.** Replace shorthand with the claim it stands for. A reader should never have to guess what a phrase means.
   - Say what is unknown in terms of what has and has not been done. Not "the mathematics is not proved", but "a formula for how often the test is wrong has been derived for Euclidean distance, and none has been derived for Bray-Curtis, so it is not known whether the result applies".
   - Name the quantity being judged in plain words, with its standard name in parentheses. Not "whether the false alarms survive", but "whether the inflated false positive rate persists (the type I error rate: the share of cases with no true difference that the test calls different, which should be 5%)".
   - Footnote every named method, distance, score, or package on first use, in one or two sentences: what it computes, and, when it matters for the problem, why the usual theory does or does not cover it (for example, that Bray-Curtis cannot be written as a straight-line distance, which is why the Euclidean theory does not apply directly).

@@ -76,9 +76,9 @@ Statistics and Computing publishes computational statistics: algorithms, Monte C
 
 ## Recent papers like ours
 
-1. Hooker G, Mentch L, Zhou S (2021). Unrestricted permutation forces extrapolation: variable importance requires at least one more model, or there is no free variable importance. *Statistics and Computing* 31(6). https://doi.org/10.1007/s11222-021-10057-z. A critique of a widely used permutation procedure that explains why it misleads under correlated features and proposes alternatives, the same shape as the group's critique papers.
+1. Hooker G, Mentch L, Zhou S (2021). Unrestricted permutation forces extrapolation: variable importance requires at least one more model, or there is no free variable importance. *Statistics and Computing* 31(6). https://doi.org/10.1007/s11222-021-10057-z. A critique of a widely used permutation procedure that explains why it misleads under correlated features and proposes alternatives, the same shape as our critique papers.
 2. McLatchie Y, Vehtari A (2024). Efficient estimation and correction of selection-induced bias with order statistics. *Statistics and Computing* 34(4). https://doi.org/10.1007/s11222-024-10442-4. Derives the bias that a routine practice (selecting models by cross-validation) introduces and gives a correction, checked by simulation.
-3. Fan Y, White SR (2026). Neural posterior estimation on exponential random graph models: evaluating bias and implementation challenges. *Statistics and Computing* 36(4). https://doi.org/10.1007/s11222-026-10896-8. An evaluation of bias in a popular estimation approach for network models, close to the group's simulation and diagnostic paper type.
+3. Fan Y, White SR (2026). Neural posterior estimation on exponential random graph models: evaluating bias and implementation challenges. *Statistics and Computing* 36(4). https://doi.org/10.1007/s11222-026-10896-8. An evaluation of bias in a popular estimation approach for network models, close to our simulation and diagnostic paper type.
 
 ## Not stated on the site, or could not be read
 

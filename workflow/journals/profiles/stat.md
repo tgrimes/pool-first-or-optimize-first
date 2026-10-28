@@ -90,7 +90,7 @@ The same passage says any use of AI must be described "in the Experimental secti
 
 ## Recent papers like ours
 
-1. Rindt D, Sejdinovic D, Steinsaltz D (2021). Consistency of permutation tests of independence using distance covariance, HSIC and dHSIC. *Stat* 10(1):e364. https://doi.org/10.1002/sta4.364. A short theoretical paper on what distance-based permutation tests can detect, close to the group's PERMANOVA work.
+1. Rindt D, Sejdinovic D, Steinsaltz D (2021). Consistency of permutation tests of independence using distance covariance, HSIC and dHSIC. *Stat* 10(1):e364. https://doi.org/10.1002/sta4.364. A short theoretical paper on what distance-based permutation tests can detect, close to our PERMANOVA work.
 2. Vondráček J, Dvořák J (2021). A cautionary note on the variance of empirical pair correlation function. *Stat* 10(1):e406. https://doi.org/10.1002/sta4.406. A short cautionary note about a commonly used estimator, the format a group short note would take, though the field is spatial statistics.
 3. Song H, Wu M (2024). Multivariate differential association analysis. *Stat* 13(2):e704. https://doi.org/10.1002/sta4.704. A method for testing changes in association between groups, related to differential co-expression.
 

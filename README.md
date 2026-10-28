@@ -14,7 +14,7 @@ A research project run with a fixed workflow: an idea is reviewed and verified i
 2. Run the setup script from the project root. It names the package, sets the authors, removes the template's examples, and fills the headers:
 
 ```bash
-Rscript tools/init.R <packagename> --title "Short title" [--student "Name"] [--no-python]
+Rscript tools/init.R <packagename> --title "Short title" --author "Name" [--coauthor "Name"] [--email ADDRESS] [--affiliation "..."] [--no-python]
 ```
 
 3. Restore the environments. renv installs itself on the first start of R in the project root:

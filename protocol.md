@@ -2,7 +2,7 @@
 
 [Project title]. Written [date], before any production simulation run. Changes after a production run are recorded at the bottom with the date and the reason.
 
-*How to use this file. Copy the "Study S1" block for each study. Delete the italic notes. Pilot runs to debug code are fine, but nothing counts as a production run until this file is written and has been reviewed at lab meeting. The framework is ADEMP (Morris, White, and Crowther 2019).*
+*How to use this file. Copy the "Study S1" block for each study. Delete the italic notes. Pilot runs to debug code are fine, but nothing counts as a production run until this file is written and has been reviewed. The framework is ADEMP (Morris, White, and Crowther 2019).*
 
 ## Study S1: [name]
 

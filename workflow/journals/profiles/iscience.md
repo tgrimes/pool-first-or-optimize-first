@@ -25,7 +25,7 @@ Every page below was read on the date shown. Bracketed numbers in the text point
 
 > "iScience is a peer-reviewed journal from Cell Press that provides a platform for original research in the life, physical, earth, sustainability, and health sciences. We aim to fuel interdisciplinary thinking and consider research with significant contribution to a relevant field combined with robust results and underlying methodology." [5]
 
-In plain terms, iScience is a broad open access Cell Press journal for original research across the sciences, read by a broad scientific audience. It says it will "consider replication studies and papers describing negative results, provided they offer clear value to the research community" [5], which opens the door to a critique. Two items on its out-of-scope list matter for the group [5]:
+In plain terms, iScience is a broad open access Cell Press journal for original research across the sciences, read by a broad scientific audience. It says it will "consider replication studies and papers describing negative results, provided they offer clear value to the research community" [5], which opens the door to a critique. Two items on its out-of-scope list matter for we [5]:
 
 > "Datamining studies using single datasets without experimental validation in original or external cohorts and strong originality, novelty and advance." [5]
 
@@ -89,8 +89,8 @@ The journal also runs Matters Arising, "a venue for research papers that directl
 
 ## Recent papers like ours
 
-1. van Hijfte L, Geurts M, Vallentgoed WR, Eilers PH, Sillevis Smitt PA, Debets R, French PJ (2023). Alternative normalization and analysis pipeline to address systematic bias in NanoString GeoMx Digital Spatial Profiling data. *iScience*. https://doi.org/10.1016/j.isci.2022.105760. Shows the vendor's standard pipeline biases results, offers a fix, and checks it on replicate and external data: the group's critique-plus-fix pattern.
-2. Yin L, Traversa P, Elati M, Moreno Y, Marek-Trzonkowska N, Battail C (2025). Sample-specific network analysis identifies gene co-expression patterns of immunotherapy response in clear cell renal cell carcinoma. *iScience*. https://doi.org/10.1016/j.isci.2025.113061. Applies sample-specific co-expression networks to a clinical outcome, the very procedure family the group critiques.
+1. van Hijfte L, Geurts M, Vallentgoed WR, Eilers PH, Sillevis Smitt PA, Debets R, French PJ (2023). Alternative normalization and analysis pipeline to address systematic bias in NanoString GeoMx Digital Spatial Profiling data. *iScience*. https://doi.org/10.1016/j.isci.2022.105760. Shows the vendor's standard pipeline biases results, offers a fix, and checks it on replicate and external data: our critique-plus-fix pattern.
+2. Yin L, Traversa P, Elati M, Moreno Y, Marek-Trzonkowska N, Battail C (2025). Sample-specific network analysis identifies gene co-expression patterns of immunotherapy response in clear cell renal cell carcinoma. *iScience*. https://doi.org/10.1016/j.isci.2025.113061. Applies sample-specific co-expression networks to a clinical outcome, the very procedure family we critiques.
 3. Nikhat A, Mandal T, Veerasubramanian N, Chakrabarti S (2026). Transcriptional noise sets fundamental limits to decoding circadian clock phase from single-cell RNA snapshots. *iScience*. https://doi.org/10.1016/j.isci.2026.115394. Uses simulation and data to show what a popular single-sample inference can and cannot recover.
 
 ## Not stated on the site, or could not be read

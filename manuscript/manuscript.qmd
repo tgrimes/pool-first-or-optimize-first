@@ -1,11 +1,11 @@
 ---
 title: "[FILL: title that names the procedure and the condition]"
 author:
-  - name: "Tyler Grimes"
+  - name: "[FILL: first author]"
     corresponding: true
-    email: "tyler.grimes@unf.edu"
+    email: "[FILL: email]"
     affiliations:
-      - name: "Department of Mathematics and Statistics, University of North Florida, Jacksonville, FL, USA"
+      - name: "[FILL: affiliation]"
   - name: "[FILL: second author]"
     affiliations:
       - name: "[FILL: affiliation]"

@@ -11,7 +11,7 @@
 
 ## Stage record
 
-One line per stage boundary, newest last: the date, the stage reached, the deliverable the person reads, and the stop that is open. The agent writes the line when it reaches a stop; the person's answer is the next message in the conversation, and the agent records the decision in the stage's log.
+One line per stage boundary, newest last: the date, the stage reached, the deliverable the user reads, and the stop that is open. The agent writes the line when it reaches a stop; the user's answer is the next message in the conversation, and the agent records the decision in the stage's log.
 
 | Date | Stage | Deliverable | Open stop |
 |---|---|---|---|

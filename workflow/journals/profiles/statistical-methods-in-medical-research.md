@@ -25,7 +25,7 @@ The live guidelines page [6] confirms Sage's PDF copy of it [1], dated 26 May 20
 
 > "The aim of the journal is to publish both review types detailing the way particular statistical methods are (and could be) employed within medical research, and, accounts of innovative methodological developments or applications." [1]
 
-In plain terms, SMMR publishes medical statistics methods papers written for a broad audience. The guidelines say papers "should include a motivating example" and that "material of a very technical nature should be relegated to an appendix" [1]. Sage describes it as "the leading vehicle for articles in all the main areas of medical statistics" [5]. Readers are medical statisticians. The group's critique fits well if the derivations go to an appendix and the lupus data serve as the motivating example; genomics is a smaller topic here than clinical trials and epidemiology.
+In plain terms, SMMR publishes medical statistics methods papers written for a broad audience. The guidelines say papers "should include a motivating example" and that "material of a very technical nature should be relegated to an appendix" [1]. Sage describes it as "the leading vehicle for articles in all the main areas of medical statistics" [5]. Readers are medical statisticians. Our critique fits well if the derivations go to an appendix and the lupus data serve as the motivating example; genomics is a smaller topic here than clinical trials and epidemiology.
 
 | Paper type | Fit | Why |
 |--------------------------------------------|----------|------------------------------------------------|
@@ -88,7 +88,7 @@ In plain terms, SMMR publishes medical statistics methods papers written for a b
 
 ## Recent papers like ours
 
-1. Štefelová N, Palarea-Albaladejo J, Martín-Fernández J (2026). A permutation test of differences between externally or internally defined groupings in compositional data sets. *Statistical Methods in Medical Research* 35(3):601 to 625. https://doi.org/10.1177/09622802251413737. A permutation test for group differences in compositional data, close to the group's PERMANOVA and cell-composition work.
+1. Štefelová N, Palarea-Albaladejo J, Martín-Fernández J (2026). A permutation test of differences between externally or internally defined groupings in compositional data sets. *Statistical Methods in Medical Research* 35(3):601 to 625. https://doi.org/10.1177/09622802251413737. A permutation test for group differences in compositional data, close to our PERMANOVA and cell-composition work.
 2. Qayed A, Han D (2021). High-dimensional covariance matrices tests for analyzing multi-tumor gene expression data. *Statistical Methods in Medical Research* 30(8):1904 to 1916. https://doi.org/10.1177/09622802211009257. Tests whether gene covariance structure differs between groups, the question behind differential co-expression, with real expression data.
 3. Johns H, Bernhardt J, Churilov L (2021). Distance-based Classification and Regression Trees for the analysis of complex predictors in health and medical research. *Statistical Methods in Medical Research* 30(9):2085 to 2104. https://doi.org/10.1177/09622802211032712. A distance-based method with simulation and a medical application, the same distance-based family as PERMANOVA.
 

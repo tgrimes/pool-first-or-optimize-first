@@ -34,8 +34,8 @@ If the references step was run before, point the log at the existing inventory a
 
 **Step 5. Render, check, prove.** Render in draft mode, run the checker, fix every error, answer every warning in the log. Finish the log. Clone to a scratch directory, run `renv::restore()` and `uv sync`, then the tests in both languages and `devtools::check()`, rerun the quick run, compare the summaries, render. If any of that fails, say so and do not hand over.
 
-**If the stops are switched off for this run,** decide at each one, record the decision and its reason in the log under `## Decisions made in place of a stop`, mark in the draft what a person should look at, and carry on.
+**If the stops are switched off for this run,** decide at each one, record the decision and its reason in the log under `## Decisions made in place of a stop`, mark in the draft what a user should look at, and carry on.
 
 ## What to return at the end
 
-One message with: the paper-test status; the path to the draft HTML, the qmd, and the log; the counts of markers by kind; the list of `[TO CONFIRM]` markers with their sections; the Zotero fixes still open; the gap table; the warnings kept and why; and what you were unsure of. No summary of the paper's findings: the person reads the draft.
+One message with: the paper-test status; the path to the draft HTML, the qmd, and the log; the counts of markers by kind; the list of `[TO CONFIRM]` markers with their sections; the Zotero fixes still open; the gap table; the warnings kept and why; and what you were unsure of. No summary of the paper's findings: the user reads the draft.

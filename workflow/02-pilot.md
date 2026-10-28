@@ -18,7 +18,7 @@ Write the project spec from the final proposal, then run the pre-registered pilo
 
 ## Procedure
 
-**1. The spec.** Fill `templates/project-spec.md` as `project-spec.md` from the proposal: the question and why it matters, the mechanism, the pilot (section 3 is this stage's plan), the ADEMP skeleton, the application, the target journal, the milestones, what is out of scope, and the reading with its questions. A decision the proposal left to the person carries a `[TO CONFIRM: ...]` marker. If writing the spec changes the pilot's pass criteria, **stop** and say why before running anything; otherwise go on.
+**1. The spec.** Fill `templates/project-spec.md` as `project-spec.md` from the proposal: the question and why it matters, the mechanism, the pilot (section 3 is this stage's plan), the ADEMP skeleton, the application, the target journal, the milestones, what is out of scope, and the reading with its questions. A decision the proposal left to the user carries a `[TO CONFIRM: ...]` marker. If writing the spec changes the pilot's pass criteria, **stop** and say why before running anything; otherwise go on.
 
 **2. Pre-register.** Before any run, write `pilot/preregistration.md`: the three pilot questions; the pass rule with numbers (what each answer must show, in which cells, beyond how many Monte Carlo standard errors); the design of the first simulation (factors, levels, methods, measures, replicates, seeds); the cells with a known answer; the time box (an hour of compute by default); and what will be reported whatever the outcome. Commit it, so that its timestamp precedes every result.
 
@@ -28,13 +28,13 @@ Write the project spec from the final proposal, then run the pre-registered pilo
 
 **5. Verdict.** Answer the three questions with numbers against the pre-registered rule. A close call is stated both ways, with the reading that passes and the reading that fails. The verdict is a table in `pilot/results/` written by a script (`pilot/verdict.R`), not a judgment typed into the report.
 
-**6. Decisions log.** `pilot/decisions.md`: D0, the literature pass (a pointer to the proposal's prior-work section and anything read since); D1, the status call with both readings; then every decision taken while building and running (what, the alternatives, why, what the person should check), each pointing at the file that holds its numbers; a final section on what was not done. Nothing in the log is a number that is not in a saved file.
+**6. Decisions log.** `pilot/decisions.md`: D0, the literature pass (a pointer to the proposal's prior-work section and anything read since); D1, the status call with both readings; then every decision taken while building and running (what, the alternatives, why, what the user should check), each pointing at the file that holds its numbers; a final section on what was not done. Nothing in the log is a number that is not in a saved file.
 
 **7. The report.** Copy `templates/pilot-report/pilot-report-template.qmd` to `pilot/pilot-report.qmd` and fill it as its README says; render; run its checker; look at the HTML. Every number comes from `pilot/results/`.
 
 **8. Status.** Write `piloted-pass`, `piloted-fail`, or `piloted-close-call` in `STATUS.md` with the date, and the stage record line.
 
-**Stop.** Return the report, the verdict, the decisions log, and the spec. The person decides: pass, and stage 3 starts; fail, and the person revises the proposal (a dated revision section at its end) for a re-pilot in `pilot-b/`, or drops the idea (`STATUS.md` says `dropped`, with the reason); or a re-scope, which is a revised proposal and a re-pilot.
+**Stop.** Return the report, the verdict, the decisions log, and the spec. The user decides: pass, and stage 3 starts; fail, and the user revises the proposal (a dated revision section at its end) for a re-pilot in `pilot-b/`, or drops the idea (`STATUS.md` says `dropped`, with the reason); or a re-scope, which is a revised proposal and a re-pilot.
 
 ## Outputs
 

@@ -34,4 +34,4 @@ except the first. Delete this comment. -->
 
 ## Notes
 
-[Anything else: constraints, the student it is for, the journal you have in mind, what you are unsure of.]
+[Anything else: constraints, who it is for, the journal you have in mind, what you are unsure of.]

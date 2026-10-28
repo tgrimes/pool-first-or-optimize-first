@@ -87,7 +87,7 @@ The publisher-wide policy grades AI use by risk: language editing is permitted w
 
 ## Recent papers like ours
 
-1. Schemet L, Friedrich-Welz S (2026). Statistical inference after variable selection in Cox models: a neutral simulation study. *BMC Medical Research Methodology* 26:143. https://doi.org/10.1186/s12874-026-02887-0. It separates the different targets that post-selection methods actually estimate before judging coverage and error rates, the same "what does it really estimate" move as the group's critiques.
+1. Schemet L, Friedrich-Welz S (2026). Statistical inference after variable selection in Cox models: a neutral simulation study. *BMC Medical Research Methodology* 26:143. https://doi.org/10.1186/s12874-026-02887-0. It separates the different targets that post-selection methods actually estimate before judging coverage and error rates, the same "what does it really estimate" move as our critiques.
 2. Gao Y, Liu Y, Matsouaka R (2024). When does adjusting covariate under randomization help? A comparative study on current practices. *BMC Medical Research Methodology* 24:250. https://doi.org/10.1186/s12874-024-02375-3. A Monte Carlo evaluation of common adjustment practices with practical guidance, the simulation-and-diagnostic type of paper.
 3. Gregorich M, Melograna F, Sunqvist M, Michiels S, Van Steen K, Heinze G (2022). Individual-specific networks for prediction modelling: a scoping review of methods. *BMC Medical Research Methodology* 22:62. https://doi.org/10.1186/s12874-022-01544-6. It reviews individual-specific network methods, the family that includes LIONESS and SSN, showing the topic has reached this journal's readers.
 

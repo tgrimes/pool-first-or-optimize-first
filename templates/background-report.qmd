@@ -28,7 +28,7 @@ devtools::load_all(project_root(), quiet = TRUE)
 # Summary {.unnumbered}
 
 <!-- Scope: what this report is (the companion to manuscript.qmd at the commit named here), who it is
-for (a statistics student unfamiliar with the topic), and how to read it (Part A by Introduction
+for (a reader with graduate training in statistics and no familiarity with the topic), and how to read it (Part A by Introduction
 paragraph, Part B by result, Part C the issues). Footnotes may define terms. -->
 
 [FILL]
@@ -98,4 +98,4 @@ editorial), proposed fix, where this report shows it. "None" is an acceptable ta
 
 # Glossary {.unnumbered}
 
-[FILL: terms a student may not know, one line each; or footnotes in the text instead.]
+[FILL: terms a reader may not know, one line each; or footnotes in the text instead.]

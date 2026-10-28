@@ -12,7 +12,7 @@ address for books, series, edition, institution, type, year, volume, number, pag
 abstracts, file paths, access dates, keywords, URLs, and an article's publisher, and replaces Zotero's
 key with the row's key. Nothing else is changed in transit.
 
-Faults in a record are the person's to fix in Zotero, not the script's to patch. They are written to
+Faults in a record are the user's to fix in Zotero, not the script's to patch. They are written to
 the fixes file with the item, the field, and the value to enter: a missing DOI (the checklist's
 identifier is offered), a journal name in lower case, an author list of exactly ten (the Google
 Scholar import cap), a pages field that holds a date or repeats one page as a range, an author

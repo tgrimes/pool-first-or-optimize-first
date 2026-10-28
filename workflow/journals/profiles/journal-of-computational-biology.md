@@ -25,7 +25,7 @@ The live guidelines page [7] matches Sage's PDF copy of it [1], dated 21 May 202
 
 > "The leading peer-reviewed journal in computational biology and bioinformatics, publishing in-depth statistical, mathematical, and computational analysis of methods, as well as their practical impact." [2]
 
-In plain terms, JCB is the RECOMB-affiliated methods journal for computational biology. Sage says it publishes "articles whose primary contributions are the development and application of new methods in computational biology, including algorithmic, statistical, mathematical, machine learning, and artificial intelligence contributions" [2]. Readers are computational biologists and bioinformaticians, many from computer science. The phrase "in-depth statistical, mathematical, and computational analysis of methods" fits the group's critique papers well, provided the fix is presented as a new method. Two practical points: mandatory page charges of $90 per page on acceptance, and a 3,000-word target for research articles [1], [7].
+In plain terms, JCB is the RECOMB-affiliated methods journal for computational biology. Sage says it publishes "articles whose primary contributions are the development and application of new methods in computational biology, including algorithmic, statistical, mathematical, machine learning, and artificial intelligence contributions" [2]. Readers are computational biologists and bioinformaticians, many from computer science. The phrase "in-depth statistical, mathematical, and computational analysis of methods" fits our critique papers well, provided the fix is presented as a new method. Two practical points: mandatory page charges of $90 per page on acceptance, and a 3,000-word target for research articles [1], [7].
 
 | Paper type | Fit | Why |
 |--------------------------------------------|----------|------------------------------------------------|
@@ -86,9 +86,9 @@ In plain terms, JCB is the RECOMB-affiliated methods journal for computational b
 
 ## Recent papers like ours
 
-1. Lee C, Song D, Chen S, Li J (2026). ClusterDE: A Statistical Software Package for Removing Double-Dipping Bias in Post-Clustering Differential Expression Analysis. *Journal of Computational Biology* 33(1):36 to 42. https://doi.org/10.1177/15578666251383562. Addresses a bias in a widely used single-cell workflow and ships the fix as software, the same shape as the group's critique plus R package.
-2. Zheng H, Ma C, Kingsford C (2022). Deriving Ranges of Optimal Estimated Transcript Expression due to Nonidentifiability. *Journal of Computational Biology* 29(2):121 to 139. https://doi.org/10.1089/cmb.2021.0444. Analyzes what a standard RNA-seq quantification actually identifies, close to the group's "what does it really estimate" question.
-3. Mcloughlin A, Huang H (2022). Shared Differential Expression-Based Distance Reflects Global Cell Type Relationships in Single-Cell RNA Sequencing Data. *Journal of Computational Biology* 29(8):867 to 879. https://doi.org/10.1089/cmb.2021.0652. A distance-based analysis of cell types in expression data, related to the group's distance-based and cell-composition work.
+1. Lee C, Song D, Chen S, Li J (2026). ClusterDE: A Statistical Software Package for Removing Double-Dipping Bias in Post-Clustering Differential Expression Analysis. *Journal of Computational Biology* 33(1):36 to 42. https://doi.org/10.1177/15578666251383562. Addresses a bias in a widely used single-cell workflow and ships the fix as software, the same shape as our critique plus R package.
+2. Zheng H, Ma C, Kingsford C (2022). Deriving Ranges of Optimal Estimated Transcript Expression due to Nonidentifiability. *Journal of Computational Biology* 29(2):121 to 139. https://doi.org/10.1089/cmb.2021.0444. Analyzes what a standard RNA-seq quantification actually identifies, close to our "what does it really estimate" question.
+3. Mcloughlin A, Huang H (2022). Shared Differential Expression-Based Distance Reflects Global Cell Type Relationships in Single-Cell RNA Sequencing Data. *Journal of Computational Biology* 29(8):867 to 879. https://doi.org/10.1089/cmb.2021.0652. A distance-based analysis of cell types in expression data, related to our distance-based and cell-composition work.
 
 ## Not stated on the site, or could not be read
 

@@ -27,7 +27,7 @@ Every page below was read on the date shown. Bracketed numbers in the text point
 
 > "The primary criterion for publication in Cell Reports Methods is a robust, reproducible method that will spur scientific progress." [4]
 
-In plain terms, Cell Reports Methods prints methods papers and method evaluations across the life sciences, including computational genomics, and welcomes "software and AI-driven approaches, community resources" [5]. Besides Articles and short Reports, it has a Resources type for "empirical studies that inform the use and interpretations of existing methods," which "do not present a new method per se" but let authors "re-evaluate current approaches in a data-driven way" [6]. That is a close description of the group's critique and diagnostic papers. Its published papers include benchmarks that expose a hidden bias in a standard pipeline and propose a correction (papers 1 and 2 below). Readers are experimental and computational life scientists who adopt methods.
+In plain terms, Cell Reports Methods prints methods papers and method evaluations across the life sciences, including computational genomics, and welcomes "software and AI-driven approaches, community resources" [5]. Besides Articles and short Reports, it has a Resources type for "empirical studies that inform the use and interpretations of existing methods," which "do not present a new method per se" but let authors "re-evaluate current approaches in a data-driven way" [6]. That is a close description of our critique and diagnostic papers. Its published papers include benchmarks that expose a hidden bias in a standard pipeline and propose a correction (papers 1 and 2 below). Readers are experimental and computational life scientists who adopt methods.
 
 | Paper type | Fit | Why |
 |--------------------------------------------|----------|------------------------------------------------|
@@ -91,7 +91,7 @@ An Article presents the method, compares it with related methods, and validates 
 
 ## Recent papers like ours
 
-1. Van den Berge K, Chou HJ, Roux de Bézieux H, Street K, Risso D, Ngai J, Dudoit S (2022). Normalization benchmark of ATAC-seq datasets shows the importance of accounting for GC-content effects. *Cell Reports Methods*. https://doi.org/10.1016/j.crmeth.2022.100321. Shows a sample-specific bias that standard normalization misses, proposes a fix, and benchmarks it on public datasets: the group's critique-plus-fix pattern.
+1. Van den Berge K, Chou HJ, Roux de Bézieux H, Street K, Risso D, Ngai J, Dudoit S (2022). Normalization benchmark of ATAC-seq datasets shows the importance of accounting for GC-content effects. *Cell Reports Methods*. https://doi.org/10.1016/j.crmeth.2022.100321. Shows a sample-specific bias that standard normalization misses, proposes a fix, and benchmarks it on public datasets: our critique-plus-fix pattern.
 2. Liu X, Yang M, Hu D, An Y, Wang W, Lin H, Pan Y, Ju J, Sun K (2024). Systematic biases in reference-based plasma cell-free DNA fragmentomic profiling. *Cell Reports Methods*. https://doi.org/10.1016/j.crmeth.2024.100793. Documents systematic bias in a widely used profiling approach.
 3. Tekkey N, Garza JE, Zhang W, Albracht D, Tomlinson C, Belter EA, Xing X, Macias-Velasco JF, Wang T (2026). Quantifying reference alignment bias in functional genomics analyses. *Cell Reports Methods*. https://doi.org/10.1016/j.crmeth.2026.101461. Quantifies how a routine step (alignment to hg38) biases RNA-seq, ATAC-seq, and WGBS readouts, an evaluation of a default practice.
 

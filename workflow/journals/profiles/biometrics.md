@@ -24,7 +24,7 @@ Every page below was read on the date shown. Bracketed numbers in the text point
 
 > "Its objectives are to promote and extend the use of statistical and mathematical methods in the principal disciplines of biosciences" [3]
 
-Biometrics is the International Biometric Society's general methods journal for statistics in biology and medicine, read mostly by methodologists. It has two main sections. Biometric Methodology is for new methods; Biometric Practice is for papers that, among other things, "re-examine from a new perspective statistical practices that are widely used in biometric applications" [1], which describes the group's critique papers almost word for word. The Practice section also warns that "routine simulation-based comparisons of competing methods are generally not suitable" [1], so a simulation paper needs a real insight or a new diagnostic. A short reply to an earlier Biometrics paper can go in Reader Reaction.
+Biometrics is the International Biometric Society's general methods journal for statistics in biology and medicine, read mostly by methodologists. It has two main sections. Biometric Methodology is for new methods; Biometric Practice is for papers that, among other things, "re-examine from a new perspective statistical practices that are widely used in biometric applications" [1], which describes our critique papers almost word for word. The Practice section also warns that "routine simulation-based comparisons of competing methods are generally not suitable" [1], so a simulation paper needs a real insight or a new diagnostic. A short reply to an earlier Biometrics paper can go in Reader Reaction.
 
 | Paper type | Fit | Why |
 |--------------------------------------------|----------|------------------------------------------------|
@@ -82,9 +82,9 @@ Biometrics is the International Biometric Society's general methods journal for 
 
 ## Recent papers like ours
 
-1. Tian J, Lei J, Roeder K (2024). From local to global gene co-expression estimation using single-cell RNA-seq data. *Biometrics* 80(1). https://doi.org/10.1093/biomtc/ujae001. Studies cell-specific gene networks (the single-cell analogue of sample-specific networks), shows what their population average actually measures, and builds a test from it, which is close to the group's LIONESS and SSN work.
+1. Tian J, Lei J, Roeder K (2024). From local to global gene co-expression estimation using single-cell RNA-seq data. *Biometrics* 80(1). https://doi.org/10.1093/biomtc/ujae001. Studies cell-specific gene networks (the single-cell analogue of sample-specific networks), shows what their population average actually measures, and builds a test from it, which is close to our LIONESS and SSN work.
 2. Gabriel EE, Sachs MC, Waernbaum I, Goetghebeur E, Blanche PF, Vansteelandt S, Sjölander A, Scheike T (2024). Propensity weighting plus adjustment in proportional hazards model is not doubly robust. *Biometrics* 80(3). https://doi.org/10.1093/biomtc/ujae069. A pure critique: states what applied users believe a common combination estimates, shows by simulation that it does not, and proposes an alternative.
-3. Heiling HM, Wilson DR, Rashid NU, Sun W, Ibrahim JG (2023). Estimating Cell Type Composition Using Isoform Expression One Gene at a Time. *Biometrics* 79(2):854 to 865. https://doi.org/10.1111/biom.13614. A cell-composition estimation paper with simulation and real RNA-seq data, the adjustment step the group's composition papers examine.
+3. Heiling HM, Wilson DR, Rashid NU, Sun W, Ibrahim JG (2023). Estimating Cell Type Composition Using Isoform Expression One Gene at a Time. *Biometrics* 79(2):854 to 865. https://doi.org/10.1111/biom.13614. A cell-composition estimation paper with simulation and real RNA-seq data, the adjustment step our composition papers examine.
 
 ## Not stated on the site, or could not be read
 

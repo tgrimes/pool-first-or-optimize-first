@@ -88,9 +88,9 @@ The instructions add that AI tools must be cited in the references with version,
 
 ## Recent papers like ours
 
-1. Spisak T (2022). Statistical quantification of confounding bias in machine learning models. *GigaScience* 11, giac082. https://doi.org/10.1093/gigascience/giac082. Proposes a test for confounding bias with type I error control, checked by simulation and applied to real data, a statistical diagnostic paper of the group's kind [9].
-2. Yang X, Liu W, Mao Z, Du Y, Lassiter C, Alakwaa FM, Benny PA, Garmire LX (2026). Cord blood DNA methylation and cell-type composition are not significantly associated with severe preeclampsia after cell-type and clinical covariate adjustment. *GigaScience* 15, giag002. https://doi.org/10.1093/gigascience/giag002. Shows earlier associations vanish after cell-composition adjustment, close to the group's composition-adjustment work [9].
-3. Garach Vélez I, Ortuño Guzmán FM, Rojas Ruiz I, Herrera Maldonado LJ (2025). Exploring the role of normalization and feature selection in microbiome disease classification pipelines. *GigaScience* 14, giaf096. https://doi.org/10.1093/gigascience/giaf096. A systematic evaluation of widely used preprocessing choices across many datasets, like the group's simulation and diagnostic papers [9].
+1. Spisak T (2022). Statistical quantification of confounding bias in machine learning models. *GigaScience* 11, giac082. https://doi.org/10.1093/gigascience/giac082. Proposes a test for confounding bias with type I error control, checked by simulation and applied to real data, a statistical diagnostic paper of our kind [9].
+2. Yang X, Liu W, Mao Z, Du Y, Lassiter C, Alakwaa FM, Benny PA, Garmire LX (2026). Cord blood DNA methylation and cell-type composition are not significantly associated with severe preeclampsia after cell-type and clinical covariate adjustment. *GigaScience* 15, giag002. https://doi.org/10.1093/gigascience/giag002. Shows earlier associations vanish after cell-composition adjustment, close to our composition-adjustment work [9].
+3. Garach Vélez I, Ortuño Guzmán FM, Rojas Ruiz I, Herrera Maldonado LJ (2025). Exploring the role of normalization and feature selection in microbiome disease classification pipelines. *GigaScience* 14, giaf096. https://doi.org/10.1093/gigascience/giaf096. A systematic evaluation of widely used preprocessing choices across many datasets, like our simulation and diagnostic papers [9].
 
 ## Not stated on the site, or could not be read
 

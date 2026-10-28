@@ -9,9 +9,9 @@ This is one research project, from an idea to a manuscript and its presentation,
 1. Read `STATUS.md`: it names the stage the project is in, the open stop, and the workflow version.
 2. Read the stage file it names in `workflow/` (for example `workflow/01-idea-review.md`) and `workflow/rules.md`.
 3. Read the stage's log in `log/` if one exists.
-4. Do what the stage file says for the person's message. A stage ends at a stop with one deliverable the person reads; update `STATUS.md` when you reach it, and wait.
+4. Do what the stage file says for the user's message. A stage ends at a stop with one deliverable the user reads; update `STATUS.md` when you reach it, and wait.
 
-The person's message starts each stage ("look at idea.md", "the proposal is final", "the pilot passed", "here are my comments on the draft"). No stage starts itself.
+The user's message starts each stage ("look at idea.md", "the proposal is final", "the pilot passed", "here are my comments on the draft"). No stage starts itself.
 
 ## Project structure and the two rules
 
@@ -96,10 +96,10 @@ The compendium may carry Python beside R, under the same two rules.
 
 ## AI conduct in this repository
 
-- Do not fabricate citations. When you cite a paper, say where it can be checked, and say when you are unsure it exists. The person verifies every citation against the paper itself before it enters a deliverable.
+- Do not fabricate citations. When you cite a paper, say where it can be checked, and say when you are unsure it exists. The user verifies every citation against the paper itself before it enters a deliverable.
 - When asked for a derivation, also propose the numerical check (a simulation, or a special case with a known answer) that would catch an error in it.
 - Flag scope creep. Compare any new idea with `proposal.md`, `project-spec.md`, and `protocol.md`, and say plainly when a request falls outside them.
-- When the person asks why something is wrong, explain first and fix second.
+- When the user asks why something is wrong, explain first and fix second.
 
 ## Directories
 

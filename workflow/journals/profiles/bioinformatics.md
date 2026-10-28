@@ -21,7 +21,7 @@ Every page below was read on the date shown. Bracketed numbers in the text point
 
 > "provides a forum for the exchange of information in the fields of computational molecular biology and genome bioinformatics ... with emphasis on new algorithms and databases that advance the progress of bioinformatics and biomedical research in a significant manner." [1]
 
-Bioinformatics is the ISCB's flagship methods journal. It publishes new algorithms, software, and databases for computational biologists, and expects each Original Paper to work on real biological data: the guidelines say "Only in extremely well-justified cases can simulated data alone be used instead of real data" [1]. A critique paper fits when it ends in a fix shipped as software and is shown on real data, which is how the group writes its main papers. A pure simulation study, a theory paper, or an applied analysis fits poorly.
+Bioinformatics is the ISCB's flagship methods journal. It publishes new algorithms, software, and databases for computational biologists, and expects each Original Paper to work on real biological data: the guidelines say "Only in extremely well-justified cases can simulated data alone be used instead of real data" [1]. A critique paper fits when it ends in a fix shipped as software and is shown on real data, which is how we writes its main papers. A pure simulation study, a theory paper, or an applied analysis fits poorly.
 
 | Paper type | Fit | Why |
 |--------------------------------------------|----------|------------------------------------------------|
@@ -84,8 +84,8 @@ The journal follows the ISCB acceptable-use policy for large language models, li
 ## Recent papers like ours
 
 1. Hsieh P-H, Lopes-Ramos CM, Zucknick M, Sandve GK, Glass K, Kuijjer ML (2023). Adjustment of spurious correlations in co-expression measurements from RNA-Sequencing data. *Bioinformatics* 39, btad610. https://doi.org/10.1093/bioinformatics/btad610. It shows a widely used preprocessing step (quantile-based normalization) creates false co-expression and proposes a correction, the same critique-then-fix pattern as the LIONESS work [6].
-2. Hu Y-J, Satten GA (2022). A rarefaction-without-resampling extension of PERMANOVA for testing presence-absence associations in the microbiome. *Bioinformatics* 38, 3689 to 3697. https://doi.org/10.1093/bioinformatics/btac399. It addresses confounding by library size in PERMANOVA and gives a fixed version of the test, close to the group's permutation-test papers [6].
-3. Dietrich A, Sturm G, Merotto L, Marini F, Finotello F, List M (2022). SimBu: bias-aware simulation of bulk RNA-seq data with variable cell-type composition. *Bioinformatics* 38, ii141 to ii147. https://doi.org/10.1093/bioinformatics/btac499. A simulation framework for evaluating methods under varying cell composition, relevant to the group's composition-adjustment papers [6].
+2. Hu Y-J, Satten GA (2022). A rarefaction-without-resampling extension of PERMANOVA for testing presence-absence associations in the microbiome. *Bioinformatics* 38, 3689 to 3697. https://doi.org/10.1093/bioinformatics/btac399. It addresses confounding by library size in PERMANOVA and gives a fixed version of the test, close to our permutation-test papers [6].
+3. Dietrich A, Sturm G, Merotto L, Marini F, Finotello F, List M (2022). SimBu: bias-aware simulation of bulk RNA-seq data with variable cell-type composition. *Bioinformatics* 38, ii141 to ii147. https://doi.org/10.1093/bioinformatics/btac499. A simulation framework for evaluating methods under varying cell composition, relevant to our composition-adjustment papers [6].
 
 ## Not stated on the site, or could not be read
 

@@ -22,7 +22,7 @@ Every page below was read on the date shown. Bracketed numbers in the text point
 
 > "aims to provide an indispensable resource for the experimental practitioner seeking awareness of the disparate sources of data and analytical tools of contemporary biology" [1]
 
-Briefings in Bioinformatics describes itself as a review journal: its manuscript-preparation page says it "is a review journal and does not publish articles that are pure original research" and does not publish "work on new methods that have not yet been described elsewhere" [2]. Its About page is broader, listing "reviews, new methods, case studies, and opinion articles" [3]. In practice the route for the group is a Problem Solving Protocol or a benchmarking review that evaluates existing, widely used tools, and the readership is applied bioinformaticians. A critique of existing methods can be framed this way; a new estimator, a theory paper, or an applied lupus analysis cannot.
+Briefings in Bioinformatics describes itself as a review journal: its manuscript-preparation page says it "is a review journal and does not publish articles that are pure original research" and does not publish "work on new methods that have not yet been described elsewhere" [2]. Its About page is broader, listing "reviews, new methods, case studies, and opinion articles" [3]. In practice the route for we is a Problem Solving Protocol or a benchmarking review that evaluates existing, widely used tools, and the readership is applied bioinformaticians. A critique of existing methods can be framed this way; a new estimator, a theory paper, or an applied lupus analysis cannot.
 
 | Paper type | Fit | Why |
 |--------------------------------------------|----------|------------------------------------------------|
@@ -86,8 +86,8 @@ The journal follows the ISCB acceptable-use policy for large language models. LL
 
 ## Recent papers like ours
 
-1. Chen H-H, Hsueh C-W, Lee C-H, Hao T-Y, Tu T-Y, Chang L-Y, Lee J-C, Lin C-Y (2023). SWEET: a single-sample network inference method for deciphering individual features in disease. *Briefings in Bioinformatics* 24, bbad032. https://doi.org/10.1093/bib/bbad032. Introduces one of the single-sample network methods the group's LIONESS follow-up critiques, so the journal is the natural audience for that critique [7].
-2. Meng G, Tang W, Huang E, Li Z, Feng H (2023). A comprehensive assessment of cell type-specific differential expression methods in bulk data. *Briefings in Bioinformatics* 24, bbac516. https://doi.org/10.1093/bib/bbac516. A simulation and real-data benchmark of composition-aware methods, like the group's composition-adjustment work [7].
+1. Chen H-H, Hsueh C-W, Lee C-H, Hao T-Y, Tu T-Y, Chang L-Y, Lee J-C, Lin C-Y (2023). SWEET: a single-sample network inference method for deciphering individual features in disease. *Briefings in Bioinformatics* 24, bbad032. https://doi.org/10.1093/bib/bbad032. Introduces one of the single-sample network methods our LIONESS follow-up critiques, so the journal is the natural audience for that critique [7].
+2. Meng G, Tang W, Huang E, Li Z, Feng H (2023). A comprehensive assessment of cell type-specific differential expression methods in bulk data. *Briefings in Bioinformatics* 24, bbac516. https://doi.org/10.1093/bib/bbac516. A simulation and real-data benchmark of composition-aware methods, like our composition-adjustment work [7].
 3. Burns JJR, Shealy BT, Greer MS, Hadish JA, McGowan MT, Biggs T, Smith MC, Feltus FA, Ficklin SP (2022). Addressing noise in co-expression network construction. *Briefings in Bioinformatics* 23, bbab495. https://doi.org/10.1093/bib/bbab495. Shows that many co-expression edges are artifacts of mixed experimental conditions and proposes a remedy, a co-expression critique with a fix [7].
 
 ## Not stated on the site, or could not be read

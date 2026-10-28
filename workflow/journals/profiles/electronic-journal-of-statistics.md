@@ -22,7 +22,7 @@ Every page below was read on the date shown. Bracketed numbers in the text point
 
 > "The Electronic Journal of Statistics (EJS) publishes research articles and short notes on theoretical, computational and applied statistics. The journal is open access." [1], [4]
 
-EJS is an open-access general statistics journal from the IMS and the Bernoulli Society, and its articles "are held to the same standard as articles in other IMS journals" [1]. It charges no publication fee [4]. Most of what it prints is mathematical statistics: estimators, tests, and their properties. Readers are methodologists and theorists. It suits the group's theory paper best (for example, a paper that characterizes what an edge-level or distance-based statistic converges to), and a short note is an explicit article type. Genomics applications are rare in recent volumes.
+EJS is an open-access general statistics journal from the IMS and the Bernoulli Society, and its articles "are held to the same standard as articles in other IMS journals" [1]. It charges no publication fee [4]. Most of what it prints is mathematical statistics: estimators, tests, and their properties. Readers are methodologists and theorists. It suits our theory paper best (for example, a paper that characterizes what an edge-level or distance-based statistic converges to), and a short note is an explicit article type. Genomics applications are rare in recent volumes.
 
 | Paper type | Fit | Why |
 |--------------------------------------------|----------|------------------------------------------------|
@@ -78,9 +78,9 @@ EJS is an open-access general statistics journal from the IMS and the Bernoulli 
 
 ## Recent papers like ours
 
-1. Rossell D, Zwiernik P (2021). Dependence in elliptical partial correlation graphs. *Electronic Journal of Statistics* 15(2):4236 to 4263. https://doi.org/10.1214/21-ejs1891. Asks what a widely used network statistic (a zero partial correlation) actually means outside the Gaussian case and answers in closed form, the theory version of the group's critiques.
+1. Rossell D, Zwiernik P (2021). Dependence in elliptical partial correlation graphs. *Electronic Journal of Statistics* 15(2):4236 to 4263. https://doi.org/10.1214/21-ejs1891. Asks what a widely used network statistic (a zero partial correlation) actually means outside the Gaussian case and answers in closed form, the theory version of our critiques.
 2. Molstad AJ, Ekvall KO, Suder PM (2024). Direct covariance matrix estimation with compositional data. *Electronic Journal of Statistics* 18(1):1702 to 1748. https://doi.org/10.1214/24-ejs2222. Shows why standard covariance estimators fail on compositional microbiome data and builds an estimator that compares dependence across populations.
-3. De Santis R, Goeman JJ, Davenport S, Hemerik J, Finos L (2025). Permutation-based multiple testing when fitting many generalized linear models. *Electronic Journal of Statistics* 19(2):3317 to 3332. https://doi.org/10.1214/25-ejs2409. A permutation-based testing method for the many-models setting of high-dimensional omics, robust to misspecified variances, close to the group's permutation-test work.
+3. De Santis R, Goeman JJ, Davenport S, Hemerik J, Finos L (2025). Permutation-based multiple testing when fitting many generalized linear models. *Electronic Journal of Statistics* 19(2):3317 to 3332. https://doi.org/10.1214/25-ejs2409. A permutation-based testing method for the many-models setting of high-dimensional omics, robust to misspecified variances, close to our permutation-test work.
 
 ## Not stated on the site, or could not be read
 

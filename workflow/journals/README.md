@@ -4,7 +4,7 @@ This folder helps choose where a paper goes, and then tells the manuscript templ
 
 Once the target is chosen, the manuscript draft takes four things from the journal's profile: the abstract headings and word limit, the length limit, the reference style (through the CSL file in `csl/`), and the AI-use policy, which the manuscript's AI-use statement is written to.
 
-Every journal is profiled on the same footing. There is no split into student venues and supervisor venues.
+Every journal is profiled on the same footing.
 
 ## What is in this folder
 
@@ -23,7 +23,7 @@ Every journal is profiled on the same footing. There is no split into student ve
 How to read it:
 
 - **Audience** is who reads the journal: *genomics users* (people who run the procedures on their data), *methodologists* (statisticians who build and evaluate methods), *both*, or *general science* (broad journals that publish any sound paper).
-- **The five fit columns** are the group's paper types: *critique* (a closed-form bias, a simulation study, a fix, and a real-data application), *simulation and diagnostic* (the same shape without a closed form), *short note*, *theory*, and *applied* analysis. Each is rated good, possible, or poor. The ratings are judgments made from the journal's stated aims and from the papers it publishes, not facts from the site; each profile gives the reason in one sentence.
+- **The five fit columns** are the paper types: *critique* (a closed-form bias, a simulation study, a fix, and a real-data application), *simulation and diagnostic* (the same shape without a closed form), *short note*, *theory*, and *applied* analysis. Each is rated good, possible, or poor. The ratings are judgments made from the journal's stated aims and from the papers it publishes, not facts from the site; each profile gives the reason in one sentence.
 - **Charge to publish** is the article processing charge as the site stated it on 2026-10-27. "None required" means a hybrid or subscription journal that charges only if the authors choose open access; the open-access fee follows in brackets.
 - **AI policy** is a three-word summary. "No drafting" means the journal or its publisher forbids using AI to draft the paper's text, which matters for this workflow (step 7 of the procedure).
 - **Guidelines read** says whether the journal's own author guidelines could be read: *yes*, *partly*, or *blocked*. For a blocked journal, most limits and rules are marked "could not be read" in its profile, and the fit ratings rest more on its published papers.
@@ -85,7 +85,7 @@ Then decide who has to read that sentence for the paper to matter.
 - **The procedure's users** are analysts and bioinformaticians who run the procedure on their own data. They read genomics and bioinformatics journals, and few of them read statistics journals. If the paper's value is that people stop misreading their results, they are the audience: look first at the *genomics users* and *both* rows.
 - **Methodologists** are statisticians who build or evaluate methods. They care about the estimand, the derivation, and the general lesson more than about one procedure. If the paper's value is a way of thinking about a class of procedures (for example, that every per-sample score built from a pseudo-value estimates a first-order linearization), they are the audience: look first at the *methodologists* and *both* rows.
 
-Most of the group's critique papers are for users, because the fix is something a user has to do. A paper whose closed form covers several procedures at once is for methodologists. The *general science* journals reach neither group in particular; they are fallbacks, not targets, unless cost or certainty decides.
+Most critique papers are for users, because the fix is something a user has to do. A paper whose closed form covers several procedures at once is for methodologists. The *general science* journals reach neither group in particular; they are fallbacks, not targets, unless cost or certainty decides.
 
 ### Step 2. Match the paper type
 
@@ -95,7 +95,7 @@ Find the paper's type in the fit columns and keep the journals rated good, addin
 
 Count the words the paper needs and the displayed equations it cannot do without.
 
-- A journal with a tight limit, such as Bioinformatics (seven pages for an Original Paper) or Scientific Reports (about 4,500 words recommended), fits only if the proofs can move to the supplement and the Methods can state the closed form in a few lines. The group's papers already put proofs in the supplement, so this is often possible.
+- A journal with a tight limit, such as Bioinformatics (seven pages for an Original Paper) or Scientific Reports (about 4,500 words recommended), fits only if the proofs can move to the supplement and the Methods can state the closed form in a few lines. Our papers already put proofs in the supplement, so this is often possible.
 - A genomics journal accepts a closed form, but its readers need each term explained in words before the formula, and the formula has to earn its place by predicting something the reader then sees in the simulation.
 - A statistics journal expects the derivation in the paper, with its assumptions stated, and asks for more generality than a genomics journal. One closed form for one procedure under one model can look thin there.
 - Many profiles say "not stated" for length. Those journals set no number on their site, which is not the same as no limit; look at the recent papers listed in the profile to see what length gets published.
@@ -127,9 +127,9 @@ A selective journal brings more readers and more credit, at a higher chance of r
 
 A short time to first decision usually means many desk rejections, not fast review. For the other journals, selectivity rests on their stated criteria and on the papers they publish; each profile gives any time-to-decision figure its site publishes.
 
-For a student paper with a fixed schedule, choose a target the paper has a real chance at and a fallback that will take a sound version of the same paper with little rework. The cheapest fallback has the same audience, a similar length, and the same abstract structure. The reference style costs nothing to change, because the CSL file changes it.
+For a paper with a fixed schedule, choose a target the paper has a real chance at and a fallback that will take a sound version of the same paper with little rework. The cheapest fallback has the same audience, a similar length, and the same abstract structure. The reference style costs nothing to change, because the CSL file changes it.
 
-For a paper of Tyler's that sets out a general result, the order can reverse: aim at the most selective journal that fits, because a rejection costs time, not a student's graduation.
+For a paper that sets out a general result and has no fixed schedule, the order can reverse: aim at the most selective journal that fits, because a rejection costs only time.
 
 ### Step 6. Look at where the procedure's own papers were published
 
@@ -175,7 +175,7 @@ Fill this in for a given paper, one line each, before the spec's section 6 is wr
 | 3. Paper type: critique, simulation and diagnostic, short note, theory, or applied | |
 | 4. Words needed, and displayed equations that must stay in the main text | |
 | 5. Money for an open-access charge (amount, or none) | |
-| 6. Schedule: is a first-round acceptance needed (student) or can the paper wait (supervisor) | |
+| 6. Schedule: is a first-round acceptance needed, or can the paper wait | |
 | 7. Journal that published the procedure, and journals of its main applications | |
 | 8. Candidates left after steps 1 to 6 (two to four) | |
 | 9. For each candidate: AI policy compatible with how the paper is being written (yes or no) | |
@@ -202,7 +202,7 @@ All profiles were written on 2026-10-27 from the journals' own pages, their publ
 The work went in two passes, both on 2026-10-27:
 
 1. **Automated reading.** Several publishers block automated readers behind a "verify you are human" check or an outright refusal, and those checks were left alone. The author guidelines of 14 journals could not be read this way, and OUP shows its charges only in an interactive calculator.
-2. **Reading in Tyler's own Chrome** (Claude in Chrome, read only, with non-essential cookies declined). This reached every blocked publisher: the Taylor & Francis instructions, aims pages, and open-access cost finder; the Wiley author guidelines and journal-metrics pages; the CSDA guide on ScienceDirect; the Cell Press author pages for Cell Reports Methods and iScience; the IMS pages for the Annals of Applied Statistics and the Electronic Journal of Statistics; the live Sage guideline pages, which confirmed the PDF copies used earlier; and the OUP charge calculator. Sources read this way are marked "read 2026-10-27 through Claude in Chrome" in each profile.
+2. **Reading in the user's own Chrome** (Claude in Chrome, read only, with non-essential cookies declined). This reached every blocked publisher: the Taylor & Francis instructions, aims pages, and open-access cost finder; the Wiley author guidelines and journal-metrics pages; the CSDA guide on ScienceDirect; the Cell Press author pages for Cell Reports Methods and iScience; the IMS pages for the Annals of Applied Statistics and the Electronic Journal of Statistics; the live Sage guideline pages, which confirmed the PDF copies used earlier; and the OUP charge calculator. Sources read this way are marked "read 2026-10-27 through Claude in Chrome" in each profile.
 
 What is still missing after the second pass:
 
@@ -244,10 +244,10 @@ Some profiles needed a judgment call, and say so:
 
 Journal policies change, AI policies most of all. Reread a profile's sources before a submission if the profile is more than six months old.
 
-## Questions for Tyler
+## Open questions
 
-1. **Journals to add or drop.** The 30 journals asked for are all profiled, plus six added because they take the group's kind of paper: Bioinformatics Advances, Statistics in Biosciences, Frontiers in Genetics, PeerJ, Journal of Applied Statistics, and Electronic Journal of Statistics (a free open-access home for a theory paper). Are there others you want, for example an autoimmune or rheumatology journal for an applied analysis, or Genetic Epidemiology? Are any on the list ones you would never use?
-2. **Budget for charges.** Is there grant or departmental money for an open-access charge, and up to what amount? Does UNF have read-and-publish agreements with Springer Nature, OUP, Wiley, Elsevier, Taylor & Francis, or Sage? The answer decides step 4 for every student paper.
+1. **Journals to add or drop.** The 30 journals asked for are all profiled, plus six added because they take this kind of paper: Bioinformatics Advances, Statistics in Biosciences, Frontiers in Genetics, PeerJ, Journal of Applied Statistics, and Electronic Journal of Statistics (a free open-access home for a theory paper). Are there others you want, for example an autoimmune or rheumatology journal for an applied analysis, or Genetic Epidemiology? Are any on the list ones you would never use?
+2. **Budget for charges.** Is there grant or departmental money for an open-access charge, and up to what amount? Does the institution have read-and-publish agreements with Springer Nature, OUP, Wiley, Elsevier, Taylor & Francis, or Sage? The answer decides step 4 for every student paper.
 3. **AI drafting.** Eleven journals forbid AI drafting of the text: the ISCB journals, all Taylor & Francis journals, Statistics in Medicine, and Stat. Should the workflow treat them as off limits for drafts it produces, or should the drafting step change for papers aimed at them?
 4. **Unclear points the sites left open:**
    - Genome Biology calls its review single anonymized in its guidelines but advertises transparent peer review on its home page.

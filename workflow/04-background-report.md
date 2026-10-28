@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Write the detailed companion to the settled manuscript: the literature its Introduction rests on, source by source, and every result it uses, proved step by step with a justification for each step, at a level a statistics student unfamiliar with the topic can follow or can see what to learn to follow. The report is also the first independent check of the manuscript: a proof that does not go through, or a source the Introduction should have cited, is an issue raised to the person, not a note buried in the report.
+Write the detailed companion to the settled manuscript: the literature its Introduction rests on, source by source, and every result it uses, proved step by step with a justification for each step, at a level a reader with graduate training in statistics and no familiarity with the topic can follow, or can see what to learn to follow. The report is also the first independent check of the manuscript: a proof that does not go through, or a source the Introduction should have cited, is an issue raised to the user, not a note buried in the report.
 
 ## Inputs
 
@@ -26,7 +26,7 @@ Write the detailed companion to the settled manuscript: the literature its Intro
 
 **4. Issues.** Collect every issue found: a step that does not go through, a passage that does not support its claim, a source the Introduction should cite (found while reading the cited sources' own references or their citing literature, within the stage's search allowance: the cited sources and what they cite, no broader search), an inconsistency between Methods and the supplement, a notation clash. Write them to `background/issues.md` as a table (location in the manuscript, the issue, its severity, the proposed fix, where the report shows it). Severity: blocking (a claim does not hold), substantive (a claim needs a changed statement or a new source), editorial.
 
-**5. Render and check.** Render `background/background.qmd` (self-contained HTML, the pilot report's style: table of contents, LaTeX, footnotes allowed for terms a student may not know). Check by hand until a checker exists: every Introduction citation has its section; every result has its walkthrough and its numerical check chunk, and every check passed or its failure is an issue; every quoted passage was read in Zotero in this stage, with the date in the log; every number is computed; the writing rules hold. Make one revision pass (stage 3, step 4) on the report.
+**5. Render and check.** Render `background/background.qmd` (self-contained HTML, the pilot report's style: table of contents, LaTeX, footnotes allowed for terms a reader may not know). Check by hand until a checker exists: every Introduction citation has its section; every result has its walkthrough and its numerical check chunk, and every check passed or its failure is an issue; every quoted passage was read in Zotero in this stage, with the date in the log; every number is computed; the writing rules hold. Make one revision pass (stage 3, step 4) on the report.
 
 **Stop.** Return the report and `issues.md`. If `issues.md` has a blocking or substantive issue, say so first: the manuscript goes back to stage 3 for a revision round before anything else, and the report is updated after it.
 

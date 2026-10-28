@@ -5,9 +5,9 @@ Everything the agent follows is in this folder, one file per stage, so that anyo
 | File | Stage | Starts when | Ends with |
 |---|---|---|---|
 | `rules.md` | all | | The rules every stage obeys |
-| `01-idea-review.md` | 1 | the person asks the agent to look at `idea.md` | `proposal.md`, for the person to review; then the Zotero check |
+| `01-idea-review.md` | 1 | the user asks the agent to look at `idea.md` | `proposal.md`, for the user to review; then the Zotero check |
 | `02-pilot.md` | 2 | the proposal is final | `project-spec.md`, the pilot, its report, and a pass or fail |
-| `03-manuscript.md`, `03-manuscript-brief.md` | 3 | the pilot passed | the manuscript draft, then revision rounds on the person's comments |
+| `03-manuscript.md`, `03-manuscript-brief.md` | 3 | the pilot passed | the manuscript draft, then revision rounds on the user's comments |
 | `04-background-report.md` | 4 | the manuscript is settled | `background/background.html`, and an issues list if the report found errors in the manuscript |
 | `05-mock-review.md`, `reviewers/` | 5 | the background report is done | `review/round-1/reviewer_{1,2,3}.md`, then responses and further rounds |
 | `06-slides.md` | 6 | the review is complete | `slides/` (not yet written) |
@@ -19,6 +19,6 @@ Each stage file has the same sections: purpose, inputs, preconditions, procedure
 
 ## Revising the instructions
 
-The instructions are meant to be revised after every project. The route is: a stage's log ends with process feedback from the agent that ran it; the person's comments on the deliverable are recorded in the same log; the person decides which lessons become rules; the stage file changes and `CHANGELOG.md` gets a dated line saying what changed and which project taught it. A project records the workflow version it ran under in `STATUS.md`, so a later reader knows which instructions produced it.
+The instructions are meant to be revised after every project. The route is: a stage's log ends with process feedback from the agent that ran it; the user's comments on the deliverable are recorded in the same log; the user decides which lessons become rules; the stage file changes and `CHANGELOG.md` gets a dated line saying what changed and which project taught it. A project records the workflow version it ran under in `STATUS.md`, so a later reader knows which instructions produced it.
 
-Two habits keep the files readable: a rule goes in `rules.md` when it applies to more than one stage and in the stage file otherwise, and a stage file says what to do, not why the group works this way (that is the grad guide's job).
+Two habits keep the files readable: a rule goes in `rules.md` when it applies to more than one stage and in the stage file otherwise, and a stage file says what to do, not why.

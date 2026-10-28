@@ -21,7 +21,7 @@ Every page below was read on the date shown. Bracketed numbers in the text point
 
 > "Bioinformatics Advances is an interdisciplinary journal on bioinformatics and computational biology. The journal covers bioinformatics methods, such as algorithms, statistics, databases and software" [1]
 
-Bioinformatics Advances is the ISCB's fully open access companion to Bioinformatics, launched in 2021 [3]. It takes methods papers (statistics is named in the scope), software and data notes, and short "Discovery Notes" that report biological findings made with computational methods [1]. Its bar is broader than Bioinformatics', it sends papers to fewer reviewers, and it states firm page and reference limits. All five of the group's paper types have a plausible slot except pure theory.
+Bioinformatics Advances is the ISCB's fully open access companion to Bioinformatics, launched in 2021 [3]. It takes methods papers (statistics is named in the scope), software and data notes, and short "Discovery Notes" that report biological findings made with computational methods [1]. Its bar is broader than Bioinformatics', it sends papers to fewer reviewers, and it states firm page and reference limits. All five of our paper types have a plausible slot except pure theory.
 
 | Paper type | Fit | Why |
 |--------------------------------------------|----------|------------------------------------------------|
@@ -84,8 +84,8 @@ The journal follows the same ISCB acceptable-use policy as Bioinformatics. Any a
 
 ## Recent papers like ours
 
-1. Vathrakokoili Pournara A, Miao Z, Beker OY, Nolte N, Brazma A, Papatheodorou I (2024). CATD: a reproducible pipeline for selecting cell-type deconvolution methods across tissues. *Bioinformatics Advances* 4, vbae048. https://doi.org/10.1093/bioadv/vbae048. A systematic evaluation of 31 widely used cell-composition methods, close to the group's composition-adjustment work [6].
-2. Li S, Vogtmann E, Graubard BI, Gail MH, Abnet CC, Shi J (2022). fast.adonis: a computationally efficient non-parametric multivariate analysis of microbiome data for large-scale studies. *Bioinformatics Advances* 2, vbac044. https://doi.org/10.1093/bioadv/vbac044. Revisits the adonis implementation of PERMANOVA and adds sampling-weight adjustment, a distance-based permutation test paper like the group's [6].
+1. Vathrakokoili Pournara A, Miao Z, Beker OY, Nolte N, Brazma A, Papatheodorou I (2024). CATD: a reproducible pipeline for selecting cell-type deconvolution methods across tissues. *Bioinformatics Advances* 4, vbae048. https://doi.org/10.1093/bioadv/vbae048. A systematic evaluation of 31 widely used cell-composition methods, close to our composition-adjustment work [6].
+2. Li S, Vogtmann E, Graubard BI, Gail MH, Abnet CC, Shi J (2022). fast.adonis: a computationally efficient non-parametric multivariate analysis of microbiome data for large-scale studies. *Bioinformatics Advances* 2, vbac044. https://doi.org/10.1093/bioadv/vbac044. Revisits the adonis implementation of PERMANOVA and adds sampling-weight adjustment, a distance-based permutation test paper like our [6].
 3. Karimnezhad A (2022). More accurate estimation of cell composition in bulk expression through robust integration of single-cell information. *Bioinformatics Advances* 2, vbac049. https://doi.org/10.1093/bioadv/vbac049. Argues existing composition estimators ignore covariance structure and offers a corrected estimator, a critique-and-fix pattern [6].
 
 ## Not stated on the site, or could not be read

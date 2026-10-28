@@ -84,7 +84,7 @@ The journal's own section points to the COPE position statement on authorship an
 
 ## Recent papers like ours
 
-1. Sturm G, List M, Zhang JD (2021). Tissue heterogeneity is prevalent in gene expression studies. *NAR Genomics and Bioinformatics* 3, lqab077. https://doi.org/10.1093/nargab/lqab077. Shows that unintended cell-composition differences are common across thousands of public datasets, the problem the group's composition-adjustment papers address [7].
+1. Sturm G, List M, Zhang JD (2021). Tissue heterogeneity is prevalent in gene expression studies. *NAR Genomics and Bioinformatics* 3, lqab077. https://doi.org/10.1093/nargab/lqab077. Shows that unintended cell-composition differences are common across thousands of public datasets, the problem our composition-adjustment papers address [7].
 2. Svoboda M, Frost HR, Bosco G (2022). Internal oligo(dT) priming introduces systematic bias in bulk and single-cell RNA sequencing count data. *NAR Genomics and Bioinformatics* 4, lqac035. https://doi.org/10.1093/nargab/lqac035. Documents a systematic bias in a near-universal RNA-seq step across public data, a critique of a widely used procedure [7].
 3. Schlegel L, Gómez Cano F, Marand AP, Johannes F (2026). Power-law penalties correct distance bias in single-cell co-accessibility and deep-learning chromatin interaction predictions. *NAR Genomics and Bioinformatics* 8, lqag063. https://doi.org/10.1093/nargab/lqag063. Identifies a systematic bias in widely used co-accessibility scores and gives a model-based correction, the critique-then-fix pattern [7].
 

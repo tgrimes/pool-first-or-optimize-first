@@ -27,7 +27,7 @@ Every page below was read on the date shown. Bracketed numbers in the text point
 
 > "The Journal of Statistical Computation and Simulation (JSCS) is a leading subscription-based peer-reviewed journal covering significant contributions or novelty approaches involving Computation or Simulation." [11]
 
-Two exclusions matter: "JSCS does not consider the analysis of specific data sets, except as examples." "JSCS does not consider new distributions or extensions of existing distributions." [11] In plain terms, the journal publishes computational statistics and simulation work, including simulation studies that compare or check the error rates of standard tests and new permutation procedures; the readers are methodologists. That makes it a reasonable home for the group's simulation-and-diagnostic papers and for critiques whose evidence is mostly simulation, and a weaker one for theory or applied analyses.
+Two exclusions matter: "JSCS does not consider the analysis of specific data sets, except as examples." "JSCS does not consider new distributions or extensions of existing distributions." [11] In plain terms, the journal publishes computational statistics and simulation work, including simulation studies that compare or check the error rates of standard tests and new permutation procedures; the readers are methodologists. That makes it a reasonable home for our simulation-and-diagnostic papers and for critiques whose evidence is mostly simulation, and a weaker one for theory or applied analyses.
 
 | Paper type | Fit | Why |
 |--------------------------------------------|----------|------------------------------------------------|
@@ -90,9 +90,9 @@ The first quotation is a checklist item on the JSCS instructions page [12]; the 
 
 ## Recent papers like ours
 
-1. Consiglio JD (2026). A simulation study to resolve conflicting evidence on the error rates from MANOVA group tests. *Journal of Statistical Computation and Simulation*. https://doi.org/10.1080/00949655.2026.2706589. A simulation-only study of whether standard multivariate group tests keep their error rates, the group's simulation-and-diagnostic paper type.
-2. ter Braak CJF (2021). Predictor versus response permutation for significance testing in weighted regression and redundancy analysis. *Journal of Statistical Computation and Simulation*, 92(10), 2041 to 2059. https://doi.org/10.1080/00949655.2021.2019256. Compares permutation schemes for a multivariate method whose significance is judged by permutation, as PERMANOVA's is, matching the group's permutation-test line.
-3. Zhang Y, Liu Y, Feng L, Wang Z (2023). Testing the differential network between two gaussian graphical models with false discovery rate control. *Journal of Statistical Computation and Simulation*, 94(2), 424 to 445. https://doi.org/10.1080/00949655.2023.2252127. Testing for differences between two groups' networks, close to the group's comparison of co-expression networks between groups.
+1. Consiglio JD (2026). A simulation study to resolve conflicting evidence on the error rates from MANOVA group tests. *Journal of Statistical Computation and Simulation*. https://doi.org/10.1080/00949655.2026.2706589. A simulation-only study of whether standard multivariate group tests keep their error rates, our simulation-and-diagnostic paper type.
+2. ter Braak CJF (2021). Predictor versus response permutation for significance testing in weighted regression and redundancy analysis. *Journal of Statistical Computation and Simulation*, 92(10), 2041 to 2059. https://doi.org/10.1080/00949655.2021.2019256. Compares permutation schemes for a multivariate method whose significance is judged by permutation, as PERMANOVA's is, matching our permutation-test line.
+3. Zhang Y, Liu Y, Feng L, Wang Z (2023). Testing the differential network between two gaussian graphical models with false discovery rate control. *Journal of Statistical Computation and Simulation*, 94(2), 424 to 445. https://doi.org/10.1080/00949655.2023.2252127. Testing for differences between two groups' networks, close to our comparison of co-expression networks between groups.
 
 ## Not stated on the site, or could not be read
 
