@@ -327,3 +327,22 @@ What in the stage file or the rules left the agent guessing, was unclear, or cou
 18. **Zotero first.** The stage file does not say to search Zotero before the literature search so that the items-to-add list excludes what the library has. It was done anyway (queries 1 and 2); the file should say so.
 19. **The stop message.** "What to return at the stop" lists nine items; it was easy to follow. It does not say whether the open-question count includes the init.R author line, which is a workflow question rather than a proposal question; it was counted.
 20. **Time box.** "One working day of agent time for steps 1 to 8" is far above what the stage took (31 minutes); a tighter box (two hours) would still leave room.
+
+
+## Stop 1: the user's answers (2026-10-28, 19:38)
+
+The user answered the open questions in the conversation. Decisions recorded:
+
+- D9. Paper type: no answer given; the reading as a critique stands and the marker stays.
+- D10. Package name `micutoff` agreed. The author line is left as is for now, so `tools/init.R` is not run: it runs once and writes the author into DESCRIPTION, LICENSE, README.md, and the manuscript skeleton, which would otherwise be hand edits later.
+- D11. Target Statistical Methods in Medical Research, fallback Biometrical Journal: confirmed. The user asked why Statistics in Medicine is conditional on writing the first draft; the answer (its AI policy against AI-drafted initial versions) is in the proposal, section 8, and in the reply.
+- D12. Aim 3 kept, restricted to a discrete covariate, supplement as fallback: confirmed.
+- D13. ADNI: skipped. The proposal's application is NHANES alone.
+- D14. No money for an open-access charge; no deadline. Both candidate journals are hybrid with no required charge, so nothing changes in the choice. The journal guide's rule for a paper with no schedule (aim at the most selective journal that fits) does not reorder the two, because Statistical Methods in Medical Research publishes no acceptance rate; noted, not applied.
+- D15. Pilot imputation engines: both predictive mean matching and the nearest-neighbour method of Long et al.; the pilot grows from 26 to 42 cells and from 13,000 to 21,000 replicates; the pass rules are judged on the predictive-mean-matching cells.
+- D16. The 0.01 threshold for the pilot's second question: confirmed.
+- D17. The argmax theorem source: deferred until the Zotero library is updated.
+- D18. NHANES cycles, decided by the agent as asked: 2013-2014, 2015-2016, and 2017-2018 pooled, cycle as an auxiliary, because the strata of Aim 3 are small in one cycle (about 1,000 current smokers in 2017-2018 across six race/ethnicity groups) and both cotinine precedents pooled three cycles; the laboratory method and the limit of detection of the two earlier cycles are confirmed at the download step in stage 2 (their documentation pages were not opened in this stage). Pima data dropped.
+- D19. The applied-usage survey: the user asked what it means; explained in the reply, stays open with a recommendation to do the minimal version (classify the 19 PubMed hits' methods sections) at the manuscript stage.
+
+The proposal's sections 1, 3 (row 7), 6, 7, 8, 9, and 11 were changed accordingly; STATUS.md stays at `1, proposal at stop 1`, since the Zotero update has not been announced. Committed as "Stage 1, stop 1: user's answers applied".
