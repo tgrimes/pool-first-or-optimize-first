@@ -187,7 +187,7 @@ table is referenced in the text. Register each output with gap_register() in its
 
 ### [FILL: aim 1, as a short heading]
 
-[FILL: the finding, with every number through prov() and a reference to @fig-aim1.]
+[FILL: the finding, with every number through prov() and a reference to the figure, written as an at-sign followed by fig-aim1.]
 
 ```{r}
 #| label: fig-aim1
