@@ -105,8 +105,9 @@ sub_file("STATUS.md", "[FILL: date, set by tools/init.R]", today, fixed = TRUE)
 for (pair in list(c("[FILL: first author]", author), c("[FILL: second author]", coauthor), c("[FILL: email]", email), c("[FILL: affiliation]", affiliation))) {
   if (!is_fill(pair[2])) sub_file("manuscript/manuscript.qmd", pair[1], pair[2], fixed = TRUE)
 }
-if (!file.exists("manuscript/drafting-log.md")) {
-  writeLines(c("# Drafting log", "", "Started by stage 3; see workflow/03-manuscript.md. The opening paragraph states the paper-test status in one line."), "manuscript/drafting-log.md")
+if (!file.exists("log/03-manuscript.md")) {
+  dir.create("log", showWarnings = FALSE)
+  writeLines(c("# Drafting log (stage 3)", "", "Started by stage 3; see workflow/03-manuscript.md. The opening paragraph states the paper-test status in one line."), "log/03-manuscript.md")
 }
 
 cat("initialized:\n  package:", pkg, "\n  title:", title, "\n  authors:", author, "|", coauthor,

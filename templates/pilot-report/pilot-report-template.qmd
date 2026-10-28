@@ -1,7 +1,6 @@
 ---
-title: "[FILL: card ID] pilot summary: [FILL: short topic]"
+title: "Pilot report: [FILL: short topic]"
 subtitle: "A review document: the pilot, its results, the draft spec, and the decisions log"
-author: "[FILL: prepared for]"
 date: today
 format:
   html:
@@ -40,14 +39,14 @@ HOW TO USE THIS FILE (full rules in README.md, same folder as this template)
 source("../templates/pilot-report/report-helpers.R")
 
 # Load every saved result file here and compute every quoted number from these objects.
-# [FILL] e.g. res <- readRDS("pilot_xx_results.rds")
+# [FILL] e.g. res <- readRDS("results/cell_summaries.rds")  # pilot/results/, written by pilot.R
 ```
 
 # Summary
 
-**Scope.** This document summarizes the pilot[^pilot] for research-idea card[^card] [FILL: ID] ("[FILL: card title]"): what the idea is, how the pilot was run, what it found, the full draft project spec, and the decisions made along the way. It was built from `project-spec.md`, `decisions.md`, and the saved results in this folder, and every number in the text and figures is computed from those files when the document renders.
+**Scope.** This document reports the pilot[^pilot] for the proposal `proposal.md` ("[FILL: proposal title]"): what the idea is, how the pilot was run, what it found, the full draft project spec, and the decisions made along the way. It was built from `project-spec.md`, `decisions.md`, and the saved results in this folder, and every number in the text and figures is computed from those files when the document renders.
 
-**Status.** In `research-ideas.md` the card is marked `[FILL: piloted-pass or piloted-fail]`[^pf] [FILL: one or two sentences on why. If the spec is for a re-scoped card, say so and add the conditional draft[^cond] footnote reference; otherwise delete the [^cond] definition use.]
+**Status.** In `STATUS.md` the pilot is marked `[FILL: piloted-pass, piloted-fail, or piloted-close-call]`[^pf] [FILL: one or two sentences on why. For a close call, state both readings: the one that passes and the one that fails. If the spec is for a re-scoped proposal, say so and add the conditional draft[^cond] footnote reference; otherwise delete the [^cond] definition use.]
 
 <!-- Three rows, one per pilot question. Evidence cells carry numbers computed with inline R. -->
 
@@ -192,7 +191,7 @@ design_diagram(
   lanes = list(
     list(label = "Part A", fill = "#e8f0fa", sim = "[FILL]", vary = "[FILL]", est = "[FILL]", meas = "[FILL]", out = "[FILL]"),
     list(label = "Part B", fill = "#fdeceb", sim = "[FILL]", vary = "[FILL]", est = "[FILL]", meas = "[FILL]", out = "[FILL]")),
-  harness = list(text = "Harness checks: cases with a known answer\n[FILL: list the checks]", out = "Harness table"))
+  harness = list(text = "Known-answer checks: cases where the correct answer is known from theory\n[FILL: list the checks]", out = "Known-answer table"))
 ```
 
 Each figure and table in the Results traces back to one row of this diagram, and the row says what its points or entries represent.
@@ -205,13 +204,13 @@ Each figure and table in the Results traces back to one row of this diagram, and
 
 [FILL: define the scenarios, if any, in one paragraph.]
 
-## Harness checks
+## Known-answer checks
 
-{{< include ../templates/pilot-report/parts/harness-intro.md >}}
+{{< include ../templates/pilot-report/parts/known-answer-intro.md >}}
 
 ```{r}
-#| label: tbl-harness
-#| tbl-cap: "Harness checks, from [FILL: result file names]."
+#| label: tbl-known-answer
+#| tbl-cap: "Known-answer checks, from [FILL: result file names]."
 #| eval: false
 
 # One harness_row() per check. Judge every row with harness_reading_mcse() or harness_reading_pct().
@@ -271,7 +270,7 @@ knitr::kable(data.frame(), row.names = FALSE)
 
 # The draft spec {#draft-spec}
 
-This is `project-spec.md`, read from the file when the document renders. Anything the worker left for you to decide is highlighted in yellow and starts with "To confirm".
+This is `project-spec.md`, read from the file when the document renders. Anything the agent[^agent] left for the user to decide is highlighted in yellow and starts with "To confirm".
 
 ```{r}
 #| label: spec
@@ -282,7 +281,7 @@ cat(read_md_part("../project-spec.md", highlight_to_confirm = TRUE), "\n")
 
 # Decisions log {#decisions-log}
 
-This is the worker's `decisions.md`, read from the file when the document renders.
+This is the agent's `decisions.md`, read from the file when the document renders.
 
 ```{r}
 #| label: decisions

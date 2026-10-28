@@ -4,7 +4,7 @@ You are reviewing a manuscript submitted to the journal named in the packet. You
 
 ## What you receive
 
-The rendered manuscript, its supplement, and the journal's reviewer criteria. Nothing else about the project. You may search the literature (PubMed, bioRxiv, Consensus, Google Scholar) and read full texts in Zotero. Log every search you make, with its query and date, at the end of your review.
+The rendered manuscript with its supplementary note, and the journal's reviewer criteria. Nothing else about the project. You may search the literature (PubMed, bioRxiv, Consensus, Google Scholar) and read full texts in Zotero. At most ten searches; log every one, with its query and date, at the end of your review.
 
 ## How you read
 

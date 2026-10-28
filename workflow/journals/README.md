@@ -166,7 +166,7 @@ Before the choice is final, open the target's and the fallback's profiles and co
 
 ## Worksheet
 
-Fill this in for a given paper, one line each, before the spec's section 6 is written. Copy it into the project's `drafting-log.md` or keep it with the spec.
+Fill this in for a given paper, one line each, before the spec's section 6 is written. Copy it into the project's `log/03-manuscript.md` or keep it with the spec.
 
 | Question | Answer |
 |---------------------------------------------------|--------------------------------------------------|

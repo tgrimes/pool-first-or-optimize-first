@@ -43,6 +43,11 @@ read_run_info <- function(path = results_path("run_info.rds")) {
   json <- sub("\\.rds$", ".json", path)
   if (!file.exists(path) && file.exists(json)) path <- json
   if (!file.exists(path)) {
+    if (isTRUE(prov_mode())) {   # a draft may render before any script has run: the banner says so
+      message("results/run_info.rds is missing: no analysis script has run yet; the draft renders with run = \"none\".")
+      .ms$run_info <- list(run = "none", note = "no analysis script has run yet")
+      return(invisible(.ms$run_info))
+    }
     stop("results/run_info.rds is missing. Every analysis script writes it, for example ",
          "saveRDS(list(run = \"quick\", n_rep = 100, n_cells = 48, date = Sys.Date(), note = \"\"), ",
          "here::here(\"results\", \"run_info.rds\")). Run the scripts in analysis/ first.")
@@ -121,9 +126,9 @@ design_table <- function(df, widths = c(18, 32, 50), ...) kable_w(df, widths, ..
 novelty_table <- function(df, widths = c(22, 39, 39), ...) kable_w(df, widths, ...)
 
 # ---- journals ----------------------------------------------------------------------------
-# One row of the journal guide's CSV (copied into manuscript/ at instantiation).
-journal_profile <- function(slug, csv = "journals.csv") {
-  if (!file.exists(csv)) stop("journals.csv not found at ", csv, "; copy it from workflow/journals/")
+# One row of the journal guide's CSV, workflow/journals/journals.csv, which the checker also reads.
+journal_profile <- function(slug, csv = file.path(project_root(), "workflow", "journals", "journals.csv")) {
+  if (!file.exists(csv)) stop("journals.csv not found at ", csv)
   j <- utils::read.csv(csv, stringsAsFactors = FALSE)
   row <- j[j$slug == slug, ]
   if (nrow(row) != 1) stop("no journal with slug '", slug, "' in ", csv)
@@ -158,15 +163,17 @@ check_no_markers <- function(qmd = "manuscript.qmd") {
   if (nrow(m)) stop("final mode: ", nrow(m), " marker(s) remain in ", qmd, " (", paste(unique(m$kind), collapse = ", "), ").")
   invisible(TRUE)
 }
+# The drafting log is the stage 3 log, log/03-manuscript.md at the project root.
+drafting_log <- function() file.path(project_root(), "log", "03-manuscript.md")
 # The log's opening paragraph: the first non-empty line after the title that is not a heading.
-log_status <- function(path = "drafting-log.md") {
+log_status <- function(path = drafting_log()) {
   if (!file.exists(path)) return(character(0))
   x <- readLines(path, warn = FALSE)
   x <- x[-grep("^# ", x)[1]]
   x <- x[nzchar(trimws(x)) & !grepl("^#", x)]
   if (length(x)) x[1] else character(0)
 }
-log_section <- function(path = "drafting-log.md", heading = "Paper test") {
+log_section <- function(path = drafting_log(), heading = "Paper test") {
   if (!file.exists(path)) return(character(0))
   x <- readLines(path, warn = FALSE)
   a <- grep(paste0("^## ", heading, "\\s*$"), x)
@@ -181,7 +188,7 @@ log_section <- function(path = "drafting-log.md", heading = "Paper test") {
 # c(...) then collapse: a vector argument (the paper-test lines) must not repeat the div once per element.
 .apparatus <- function(...) paste0("\n::: {.apparatus}\n\n", paste(c(...), collapse = "\n"), "\n\n:::\n\n")
 
-draft_banner <- function(log = "drafting-log.md", qmd = "manuscript.qmd") {
+draft_banner <- function(log = drafting_log(), qmd = "manuscript.qmd") {
   ri <- run_info()
   m <- marker_scan(qmd)
   counts <- table(factor(m$kind, levels = c("TO CONFIRM", "CITE", "FILL")))

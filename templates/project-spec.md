@@ -2,14 +2,14 @@
 
 | | |
 |---|---|
-| Card | [ID and title from the idea file, if there is one] |
+| Proposal | `proposal.md`, final [date] |
 | Authors | [names] |
 | Written | [date] |
-| Status | draft / handed off [date] / done [date] |
+| Status | draft / final [date] |
 
 ## How to use this form
 
-Fill it in at stage 2, from the final proposal, before the pilot runs. The spec is the question and the design. It is not instructions for writing code: the code is written as package functions with tests, and the user's time goes where an assistant is weak, which is choosing which factors to vary and why, noticing when a result is wrong, and deciding what the paper claims.
+Fill it in at stage 2 (`workflow/02-pilot.md`, step 1), from the final proposal, before the pilot runs; section 3 is completed after the verdict. The spec is the question and the design. It is not instructions for writing code: the code is written as package functions with tests, and the user's time goes where an assistant is weak, which is choosing which factors to vary and why, noticing when a result is wrong, and deciding what the paper claims.
 
 Keep it to two to four pages. Each section ends with a note on what good looks like; delete those notes in the filled copy.
 
@@ -39,9 +39,15 @@ The filled copy is `project-spec.md` at the project root, next to `protocol.md`.
 
 ## 3. Pilot
 
-**Code:** [path in the repository, and the command that runs it]
+Filled twice: the plan when the spec is written, the answers after the verdict (stage 2, step 5).
 
-**Plot:** [one figure, saved in `results/`, or pasted here]
+**Code:** [`pilot/pilot.R`, and the command that runs it]
+
+**Pass rule:** [from the proposal, as numbers]
+
+**Verdict file:** [`pilot/results/verdict.rds`, after the run]
+
+**Plot:** [one figure, saved in `pilot/results/`, or pasted here]
 
 **The three pilot answers:**
 
@@ -49,7 +55,7 @@ The filled copy is `project-spec.md` at the project root, next to `protocol.md`.
 2. Is it large enough to matter at realistic sample sizes? [the effect at the sample sizes in section 4]
 3. Is there an obvious fix or diagnostic? [what it is, or "none yet"]
 
-> **What good looks like.** The pilot is the smallest simulation that would show the effect if it exists, run for real, with the three answers in one line each and with numbers. It is the project's starting point, so it must run from a clean clone. If the answers are "yes, small, no", this is not a project yet. Do not assign it.
+> **What good looks like.** The pilot is the smallest simulation that would show the effect if it exists, run for real, with the three answers in one line each and with numbers. It is the project's starting point, so it must run from a clean clone. If the answers are "yes, small, no", this is not a project yet.
 
 ## 4. ADEMP skeleton
 
@@ -81,7 +87,7 @@ This becomes `protocol.md` at the design stop of stage 3. Bullets are enough her
 
 **What to show:** [the one thing the application should demonstrate]
 
-> **What good looks like.** The dataset has been downloaded and opened by you before the spec is written, not just named. It is open data, autoimmune where possible and single-cell or spatial where possible; lupus is not required. "What to show" is a claim about the user's conclusion, for example "a comparison where the artifact changes which edges look different", not "run the method on the data". The application is there to show the effect matters in a real cohort. It is not a search for new biology.
+> **What good looks like.** The dataset has been downloaded and opened by you before the spec is written, not just named. It is open data that matches the setting the idea names, single-cell or spatial where the question allows. "What to show" is a claim about the user's conclusion, for example "a comparison where the artifact changes which edges look different", not "run the method on the data". The application is there to show the effect matters in a real cohort. It is not a search for new biology.
 
 ## 6. Target journal
 
@@ -117,7 +123,7 @@ The project must not add:
 - [ ]
 - [ ]
 
-> **What good looks like.** This is the section that saves projects. Write it by listing what a user with an AI assistant will be tempted to add: one more method or distance, a second dataset, the next sample-specific method after the ones in scope, a predictive model (not the research direction), an R package or software paper (software is a byproduct, not a publication), or a theory result beyond the closed form in section 2. Each item is a different project, not a missing section of this one. If the extension is already on the list of project ideas, name it, so the user knows it is parked, not forgotten. When the user proposes something on this list, the answer is "later, as its own paper".
+> **What good looks like.** This is the section that saves projects. Write it by listing what a user with an AI assistant will be tempted to add: one more method or distance, a second dataset, the next sample-specific method after the ones in scope, a predictive model (not the research direction), an R package or software paper (software is a byproduct, not a publication), or a theory result beyond the closed form in section 2. Each item is a different project, not a missing section of this one. If the extension is itself a research idea, say so, so that the user knows it is parked, not forgotten. When the user proposes something on this list, the answer is "later, as its own paper".
 
 ## 9. Reading
 

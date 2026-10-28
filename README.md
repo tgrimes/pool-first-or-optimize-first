@@ -36,13 +36,14 @@ uv sync
 |---|---|---|---|
 | 1. Idea review | `workflow/01-idea-review.md` | "look at idea.md" | `proposal.md`: novelty, fit, theory, datasets, a pilot plan with pass criteria, and a list of items to add to Zotero |
 | 2. Pilot | `workflow/02-pilot.md` | "the proposal is final" | `project-spec.md`, the pre-registered pilot in `pilot/`, its report, and a pass or fail |
-| 3. Manuscript | `workflow/03-manuscript.md` | "the pilot passed" | `manuscript/manuscript.html`, then revision rounds on your comments |
+| 3. Manuscript | `workflow/03-manuscript.md` | "the pilot passed" | `manuscript/manuscript.html`, then revision rounds on your comments, then the production run and the final render |
 | 4. Background report | `workflow/04-background-report.md` | "the manuscript is settled" | `background/background.html`, with the literature in full and every proof walked through; an issues list if it found errors |
 | 5. Mock review | `workflow/05-mock-review.md` | "run the review" | `review/round-1/reviewer_1.md`, `_2`, `_3`; then responses and further rounds |
 | 6. Slides | `workflow/06-slides.md` | "make the slides" | `slides/` (not yet written) |
 | 7. Poster | `workflow/07-poster.md` | "make the poster" | `poster/` (not yet written) |
+| 8. Publish | `workflow/08-publish.md` | "publish it" | a clean copy of the project outside this repository, with only the code, data, results, and manuscript, verified from a fresh restore |
 
-Every stage ends at a stop: one file for you to read, and nothing moves until you answer. The rules that hold in every stage are in `workflow/rules.md`.
+Every stage ends at a stop: one file for you to read, committed at the stop, and nothing moves until you answer. `STATUS.md` names that file. The rest of the repository (`workflow/`, `templates/`, `tools/`, `log/`, the pilot and analysis folders) is the agent's working material, and you need not read it. The rules that hold in every stage are in `workflow/rules.md`.
 
 ## Layout
 
@@ -51,15 +52,15 @@ Every stage ends at a stop: one file for you to read, and nothing moves until yo
 | `idea.md`, `proposal.md`, `project-spec.md`, `protocol.md` | The idea, the verified proposal, the spec, and the ADEMP protocol |
 | `STATUS.md` | The stage, the open stop, and the stage record |
 | `workflow/` | The instructions, `rules.md`, the journal guide, and the changelog |
-| `log/` | One log per stage: decisions, sources, process feedback |
+| `log/` | One log per stage: decisions, sources, process feedback; the manuscript's drafting log is `log/03-manuscript.md` |
 | `templates/` | The forms the stages fill |
-| `tools/` | `init.R` and scripts shared by stages |
+| `tools/` | `init.R`, `export.R`, and scripts shared by stages |
 | `R/`, `tests/testthat/` | Functions with roxygen comments, and their tests |
 | `pilot/` | The pilot: pre-registration, script, results, decisions, report |
 | `analysis/` | Numbered scripts that call the functions and write to `results/` |
 | `data/raw/`, `data/processed/` | Untouched inputs, and data derived by scripts |
 | `results/` | Everything `analysis/` produces; never edited by hand |
-| `manuscript/` | `manuscript.qmd`, its helpers and checker, `citations.csv`, `references.bib` |
+| `manuscript/` | `manuscript.qmd` and `_supplement.qmd`, their helpers and checker, `citations.csv`, `references.bib` |
 | `background/`, `review/`, `slides/`, `poster/` | The later stages' deliverables |
 | `renv.lock`, `renv/`, `.Rprofile` | The R environment (renv) |
 | `pyproject.toml`, `uv.lock`, `.python-version`, `inst/python/` | The Python environment (uv) and the Python package |

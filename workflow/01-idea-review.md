@@ -9,44 +9,87 @@ Turn `idea.md`, in whatever state it is in, into a proposal the user can judge: 
 - `idea.md`. It may hold a paragraph or a full plan with aims, a literature review, a derivation, and datasets. Nothing in it is taken as verified.
 - `templates/proposal.md`, the form this stage fills.
 - `workflow/journals/`, for the target journal.
+- `workflow/rules.md`, in full.
 
 ## Preconditions
 
-- Zotero is open with the connector serving (`workflow/rules.md`, section 2). This stage can run its searches without it, but the Zotero check after the stop needs it.
-- Literature search tools are available: PubMed, bioRxiv and medRxiv, Consensus, and the browser (Google Scholar, GitHub, GEO, the Human Cell Atlas portal). Searching is allowed in this stage; every search is logged.
+- Zotero is open with the connector serving (`rules.md`, section 2). This stage can run its searches without it, but the Zotero check after the stop needs it.
+- Literature search tools are available: PubMed, bioRxiv and medRxiv, Consensus, and the browser (Google Scholar, GitHub, GEO, the Human Cell Atlas portal). Searching is allowed in this stage within the budget of step 3; every search is logged.
 - `log/01-idea-review.md` is started at the first step and holds the inventory, the searches, the decisions, and the process feedback.
 
-## Procedure
+## The paper test, the two paper types, and the three tools
 
-**1. Inventory the idea.** Read `idea.md`. In the log, write what it states for each of: the question, the procedure in question, the setting, the mechanism, the estimand, any claimed theory, the aims, the literature it cites, the datasets it names, the journal, and constraints. For each, say whether it is stated, implied, or absent. Do not fill a gap yet.
+**The two paper types.** A *critique* asks what a procedure in wide use estimates in a setting it was not built for: it states the estimand, derives the target and the bias term, confirms them by simulation, offers a correction or a diagnostic, and shows the effect on real data. A *constructive method paper* proposes a procedure for a stated estimand, shows its properties by theory and simulation, compares it with the existing methods for the same estimand, and applies it. Every idea is one or the other, and the proposal says which.
 
-**2. The paper test.** Apply the seven steps of the critique template to the idea, each answered as far as the idea allows, with what is missing named:
+**The paper test** is seven questions, written for a critique. For a constructive idea, read question 1 as the estimand and the gap the existing methods leave, question 2 as the proposed procedure, question 4 as its properties under the stated conditions (bias, variance, consistency), and question 6 as the comparison with the existing methods; questions 3, 5, and 7 stay as they are.
 
 1. A procedure in wide use: which, in which package, with what default, and how its output is read.
 2. A setting it was not built for but is used in: the heterogeneity in question (means, variances, composition, group size, observations per subject, architecture, batch).
 3. The estimand, stated as a functional of a specific distribution: what users believe the output estimates.
-4. The target and the bias term: what the procedure converges to under the setting, and the difference from the estimand. Sketch it with the three algebraic tools (mixture algebra, projection algebra, the second-order expansion) where one applies; label the sketch as a sketch, and say what a full derivation would need.
+4. The target and the bias term: what the procedure converges to under the setting, and the difference from the estimand, sketched with one of the three tools below where one applies. The sketch is labeled as a sketch, states its assumptions (which moments are finite, what is held fixed as the sample grows), and says what a full derivation would need.
 5. Confirmation by simulation: the smallest design that would show the effect, with a null cell and a cell with a known answer.
 6. A correction or a diagnostic, read off the formula, or "none yet".
 7. The application: a confirmed dataset and the one thing it would show.
 
-A "no" on step 3 or 4 is stated plainly; it is the most common reason an idea is not yet a project.
+A "no" on question 3 or 4 is stated plainly; it is the most common reason an idea is not yet a project.
 
-**3. Prior work and novelty.** Search for what has been done: the procedure's own papers and their critiques, the mechanism in other fields (measurement error, meta-analysis, psychometrics, mixed models are frequent homes), benchmarks that observed the artifact, and fixes that exist. Log every search: the source, the query, the date, and which hits were read. For each relevant source, record what it did and what it did not do, read from the abstract or the full text and not from a title. Then give one verdict with its reason: the mechanism is new; the artifact is known informally with no closed form and no fix; or the result is published, with the source. Say what the idea adds beyond the closest source. If the user's own prior work is named in `idea.md`, say how the idea relates to it. List every source the proposal will cite, with the full citation and the identifier as seen on the page, as items to add to Zotero.
+**The three tools** for sketching a target and a bias term.
 
-**4. Theory check.** For each derivation, proof sketch, or claimed result in the idea: restate it, check each step, name the first step that does not hold or is not justified, and propose the numerical check (a simulation or a special case with a known answer) that would catch an error in it. For the suspected mechanism, give the first-order sketch from step 2 of the paper test, with its assumptions. Do not present a sketch as a result.
+- *Mixture algebra.* When a statistic is computed on data pooled across groups, every moment of the pooled data is a mixture of the group moments: the pooled mean is the fraction-weighted mean of the group means, the pooled variance is the fraction-weighted within-group variance plus the between-group spread of the means, and the pooled covariance follows the same pattern. Write the statistic's population version in these mixture moments and compare it with the within-group quantity the user has in mind; the difference is the bias term, as a function of the group fractions and the differences between groups.
+- *Projection algebra.* When a procedure centers, regresses out, residualizes, or leaves one sample out, each step is a linear projection of the data. Write the procedure as the composition of its projections and ask what the estimand looks like after each: the target is the projected quantity, and the bias term is what the projection kept that the estimand excludes.
+- *The second-order expansion.* When the statistic is a nonlinear function of sample moments (a ratio, a correlation, a logarithm), expand it to second order around its population value. The first-order term is the influence of one observation, which is what a leave-one-out or jackknife procedure measures; the second-order term is the first-order bias of the statistic. This is the delta method carried one order further.
 
-**5. Datasets.** Find open datasets that fit the setting: the groups the question needs, the sample sizes, the measurement type, and single-cell or spatial where the question allows. For each candidate, open the accession or portal and record what is deposited (samples by group, format, processing level, access conditions, size), with the date. Mark each `verified` (opened and matches), `verify` (named in the literature, not opened), or `unavailable`. Recommend one with a fallback, and say what the application would show on it.
+## Procedure
 
-**6. Feasibility and the pilot plan.** Write the first simulation: the design cells, the methods, the measures, the known-answer cells, and an estimate of runtime from what is known. Write the three pilot questions with pass criteria as numbers, decided before any run: does the effect exist; is it large enough to matter at realistic sizes; is there a fix or a diagnostic. Say what code and data already exist. This is the draft pre-registration that stage 2 carries into `pilot/preregistration.md`.
+**1. Inventory the idea.**
 
-**7. Impact and fit.** The size of the user base and how often the output is read the vulnerable way; the plausible size of the artifact at realistic sizes, from the mechanism; whether a correction or only a diagnostic is in sight; and the fit with the two paper types (a critique of what a procedure estimates, or a constructive method). Propose a target journal and a fallback with the journal guide's worksheet.
+1. Read `idea.md`. In the log, write what it states for each of: the question, the procedure in question, the setting, the mechanism, the estimand, any claimed theory, the aims, the literature it cites, the user's own prior work, the datasets it names, the journal, and constraints. For each, say whether it is stated, implied, or absent. Do not fill a gap yet.
+2. Set `STATUS.md` to `1, reviewing`.
+3. Send one message before any search: the question as read, in one sentence, and the paper type as read. Do not wait for an answer; a misreading is caught at once, and the stage goes on.
 
-**8. Write `proposal.md`** from the template, in the proposal's own words and not by copying `idea.md`. Every claim has a source or a `[TO CONFIRM: ...]` marker. Every decision that is the user's carries a marker. The last two sections are the open questions and the Zotero list. Make one revision pass for clarity (stage 3, step 4) before the stop.
+**2. The paper test.** Answer the seven questions as far as the idea allows, each with what is missing named. Write the answers in the log as a three-column table (question, answer, what is missing).
+
+**3. Prior work and novelty.**
+
+1. Search for what has been done: the procedure's own papers and their critiques, the mechanism in other fields (measurement error, meta-analysis, psychometrics, mixed models are frequent homes), benchmarks that observed the artifact, and fixes that exist. For a constructive idea, the existing methods for the same estimand and their comparisons.
+2. Budget: at most about twenty queries across the sources; the abstract of every hit whose title could be relevant; the full text of at most ten sources; stop when two consecutive queries on different sources add no relevant source. Log every query with its source, the date, and which hits were read. Log the time spent.
+3. The search may be delegated to workers, one per source family (PubMed with bioRxiv and medRxiv; Consensus; the browser), each returning its log rows and, for each relevant source, what it did and what it did not do, read from the abstract or the full text and never from a title. The coordinator reads the full text of every source the verdict rests on.
+4. Give one verdict with its reason: the mechanism is new; the artifact is known informally with no closed form and no fix; or the result is published, with the source. Say what the idea adds beyond the closest source. If the user's own prior work is named in `idea.md`, say how the idea relates to it.
+5. List every source the proposal will cite, with the full citation and the identifier as seen on the page, as items to add to Zotero.
+
+**4. Theory check.** For each derivation, proof sketch, or claimed result in the idea: restate it, check each step, name the first step that does not hold or is not justified, and propose the numerical check (a simulation or a special case with a known answer) that would catch an error in it. For the suspected mechanism, give the first-order sketch from question 4 with its assumptions. Do not present a sketch as a result.
+
+**5. Datasets.**
+
+1. Find open datasets that fit the setting: the groups the question needs, the sample sizes, the measurement type, and single-cell or spatial where the question allows. Open at most five candidates.
+2. For each candidate, open the accession or portal and record what is deposited (samples by group, format, processing level, access conditions, size), with the date.
+3. Mark each `verified` (opened and matches), `verify` (named in the literature, not opened), or `unavailable`.
+4. Recommend one with a fallback, and say what the application would show on it.
+
+**6. Feasibility and the pilot plan.**
+
+1. Write the first simulation: the design cells, the methods, the measures, the known-answer cells, and an estimate of runtime from what is known.
+2. Write the three pilot questions with pass criteria as numbers, decided before any run: does the effect exist; is it large enough to matter at realistic sizes; is there a fix or a diagnostic.
+3. Say what code and data already exist. This is the draft pre-registration that stage 2 carries into `pilot/preregistration.md`.
+
+**7. Impact and fit.** The size of the user base and how often the output is read the vulnerable way; the plausible size of the artifact at realistic sizes, from the mechanism; whether a correction or only a diagnostic is in sight; the paper type. Propose a target journal and a fallback with the journal guide's worksheet (`workflow/journals/README.md`).
+
+**8. Write `proposal.md`.**
+
+1. Fill `templates/proposal.md` in the proposal's own words, not by copying `idea.md`. Every claim has a source or a `[TO CONFIRM: ...]` marker. Every decision that is the user's carries a marker. The last two sections are the open questions and the Zotero list.
+2. Make one revision pass for clarity (`03-manuscript.md`, step 4) before the stop.
+3. Set `STATUS.md` to `1, proposal at stop 1`, write the stage record line, and commit ("Stage 1, step 8: proposal").
 
 **Stop 1.** Return `proposal.md` and the log. The user reviews it, answers the open questions, and adds the listed items to Zotero with their full text. Wait.
 
-**9. The Zotero check.** When told the library is updated: look each cited source up by DOI and then by title; a source is available when the item is there, its record is complete enough to cite, and a PDF with full text is attached (a pre-1980 record or a book counts without one). Start `manuscript/citations.csv` with one row per source (key, Zotero item, grade `core` or `supporting`, the section of the proposal, why it is needed, the identifier, the passage that supports the claim, the date read). Report record faults with the value to enter. If any source is missing, **Stop 2** (at most twice): return the missing list grouped by what the user must do, and wait. Then rebuild the proposal's citations from the checklist keys and mark the proposal final in `STATUS.md`.
+**9. The Zotero check.** When told the library is updated:
+
+1. Set `STATUS.md` to `1, Zotero check`.
+2. Look each cited source up by DOI and then by title. A source is available when the item is there, its record is complete enough to cite, and a PDF with full text is attached (a pre-1980 record or a book counts without one).
+3. Start `manuscript/citations.csv` with one row per source, under the header the skeleton ships: `key, zotero_item, grade, section, why, origin, identifier, identifier_source, pdf, usable, deviations_from_record, support_passage, read_date, verified_by, verified_date`. Grade is `core` or `supporting`; section is the proposal's section; the passage is the one that supports the claim, with the date read; `verified_by` and `verified_date` stay empty.
+4. Report record faults with the value to enter.
+5. If any source is missing, **Stop 2** (at most twice): return the missing list grouped by what the user must do, and wait.
+6. Rebuild the proposal's citations from the checklist keys, add a dated entry to the proposal's Revisions section, set `STATUS.md` to `1, proposal final`, and commit ("Stage 1, step 9: proposal final").
 
 ## Outputs
 
@@ -58,14 +101,19 @@ A "no" on step 3 or 4 is stated plainly; it is the most common reason an idea is
 
 - Every source the proposal cites is either in Zotero or in the items-to-add list with an identifier the agent saw.
 - Every dataset marked `verified` was opened in this stage, with the date and what was seen.
-- Every search is logged with query, source, and date.
+- Every search is logged with query, source, and date, and the budget of step 3 was kept or the overrun is explained in the log.
 - The proposal states the estimand as a functional, or says plainly that it cannot yet.
+- The proposal says which paper type the idea is.
 - The pilot plan has pass criteria as numbers.
-- No claim without a source or a marker; the writing rules of `rules.md` hold.
+- No claim without a source or a marker; the writing rules of `rules.md`, section 4, hold.
 
 ## What to return at the stop
 
 One message: the verdict in a sentence; the path to `proposal.md` and the log; the novelty verdict with the closest source; the recommended dataset and its status; the pilot's pass criteria; the count of open questions; the Zotero list with its count; and what the agent was unsure of.
+
+## Delegating this stage
+
+A worker reads this file and `rules.md` in full; the brief adds the decisions already taken, the time box (one working day of agent time for steps 1 to 8), and whether the worker also runs step 9 after the user's answer. The worker returns the stop message above and nothing else. The coordinator opens `proposal.md` and the log and checks the list under "Checks before the stop" before relaying.
 
 ## Lessons
 

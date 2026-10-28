@@ -3,7 +3,7 @@
 Usage:
   python3 -I check-manuscript.py manuscript.qmd manuscript.html
           [--citations citations.csv] [--bib references.bib]
-          [--journals journals.csv --journal <slug>] [--final]
+          [--journals workflow/journals/journals.csv --journal <slug>] [--final]
 
 Exit status is 1 if any ERROR is found. WARN lines need a human look. INFO lines are counts.
 The checker reads the qmd for what was written and the HTML for what rendered. It ignores the
@@ -233,7 +233,7 @@ delete_words = ["considerably", "dramatically", "enormously", "exceptionally", "
                 "kind of", "of course", "really", "simply", "sort of", "certainly", "obviously", "undoubtedly", "important",
                 "interesting", "notable", "remarkable", "considerable", "major", "minor", "substantial"]
 justify_words = ["apparently", "arguably", "can", "conceivably", "could", "maybe", "may", "might", "perhaps", "potentially",
-                 "possibly", "presumably", "seemingly", "would", "commonly", "frequently", "generally", "largely", "mostly",
+                 "possibly", "presumably", "probably", "likely", "seemingly", "would", "commonly", "frequently", "generally", "largely", "mostly",
                  "often", "rarely", "typically", "usually"]
 low = own_prose.lower()
 found = {w: len(re.findall(r"\b" + re.escape(w) + r"\b", low)) for w in delete_words}

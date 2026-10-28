@@ -16,7 +16,7 @@ link-citations: true
 # file and name it here for the submission render; the draft renders in Quarto's default author-date style.
 params:
   draft: true
-  journal: "[FILL: journal slug from journals/journals.csv]"
+  journal: "[FILL: journal slug from workflow/journals/journals.csv]"
 format:
   html:
     toc: true
@@ -51,10 +51,11 @@ HOW TO USE THIS FILE (the manual is workflow/03-manuscript.md)
   [CITE: the claim]{.cite} for a claim without a usable source.
 - Write in this order: purpose draft of the Introduction; the design proposal (stop); the quick run;
   Methods, Design, Results, Discussion; Introduction revised; Abstract.
-- No workflow words in the paper (pilot, card, worker, quick run, spec, harness, the report).
+- No workflow words in the paper (pilot, card, worker, quick run, spec, harness, known-answer check, the report).
+- The proofs go in _supplement.qmd, included after the references as the supplementary note.
 - Render: quarto render manuscript.qmd            (draft mode, with the banner and gap table)
           quarto render manuscript.qmd -P draft:false   (final mode, when production numbers exist)
-- Check:  python3 -I check-manuscript.py manuscript.qmd manuscript.html --citations citations.csv --bib references.bib --journals journals.csv --journal <slug>
+- Check:  python3 -I check-manuscript.py manuscript.qmd manuscript.html --citations citations.csv --bib references.bib --journals ../workflow/journals/journals.csv --journal <slug>
 -->
 
 ```{r}
@@ -76,7 +77,7 @@ if (!params$draft) check_no_markers("manuscript.qmd")
 #| results: asis
 #| eval: !expr params$draft
 
-cat(draft_banner(log = "drafting-log.md", qmd = "manuscript.qmd"))
+cat(draft_banner(qmd = "manuscript.qmd"))
 ```
 
 # Abstract {.unnumbered}
@@ -263,6 +264,10 @@ novelty_table(data.frame(Element = c("[FILL]"), `Prior literature` = c("[FILL]")
 
 ::: {#refs}
 :::
+
+# Supplementary note S1 {.unnumbered}
+
+{{< include _supplement.qmd >}}
 
 ```{r}
 #| label: gap-table

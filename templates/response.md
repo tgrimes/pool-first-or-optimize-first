@@ -1,6 +1,6 @@
 # Response to the reviewers, round [N]
 
-[Date.] Changes are in the manuscript at commit [hash]; the revision is logged in `manuscript/drafting-log.md` under "Revision from review round [N]".
+[Date.] Changes are in the manuscript at commit [hash]; the revision is logged in `log/03-manuscript.md` under "Revision from review round [N]".
 
 ## Reviewer 1
 

@@ -2,6 +2,21 @@
 
 Dated lessons. Each line says what changed in which file and which project taught it.
 
+## 0.2.0 (2026-10-28)
+
+Reorganized for the agent after a review of 0.1.0 as the agent that runs it. The files in `workflow/` and `templates/` are written for the agent; the user reads `STATUS.md` and the deliverables; the clean copy for publication is a stage of its own.
+
+- One file per stage: `03-manuscript-brief.md` was folded into `03-manuscript.md` as "Delegating this stage", and every stage file now ends with that section. Procedures are numbered checklists; the reasons moved to each file's Lessons.
+- One log folder: `log/<stage>.md` for every stage. The drafting log is `log/03-manuscript.md`, which the draft's banner reads; `log/.gitkeep` keeps the folder in a clone.
+- Commits: `rules.md`, section 1, says when the agent commits without being asked (a pre-registration, a stop, a revision round, a production run, the end of a stage) and that rendered deliverables are committed at their stops. `.gitignore` no longer ignores them.
+- Vocabulary: `rules.md`, section 9, defines the words the stage files use. The two paper types and the three algebraic tools (mixture algebra, projection algebra, the second-order expansion) are defined in `01-idea-review.md`, which the files had cited from a guide outside this repository. "Harness check" became "known-answer check" in the pilot report template, its parts, and its checker.
+- Stage 1: a search budget (about twenty queries, ten full texts, a stop rule) and the option to delegate the search by source family; the first message restates the question as read; the `citations.csv` columns are the skeleton's fifteen; a commit at each stop.
+- Stage 2: the spec's section 3 is filled twice, the plan before the run and the answers after the verdict; the rendered report is committed at the stop; `piloted-close-call` is a status.
+- Stage 3: the production run and the final render are step 6, which no step had owned; `_supplement.qmd` ships as a skeleton and is included after the references; the references inventory starts from the proposal's list, not a "parent manuscript"; the model example sentences for the Introduction are quoted in the file; the word lists live in `rules.md` and the checker only, with "probably" and "likely" added to both; the stops-off, ruling, Zotero-down, and core-cap rules are cited from `rules.md`, not copied.
+- Stages 4 and 5 read the final render; the review packet is a copy of the final render with the journal's criteria, never a draft-mode page; reviewers 1 and 3 have a search budget of ten queries.
+- Stage 8 (`08-publish.md`) and `tools/export.R` are new: the clean publication copy from the tracked files on an allowlist, with a generated README and a verification from a fresh restore. Tested on the template: tests, check with no notes, and the manifest.
+- `STATUS.md` lists the states a stage can be in. `idea.md` asks for the user's own prior work. The spec template lost its card row, its assignment language, and its domain preference for datasets (now: open data that matches the setting the idea names). `manuscript/journals.csv` was removed; the helpers and the checker read `workflow/journals/journals.csv`.
+
 ## 0.1.0 (2026-10-28)
 
 - First assembly from pieces developed on earlier projects: the critique template (the paper test) as the idea review's backbone; the pilot conventions of eleven piloted cards and three re-pilots (literature pass, pre-registration, harness checks, verdict, decisions log, summary report); the project template with renv and uv; the manuscript template after its two runs on SS1 (stops, provenance, the checker, the bib builder, the journal guide, the revision pass); the writing rules from the review of the SS1 draft.

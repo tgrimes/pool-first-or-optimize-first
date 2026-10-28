@@ -1,7 +1,7 @@
-# Helpers for pilot summary reports (see README.md in this folder).
+# Helpers for pilot reports (see README.md in this folder).
 # From a pilot folder: source("../templates/pilot-report/report-helpers.R")
 
-# ---- Reading the worker's files ------------------------------------------------
+# ---- Reading the agent's files -------------------------------------------------
 
 # Read a markdown file for inclusion in the report. Drops the first H1 (the document
 # supplies its own title) and, for the spec, turns each [TO CONFIRM: ...] marker into a
@@ -20,10 +20,10 @@ read_md_part <- function(path, drop_title = TRUE, highlight_to_confirm = FALSE) 
   txt
 }
 
-# ---- Harness table -------------------------------------------------------------
+# ---- Known-answer table --------------------------------------------------------
 
-# One row of the harness table. Every row states the setting, the known answer, what the
-# simulation gave, and a reading produced by one of the two functions below, so rows are
+# One row of the known-answer table. Every row states the setting, the known answer, what the
+# simulation gave, and a reading produced by one of the three functions below, so rows are
 # judged the same way.
 harness_row <- function(check, setting, known, gave, reading) {
   list(check = check, setting = setting, known = known, gave = gave, reading = reading)
@@ -61,7 +61,7 @@ harness_reading_tol <- function(sim, truth, tol, thing = "the known value", extr
           ifelse(nzchar(extra), paste0(" ", extra), ""))
 }
 
-# Build the five-column harness table from a list of harness_row() results. Column widths are set
+# Build the five-column known-answer table from a list of harness_row() results. Column widths are set
 # by hand through the dashes in the separator row (Pandoc uses their proportions when a line is
 # long), because the default sizes each column by its longest cell and one long reading squeezes
 # the others. Adjust `widths` (relative; Check, Setting, Known answer, Simulation gave, How to read it).

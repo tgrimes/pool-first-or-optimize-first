@@ -24,6 +24,10 @@ except the first. Delete this comment. -->
 
 [What you know has been done, with citations as you have them. Nothing here is taken as verified.]
 
+## Your own prior work
+
+[Papers, code, or data of your own that the idea builds on or extends, if any.]
+
 ## Data
 
 [Datasets you have in mind, with accessions or links if you know them.]

@@ -2,18 +2,22 @@
 
 These rules apply in every stage. A stage file may add rules; it may not remove one. Where a stage file and this file disagree, this file wins, and the disagreement is a lesson for `CHANGELOG.md`.
 
-## 1. Stops and status
+The files in `workflow/` and `templates/` are written for the agent that runs the stages. The user reads `STATUS.md` and the deliverables. So a stage file is a checklist the agent can execute and verify against, as long as it needs to be, and never ambiguous.
+
+## 1. Stops, status, and commits
 
 - Every stage ends at a stop with one deliverable the user reads. No stage starts itself; the user's message starts it.
 - `STATUS.md` names the stage and the open stop. The agent updates it when it reaches a stop and when a stop is answered. On any message, the agent reads `STATUS.md` first, then the stage file it names, then the stage's log.
-- Within a stage, the stops the stage file marks are real stops: the agent returns what the stop asks for and waits. If the user has switched the stops off for a run, the agent decides at each one, records the decision and its reason in the stage's log under "Decisions made in place of a stop", and marks in the deliverable what a user should look at.
-- When a stop has been answered by a ruling, the agent applies the ruling. If the ruling's stated reason turns out to be wrong, the agent keeps the ruling, says so in the log with a dated note, and marks it in the deliverable.
+- Within a stage, the stops the stage file marks are real stops: the agent returns what the stop asks for and waits. If the user has switched the stops off for a run, the agent decides at each one, records the decision and its reason in the stage's log under "Decisions made in place of a stop", and marks in the deliverable what the user should look at.
+- When a stop has been answered by a ruling, the agent applies the ruling. If the ruling's stated reason turns out to be wrong, the agent keeps the ruling, says so in the log with a dated note (and in `protocol.md` when the ruling concerns the design), and marks it in the deliverable.
 - The user may change at any stop. Every user is treated the same, and nothing in a deliverable or a log names the user.
+- The agent commits without being asked at these points, and nowhere else unless asked: when a pre-registration or `protocol.md` is written, before any run it governs; at every stop, with the deliverable and its rendered file; after every revision round; at the end of a production run; at the end of a stage. The commit message starts with the stage and the step ("Stage 2, step 2: pre-registration"). Nothing is pushed unless the user asks.
+- A rendered deliverable (the pilot report, the manuscript, the background report) is committed at its stop and after each revision round, so that a handover carries what the user read. It is not committed after every render.
 
 ## 2. Sources
 
 - Zotero is the only source for anything cited in a deliverable from the proposal onward. A citation is an item in the library, read through the connector, with the passage that supports the claim recorded in `manuscript/citations.csv` (started at the proposal stage) and the date it was read. A citation that only names a method or a dataset is marked `definitional`.
-- Searching the literature (PubMed, bioRxiv, Consensus, the browser) is allowed only where a stage file says so (the idea review, the mock review's first reviewer). Every search is logged with its query, source, and date. Nothing found is relied on until it is in Zotero with full text; until then it is listed for the user to add.
+- Searching the literature (PubMed, bioRxiv, Consensus, the browser) is allowed only where a stage file says so (the idea review, the mock review's first and third reviewers), within the budget that stage file sets. Every search is logged with its query, source, and date. Nothing found is relied on until it is in Zotero with full text; until then it is listed for the user to add.
 - Nothing from memory. A fact about the literature or about a dataset points at a file or a page the agent opened. An identifier (DOI, accession) is one the agent saw, never one it reconstructed.
 - A fault in a Zotero record (a missing DOI, a lowercased journal, a cut author list, a date in the pages field) is reported to the user with the value to enter, and never patched in a bib.
 - If the Zotero connector is down, the agent says so before anything else: restart the server in Zotero's plugin pane and confirm `curl http://127.0.0.1:23120/ping` answers `pong`; in the session, reconnect the `zotero-mcp` server.
@@ -24,7 +28,8 @@ These rules apply in every stage. A stage file may add rules; it may not remove 
 - Every analysis script writes its run file (`results/run_info.rds`, or `results/<name>_run_info.rds` for a second script) and `sessionInfo()`; a Python script writes the same fields to a JSON file.
 - A simulated rate, bias, or coverage is reported with its Monte Carlo standard error. A difference is called nonzero only when it exceeds about three Monte Carlo standard errors; otherwise it is marked.
 - A finding stated in prose is shown in a table or figure, and no cell that supports a finding is dropped from a display; a cell where a method misbehaves gets its own row, panel, or table.
-- A simulation study always plans power, not only type I error: for every method whose type I error is controlled (under about 10% for a test at 5%), cells with a true effect whose levels run from low power to about 80%, calibrated with a few low-replicate cells, with the real data placed on that gradient. Every varied factor runs from a small effect to a large one, and the application places the real data on the gradient.
+- A simulation study always plans power, not only type I error. For every method whose type I error is controlled (under about 10% for a test at 5%), the design has cells with a true effect whose levels run from low power to about 80%, calibrated with a few low-replicate cells before the full run. A method whose type I error is not controlled is left out of the power cells, and the design says so.
+- Every varied factor runs from a small effect to a large one, and the application places the real data on each gradient.
 
 ## 4. Writing
 
@@ -34,10 +39,10 @@ These rules apply in every stage. A stage file may add rules; it may not remove 
 - Keep the paragraph's subject rather than introducing another to carry a fact about it ("these methods were developed to", not "their authors' aim was to").
 - No claim without a source, the first sentence included. No em or en dashes. The Oxford comma. No bold lead-ins outside an abstract with required headings. No footnotes in a manuscript (a report may use them to define a term). "We", never "I".
 - Keep estimand, estimator, statistic, and limit distinct. Say what "trustworthy", "safe", or "valid" refers to. No workflow vocabulary in a deliverable meant for readers outside the project (harness, pilot, card, worker, quick run, spec, the report, too small to matter).
-- Delete on sight: considerably, dramatically, enormously, exceptionally, extremely, highly, quite, remarkably, substantially, very, actually, basically, clearly, essentially, in fact, indeed, just, kind of, of course, really, simply, sort of, certainly, obviously, undoubtedly, important, interesting, notable, remarkable, considerable, major, minor, substantial. Justify or replace: apparently, arguably, can, conceivably, could, maybe, may, might, perhaps, potentially, presumably, probably, seemingly, likely, would, often, mostly, commonly, generally, typically, usually.
+- The word lists below are the only copies; the manuscript checker carries the same lists, and a change is made in both places. Delete on sight: considerably, dramatically, enormously, exceptionally, extremely, highly, quite, remarkably, substantially, very, actually, basically, clearly, essentially, in fact, indeed, just, kind of, of course, really, simply, sort of, certainly, obviously, undoubtedly, important, interesting, notable, remarkable, considerable, major, minor, substantial. Justify or replace: apparently, arguably, can, conceivably, could, maybe, may, might, perhaps, potentially, possibly, presumably, probably, likely, seemingly, would, commonly, frequently, generally, largely, mostly, often, rarely, typically, usually.
 - A table of notation is never included. A design table with a reason column is welcome; its caption defines every label it uses and its cells read on their own.
 - An abstract gives numeric results with their uncertainty for every claim.
-- Every deliverable goes through at least one revision pass for clarity (stage 03, step 4) before the user reads it.
+- Every deliverable goes through at least one revision pass for clarity (`03-manuscript.md`, step 4) before the user reads it.
 
 ## 5. Environment
 
@@ -48,13 +53,13 @@ These rules apply in every stage. A stage file may add rules; it may not remove 
 
 ## 6. Logs and feedback
 
-- Every stage keeps a log in `log/<stage>.md` (stage 3's is `manuscript/drafting-log.md`, which the draft's banner reads; stage 2's decisions are in `pilot/decisions.md` with the process log in `log/02-pilot.md`): what was read, what was decided and why (decisions numbered D0, D1, ...), what was carried from where, what was unsure, and the time each step took.
+- Every stage keeps its log in `log/`, named for the stage file: `log/01-idea-review.md`, `log/02-pilot.md`, `log/03-manuscript.md` (the drafting log, whose opening paragraph the draft's banner reads), `log/04-background-report.md`, `log/05-mock-review.md`, `log/06-slides.md`, `log/07-poster.md`, `log/08-publish.md`. The log holds what was read, what was decided and why (decisions numbered D0, D1, ...), what was carried from where, what was unsure, and the time each step took. The pilot's `pilot/decisions.md` is part of the pilot's deliverable, which the report embeds, and is not the process log.
 - Every stage's log ends with "Process feedback": what in the stage file was unclear, could be simplified, or was missing, with times. The user folds accepted lessons into the stage file and `CHANGELOG.md`.
 - When the user's comment on a deliverable states a general rule, the agent applies the comment and proposes the rule for the stage file; the user decides whether it is adopted.
 
 ## 7. Workers
 
-- A stage may be run by the agent in the conversation (the coordinator) or delegated to a worker with a brief. A brief names the files to read, the rules, the decisions already taken, what to return, and the time box. A worker's report is a report, not proof: the coordinator verifies the files before relaying it.
+- A stage may be run by the agent in the conversation (the coordinator) or delegated to a worker. The worker's brief is the stage file itself, read in full, plus the section "Delegating this stage" at its end and the decisions already taken; a brief in a message adds only the decisions and the time box. A worker's report is a report, not proof: the coordinator verifies the files before relaying it.
 - Workers do not install into the user's library, do not write outside the project, and do not edit the deliverables of earlier stages except where the stage file says a later stage may raise issues (the background report, the mock review).
 - Two writers never touch the same files at once.
 
@@ -65,3 +70,17 @@ These rules apply in every stage. A stage file may add rules; it may not remove 
 - Flag scope creep against `proposal.md`, `project-spec.md`, and `protocol.md`.
 - Explain first and fix second when asked why something is wrong.
 - The user reviews every deliverable; the agent never marks a stop as answered on its own.
+
+## 9. Vocabulary
+
+The words the stage files use, so that none is guessed at.
+
+- **Stop:** a point where the agent returns one message, named in the stage file, and waits for the user.
+- **Deliverable:** the file the user reads at a stop; `STATUS.md` names it.
+- **Settled:** a draft or report the user has declared ready for the next stage.
+- **Marker:** `[TO CONFIRM: ...]{.tc}` for a decision that is the user's, `[CITE: ...]{.cite}` for a claim without a usable source, `[FILL: ...]` only in a template.
+- **Run label:** the `run` field of a run file, one of `pilot`, `quick`, `production`. A quick run is the full design at a replicate count that finishes within an hour; a production run is the design at the replicate count `protocol.md` sets.
+- **The paper test:** the seven questions in `01-idea-review.md`, which also defines the two paper types (a critique, a constructive method) and the three algebraic tools used to sketch a bias term.
+- **Known-answer check:** a run of the simulation code on a case whose answer is known (a null cell, a closed form, a literal implementation), compared with that answer. It is a test in `tests/testthat/`, and the pilot report displays its outcome; it is never content of a manuscript.
+- **Coordinator, worker:** the agent in the conversation, and an agent it delegates a stage or a step to.
+- **Round:** one message of comments from the user on a draft, or one pass of the three mock reviewers.

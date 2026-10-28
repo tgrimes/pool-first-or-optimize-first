@@ -67,7 +67,7 @@ Searches are logged in `log/01-idea-review.md`.
 
 ## 8. Impact and fit
 
-[User base; expected size of the artifact; correction or diagnostic; fit with the critique or the constructive template.]
+[User base; expected size of the artifact; correction or diagnostic; which of the two paper types the idea is (a critique or a constructive method, `workflow/01-idea-review.md`).]
 
 **Target journal:** [one], **fallback:** [one], from the journal guide's worksheet.
 
