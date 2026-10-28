@@ -117,7 +117,7 @@ The project must not add:
 - [ ]
 - [ ]
 
-> **What good looks like.** This is the section that saves projects. Write it by listing what a user with an AI assistant will be tempted to add: one more method or distance, a second dataset, the next sample-specific method after the ones in scope, a predictive model (not the research direction), an R package or software paper (software is a byproduct, not a publication), or a theory result beyond the closed form in section 2. Each item is a different project, not a missing section of this one. If the extension is already on the list of project ideas, name it, so the student knows it is parked, not forgotten. When the user proposes something on this list, the answer is "later, as its own paper".
+> **What good looks like.** This is the section that saves projects. Write it by listing what a user with an AI assistant will be tempted to add: one more method or distance, a second dataset, the next sample-specific method after the ones in scope, a predictive model (not the research direction), an R package or software paper (software is a byproduct, not a publication), or a theory result beyond the closed form in section 2. Each item is a different project, not a missing section of this one. If the extension is already on the list of project ideas, name it, so the user knows it is parked, not forgotten. When the user proposes something on this list, the answer is "later, as its own paper".
 
 ## 9. Reading
 

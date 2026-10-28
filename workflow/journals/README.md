@@ -247,7 +247,7 @@ Journal policies change, AI policies most of all. Reread a profile's sources bef
 ## Open questions
 
 1. **Journals to add or drop.** The 30 journals asked for are all profiled, plus six added because they take this kind of paper: Bioinformatics Advances, Statistics in Biosciences, Frontiers in Genetics, PeerJ, Journal of Applied Statistics, and Electronic Journal of Statistics (a free open-access home for a theory paper). Are there others you want, for example an autoimmune or rheumatology journal for an applied analysis, or Genetic Epidemiology? Are any on the list ones you would never use?
-2. **Budget for charges.** Is there grant or departmental money for an open-access charge, and up to what amount? Does the institution have read-and-publish agreements with Springer Nature, OUP, Wiley, Elsevier, Taylor & Francis, or Sage? The answer decides step 4 for every student paper.
+2. **Budget for charges.** Is there grant or departmental money for an open-access charge, and up to what amount? Does the institution have read-and-publish agreements with Springer Nature, OUP, Wiley, Elsevier, Taylor & Francis, or Sage? The answer decides step 4 for every paper.
 3. **AI drafting.** Eleven journals forbid AI drafting of the text: the ISCB journals, all Taylor & Francis journals, Statistics in Medicine, and Stat. Should the workflow treat them as off limits for drafts it produces, or should the drafting step change for papers aimed at them?
 4. **Unclear points the sites left open:**
    - Genome Biology calls its review single anonymized in its guidelines but advertises transparent peer review on its home page.

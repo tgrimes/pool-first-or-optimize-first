@@ -249,7 +249,7 @@ conclusions belong in the numbered findings. Name the part in the caption. -->
 
 ## Numbered findings
 
-Each finding is a claim followed by the output behind it. Read the claim, open the output, and check that you can see the claim there before accepting it. A claim that cannot be seen in the output is a question to raise at lab meeting.
+Each finding is a claim followed by the output behind it. Read the claim, open the output, and check that you can see the claim there before accepting it. A claim that cannot be seen in the output is a question to raise with the user.
 
 1. **[FILL: claim.]** [FILL: evidence with numbers computed by inline R and a cross-reference to the output.]
 
