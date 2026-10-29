@@ -54,9 +54,11 @@ MarkerTruth <- function(delta, sigma1) {
 #' @param sigma1 Standard deviation of the marker in group 1.
 #' @param b_z Coefficient of the auxiliary.
 #' @param b_d Coefficient of the disease status.
+#' @param p1 Share of the sample in group 1 (one half for equal groups).
 #' @return The intercept \eqn{\alpha_0}.
 #' @export
-MissingIntercept <- function(rate, delta, sigma1, b_z = 1, b_d = 0.5) {
+MissingIntercept <- function(rate, delta, sigma1, b_z = 1, b_d = 0.5,
+                             p1 = 0.5) {
   stopifnot(rate > 0, rate < 1)
   ExpectedRate <- function(alpha0) {
     m0 <- stats::integrate(function(z) {
@@ -66,7 +68,7 @@ MissingIntercept <- function(rate, delta, sigma1, b_z = 1, b_d = 0.5) {
       stats::plogis(alpha0 + b_z * z + b_d) *
         stats::dnorm(z, delta, sqrt(sigma1^2 + 1))
     }, -Inf, Inf)$value
-    (m0 + m1) / 2
+    (1 - p1) * m0 + p1 * m1
   }
   stats::uniroot(function(a) ExpectedRate(a) - rate, c(-20, 20),
                  tol = 1e-10)$root
@@ -74,25 +76,26 @@ MissingIntercept <- function(rate, delta, sigma1, b_z = 1, b_d = 0.5) {
 
 #' Simulate one dataset from the pilot's marker model
 #'
-#' @param n Subjects per group.
+#' @param n Subjects in group 0 (and in group 1 unless `n1` is given).
 #' @param delta Mean of the marker in group 1.
 #' @param sigma1 Standard deviation of the marker in group 1.
 #' @param alpha0 Intercept of the missingness model, or `NA` for no missing
 #'   values.
 #' @param b_z,b_d Coefficients of the missingness model.
+#' @param n1 Subjects in group 1.
 #' @return A data frame with `d` (0 or 1), `x_full`, `z`, `observed`
 #'   (logical), and `x` (`NA` where missing).
 #' @export
 SimulateMarkerData <- function(n, delta, sigma1, alpha0 = NA,
-                               b_z = 1, b_d = 0.5) {
-  d <- rep(c(0L, 1L), each = n)
-  x_full <- c(stats::rnorm(n), stats::rnorm(n, delta, sigma1))
-  z <- x_full + stats::rnorm(2 * n)
+                               b_z = 1, b_d = 0.5, n1 = n) {
+  d <- rep(c(0L, 1L), c(n, n1))
+  x_full <- c(stats::rnorm(n), stats::rnorm(n1, delta, sigma1))
+  z <- x_full + stats::rnorm(n + n1)
   if (is.na(alpha0)) {
-    observed <- rep(TRUE, 2 * n)
+    observed <- rep(TRUE, n + n1)
   } else {
     p_miss <- stats::plogis(alpha0 + b_z * z + b_d * d)
-    observed <- stats::runif(2 * n) >= p_miss
+    observed <- stats::runif(n + n1) >= p_miss
   }
   x <- ifelse(observed, x_full, NA_real_)
   data.frame(d = d, x_full = x_full, z = z, observed = observed, x = x)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulation.R
 \name{SimulationDesign}
 \alias{SimulationDesign}
-\title{Design table of the simulation study}
+\title{Design table of one arm of the simulation study}
 \usage{
 SimulationDesign(
   shapes,
@@ -10,31 +10,41 @@ SimulationDesign(
   miss_rates,
   engines,
   n_imp = 20L,
+  n_cases = NULL,
+  include_null = TRUE,
   base = list(shape = "sharp", n = 250L, miss_rate = 0.4, engine = "pmm")
 )
 }
 \arguments{
 \item{shapes}{A data frame with \code{shape}, \code{delta}, and \code{sigma1}.}
 
-\item{n}{Subjects per group (one or more).}
+\item{n}{Subjects in group 0 (one or more sizes).}
 
 \item{miss_rates}{Missing fractions above zero.}
 
-\item{engines}{Imputation engines, as \code{ImputeWith()} names them.}
+\item{engines}{Imputation engines, as \code{ImputeWith()} names them, or
+\code{"cc"} for complete cases.}
 
 \item{n_imp}{Number of imputations \eqn{L} of the analysis.}
 
+\item{n_cases}{Subjects in group 1, one per size in \code{n}; \code{NULL} for
+equal groups.}
+
+\item{include_null}{Whether each shape and size has a cell without
+missing values.}
+
 \item{base}{A list naming the base cell's \code{shape}, \code{n}, \code{miss_rate}, and
-\code{engine}.}
+\code{engine}; the base cell has equal groups.}
 }
 \value{
 A data frame with \code{cell}, \code{shape}, \code{delta}, \code{sigma1},
-\code{miss_rate}, \code{alpha0}, \code{n}, \code{engine}, \code{n_imp}, \code{base}.
+\code{miss_rate}, \code{alpha0}, \code{n}, \code{engine}, \code{n_imp}, \code{base}, \code{n1}.
 }
 \description{
 One row per data cell. For each shape and group size, the cell without
-missing values comes first, then every missing fraction crossed with every
-imputation engine, the engines varying fastest. With pilot-c's levels
-(the sharp shape, 250 per group, 40\% and 60\% missing, predictive mean
-matching and normal imputation) the table equals \code{PilotDesignC()}.
+missing values comes first (unless \code{include_null} is \code{FALSE}), then every
+missing fraction crossed with every imputation engine, the engines
+varying fastest. With pilot-c's levels (the sharp shape, 250 per group,
+40\% and 60\% missing, predictive mean matching and normal imputation) the
+table equals \code{PilotDesignC()} with the column \code{n1} added.
 }

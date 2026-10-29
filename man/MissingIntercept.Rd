@@ -4,7 +4,7 @@
 \alias{MissingIntercept}
 \title{Intercept of the missingness model for a target missing fraction}
 \usage{
-MissingIntercept(rate, delta, sigma1, b_z = 1, b_d = 0.5)
+MissingIntercept(rate, delta, sigma1, b_z = 1, b_d = 0.5, p1 = 0.5)
 }
 \arguments{
 \item{rate}{Target missing fraction, strictly between 0 and 1.}
@@ -16,6 +16,8 @@ MissingIntercept(rate, delta, sigma1, b_z = 1, b_d = 0.5)
 \item{b_z}{Coefficient of the auxiliary.}
 
 \item{b_d}{Coefficient of the disease status.}
+
+\item{p1}{Share of the sample in group 1 (one half for equal groups).}
 }
 \value{
 The intercept \eqn{\alpha_0}.

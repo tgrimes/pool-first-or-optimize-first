@@ -233,8 +233,10 @@ test_that("SummarizeCellC summarizes real replicates of a small cell", {
     RunReplicateC(cell, truth, n_boot = 20L, m_boot = 2L, n_boot_opt = 5L,
                   n_boot_opt2 = 5L, grid_n = 9L, n_draw = 500L)
   })
-  # The hand-made replicates have the same columns as the real ones.
-  expect_equal(names(FakeRepsC()), setdiff(names(reps), c("rep", "cell")))
+  # The hand-made replicates have pilot-c's columns, which the real ones
+  # still carry first (the study's design added columns after them).
+  real <- setdiff(names(reps), c("rep", "cell"))
+  expect_equal(names(FakeRepsC()), real[seq_along(names(FakeRepsC()))])
   out <- SummarizeCellC(reps, truth)
   expect_equal(nrow(out), 1L)
   expect_named(out, summary_columns_c)

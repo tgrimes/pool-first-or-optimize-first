@@ -2,38 +2,50 @@
 # blocks of replicates on PSOCK workers. analysis/01_simulation.R calls
 # these; the replicate itself is RunReplicateC().
 
-#' Design table of the simulation study
+#' Design table of one arm of the simulation study
 #'
 #' One row per data cell. For each shape and group size, the cell without
-#' missing values comes first, then every missing fraction crossed with every
-#' imputation engine, the engines varying fastest. With pilot-c's levels
-#' (the sharp shape, 250 per group, 40% and 60% missing, predictive mean
-#' matching and normal imputation) the table equals `PilotDesignC()`.
+#' missing values comes first (unless `include_null` is `FALSE`), then every
+#' missing fraction crossed with every imputation engine, the engines
+#' varying fastest. With pilot-c's levels (the sharp shape, 250 per group,
+#' 40% and 60% missing, predictive mean matching and normal imputation) the
+#' table equals `PilotDesignC()` with the column `n1` added.
 #'
 #' @param shapes A data frame with `shape`, `delta`, and `sigma1`.
-#' @param n Subjects per group (one or more).
+#' @param n Subjects in group 0 (one or more sizes).
 #' @param miss_rates Missing fractions above zero.
-#' @param engines Imputation engines, as `ImputeWith()` names them.
+#' @param engines Imputation engines, as `ImputeWith()` names them, or
+#'   `"cc"` for complete cases.
 #' @param n_imp Number of imputations \eqn{L} of the analysis.
+#' @param n_cases Subjects in group 1, one per size in `n`; `NULL` for
+#'   equal groups.
+#' @param include_null Whether each shape and size has a cell without
+#'   missing values.
 #' @param base A list naming the base cell's `shape`, `n`, `miss_rate`, and
-#'   `engine`.
+#'   `engine`; the base cell has equal groups.
 #' @return A data frame with `cell`, `shape`, `delta`, `sigma1`,
-#'   `miss_rate`, `alpha0`, `n`, `engine`, `n_imp`, `base`.
+#'   `miss_rate`, `alpha0`, `n`, `engine`, `n_imp`, `base`, `n1`.
 #' @export
 SimulationDesign <- function(shapes, n, miss_rates, engines, n_imp = 20L,
+                             n_cases = NULL, include_null = TRUE,
                              base = list(shape = "sharp", n = 250L,
                                          miss_rate = 0.4, engine = "pmm")) {
+  if (is.null(n_cases)) n_cases <- n
+  stopifnot(length(n_cases) == length(n))
   rows <- list()
   for (i in seq_len(nrow(shapes))) {
-    for (size in n) {
-      cells <- rbind(
-        data.frame(miss_rate = 0, engine = "none"),
-        expand.grid(engine = engines, miss_rate = miss_rates,
-                    stringsAsFactors = FALSE)[, c("miss_rate", "engine")])
+    for (j in seq_along(n)) {
+      cells <- expand.grid(engine = engines, miss_rate = miss_rates,
+                           stringsAsFactors = FALSE)[, c("miss_rate",
+                                                         "engine")]
+      if (include_null) {
+        cells <- rbind(data.frame(miss_rate = 0, engine = "none"), cells)
+      }
       cells$shape <- shapes$shape[i]
       cells$delta <- shapes$delta[i]
       cells$sigma1 <- shapes$sigma1[i]
-      cells$n <- as.integer(size)
+      cells$n <- as.integer(n[j])
+      cells$n1 <- as.integer(n_cases[j])
       rows[[length(rows) + 1]] <- cells
     }
   }
@@ -42,28 +54,48 @@ SimulationDesign <- function(shapes, n, miss_rates, engines, n_imp = 20L,
   design$n_imp <- as.integer(n_imp)
   design$alpha0 <- NA_real_
   for (i in which(design$miss_rate > 0)) {
-    design$alpha0[i] <- MissingIntercept(design$miss_rate[i],
-                                         design$delta[i], design$sigma1[i])
+    design$alpha0[i] <- MissingIntercept(
+      design$miss_rate[i], design$delta[i], design$sigma1[i],
+      p1 = design$n1[i] / (design$n[i] + design$n1[i]))
   }
   design$base <- design$shape == base$shape & design$n == base$n &
-    design$miss_rate == base$miss_rate & design$engine == base$engine
+    design$n1 == base$n & design$miss_rate == base$miss_rate &
+    design$engine == base$engine
   rownames(design) <- NULL
   design[, c("cell", "shape", "delta", "sigma1", "miss_rate", "alpha0", "n",
-             "engine", "n_imp", "base")]
+             "engine", "n_imp", "base", "n1")]
+}
+
+#' Join the arms of a design and number the cells
+#'
+#' @param arms A list of design tables from `SimulationDesign()`.
+#' @return One design table with cells numbered 1, 2, ... in the order of
+#'   the arms.
+#' @export
+CombineDesigns <- function(arms) {
+  design <- do.call(rbind, arms)
+  design$cell <- seq_len(nrow(design))
+  rownames(design) <- NULL
+  design
 }
 
 #' Plain labels for the cells of a design table
 #'
-#' @param design A design table with `shape`, `n`, `miss_rate`, `engine`.
+#' @param design A design table with `shape`, `n`, `miss_rate`, `engine`,
+#'   and optionally `n1`.
 #' @return A character vector, one label per cell, naming only the factors
 #'   that vary across the table.
 #' @export
 CellLabel <- function(design) {
-  engine <- c(none = "complete", pmm = "PMM", norm = "normal",
-              nn = "nearest neighbour")[design$engine]
+  engine <- c(none = "complete", pmm = "PMM", pmm10 = "PMM, 10 donors",
+              norm = "normal", nn = "nearest neighbour",
+              cc = "complete cases")[design$engine]
+  n1 <- if (is.null(design$n1)) design$n else design$n1
+  size <- ifelse(n1 == design$n, paste0("n = ", design$n),
+                 paste0(n1, " cases, ", design$n, " controls"))
   parts <- list()
   if (length(unique(design$shape)) > 1) parts$shape <- design$shape
-  if (length(unique(design$n)) > 1) parts$n <- paste0("n = ", design$n)
+  if (length(unique(size)) > 1) parts$n <- size
   parts$miss <- ifelse(design$miss_rate > 0,
                        paste0(round(100 * design$miss_rate), "% ", engine),
                        "no missing")

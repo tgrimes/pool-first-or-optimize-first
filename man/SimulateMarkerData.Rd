@@ -4,10 +4,10 @@
 \alias{SimulateMarkerData}
 \title{Simulate one dataset from the pilot's marker model}
 \usage{
-SimulateMarkerData(n, delta, sigma1, alpha0 = NA, b_z = 1, b_d = 0.5)
+SimulateMarkerData(n, delta, sigma1, alpha0 = NA, b_z = 1, b_d = 0.5, n1 = n)
 }
 \arguments{
-\item{n}{Subjects per group.}
+\item{n}{Subjects in group 0 (and in group 1 unless \code{n1} is given).}
 
 \item{delta}{Mean of the marker in group 1.}
 
@@ -17,6 +17,8 @@ SimulateMarkerData(n, delta, sigma1, alpha0 = NA, b_z = 1, b_d = 0.5)
 values.}
 
 \item{b_z, b_d}{Coefficients of the missingness model.}
+
+\item{n1}{Subjects in group 1.}
 }
 \value{
 A data frame with \code{d} (0 or 1), \code{x_full}, \code{z}, \code{observed}

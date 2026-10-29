@@ -2,7 +2,7 @@
 % Please edit documentation in R/simulate_c.R
 \name{RunReplicateC}
 \alias{RunReplicateC}
-\title{Run one replicate of pilot-c}
+\title{Run one replicate of the simulation study}
 \usage{
 RunReplicateC(
   cell,
@@ -16,7 +16,7 @@ RunReplicateC(
 )
 }
 \arguments{
-\item{cell}{One row of \code{PilotDesignC()} (or of \code{BlockTable()}).}
+\item{cell}{One row of a design table (or of \code{BlockTable()}).}
 
 \item{truth}{Output of \code{MarkerTruth()}.}
 
@@ -39,5 +39,10 @@ values.}
 A one-row data frame of per-replicate quantities.
 }
 \description{
-Run one replicate of pilot-c
+Simulates a dataset for the cell, applies \code{MiYoudenInference()}, and
+compares its output with the truth. Written for pilot-c and extended for
+the study's design: the engine \code{"cc"} analyses the complete cases without
+imputation, \code{"pmm10"} matches on 10 donors, and a column \code{n1} in the cell
+sets the size of group 1 (equal to \code{n} when absent). The order of random
+draws is pilot-c's, so pilot-c's replicates are reproduced exactly.
 }

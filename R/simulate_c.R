@@ -48,9 +48,16 @@ BlockTable <- function(design, n_rep, block_size = 100L,
   out
 }
 
-#' Run one replicate of pilot-c
+#' Run one replicate of the simulation study
 #'
-#' @param cell One row of `PilotDesignC()` (or of `BlockTable()`).
+#' Simulates a dataset for the cell, applies `MiYoudenInference()`, and
+#' compares its output with the truth. Written for pilot-c and extended for
+#' the study's design: the engine `"cc"` analyses the complete cases without
+#' imputation, `"pmm10"` matches on 10 donors, and a column `n1` in the cell
+#' sets the size of group 1 (equal to `n` when absent). The order of random
+#' draws is pilot-c's, so pilot-c's replicates are reproduced exactly.
+#'
+#' @param cell One row of a design table (or of `BlockTable()`).
 #' @param truth Output of `MarkerTruth()`.
 #' @param n_boot Resamples for the curve, each imputed `m_boot` times.
 #' @param m_boot Imputations per curve resample.
@@ -66,100 +73,73 @@ BlockTable <- function(design, n_rep, block_size = 100L,
 RunReplicateC <- function(cell, truth, n_boot = 1000L, m_boot = 2L,
                           n_boot_opt = 100L, n_boot_opt2 = 200L,
                           grid_n = 41L, n_draw = 5000L) {
-  dat <- SimulateMarkerData(cell$n, cell$delta, cell$sigma1, cell$alpha0)
-  x <- if (cell$engine == "none") dat$x_full else dat$x
-  d <- dat$d
-  n0 <- sum(d == 0)
-  n1 <- sum(d == 1)
-  completed <- ImputeWith(cell$engine, x, d, dat$z, cell$n_imp)
+  n1 <- if (is.null(cell$n1)) cell$n else cell$n1
+  dat <- SimulateMarkerData(cell$n, cell$delta, cell$sigma1, cell$alpha0,
+                            n1 = n1)
+  engine <- cell$engine
+  if (engine == "cc") {
+    dat_used <- dat[dat$observed, ]
+    engine <- "none"
+  } else {
+    dat_used <- dat
+  }
+  x <- if (engine == "none") dat_used$x_full else dat_used$x
+  d <- dat_used$d
+  z <- dat_used$z
+  Impute <- function(rows, m) ImputeWith(engine, x[rows], d[rows], z[rows], m)
   true_at <- function(cc) TrueYouden(cc, truth$delta, truth$sigma1)
 
-  emp <- EmpiricalCurves(completed, d)
-  pooled <- PoolStepCurves(emp$u, emp$values)
-  c_hat <- pooled$cutoff[["p1"]]
-  apparent <- pooled$index[["p1"]]
-  at_c_hat <- StepValue(c_hat, emp$u, pooled$j_bar)
-
-  grid <- GridFromCompleted(completed, grid_n)
+  res <- MiYoudenInference(d, Impute, n_imp = cell$n_imp, n_boot = n_boot,
+                           m_boot = m_boot, n_boot_opt = n_boot_opt,
+                           n_boot_opt2 = n_boot_opt2, grid_n = grid_n,
+                           n_draw = n_draw)
+  grid <- res$grid
   j_true <- true_at(grid)
   k_best <- which.max(j_true)
-  gc <- GridCurves(completed, d, grid)
-  estimate <- PoolMean(gc$j)
-  pw <- PointwiseRubinBand(gc, n0, n1)
-  rb <- RubinBand(gc, n0, n1, n_draw = n_draw)
-
-  # Resamples for the curve; the first n_boot_opt2 also give the
-  # 2-imputation optimism.
-  boot_grid <- replicate(m_boot, matrix(NA_real_, n_boot, grid_n),
-                         simplify = FALSE)
-  pooled_2 <- vector("list", n_boot_opt2)
-  for (b in seq_len(n_boot)) {
-    idx <- ResampleWithinGroups(d)
-    comp_b <- ImputeWith(cell$engine, x[idx], d[idx], dat$z[idx], m_boot)
-    gb <- GridCurves(comp_b, d[idx], grid)
-    for (m in seq_len(m_boot)) boot_grid[[m]][b, ] <- gb$j[m, ]
-    if (b <= n_boot_opt2) {
-      emp_b <- EmpiricalCurves(comp_b, d[idx])
-      pooled_2[[b]] <- list(u = emp_b$u, j_bar = PoolMean(emp_b$values))
-    }
-  }
-  # Resamples for the matched correction, imputed as the analysis is.
-  pooled_20 <- lapply(seq_len(n_boot_opt), function(b) {
-    idx <- ResampleWithinGroups(d)
-    comp_b <- ImputeWith(cell$engine, x[idx], d[idx], dat$z[idx],
-                         cell$n_imp)
-    emp_b <- EmpiricalCurves(comp_b, d[idx])
-    list(u = emp_b$u, j_bar = PoolMean(emp_b$values))
-  })
-  opt_20 <- BootOptimism(pooled_20, emp$u, pooled$j_bar)
-  opt_2 <- BootOptimism(pooled_2, emp$u, pooled$j_bar)
-
-  cs <- CovarianceSplit(boot_grid, cell$n_imp)
-  se <- sqrt(diag(cs$sigma))
-  centred <- cs$boot_mean - rep(colMeans(cs$boot_mean),
-                                each = nrow(cs$boot_mean))
-  keep <- diag(cs$v) > 0
-  q_boot <- unname(stats::quantile(
-    apply(abs(centred[, keep, drop = FALSE]) /
-            rep(sqrt(diag(cs$v))[keep], each = nrow(centred)), 1, max),
-    0.95, type = 7))
-  q_hybrid <- SupTCritical(cs$sigma, n_draw = n_draw)
-  bands <- list(
-    boot = list(lower = estimate - q_boot * se, upper = estimate + q_boot * se),
-    hybrid = list(lower = estimate - q_hybrid * se,
-                  upper = estimate + q_hybrid * se))
-  qd <- c(boot = ComparisonCritical(centred, cs$v),
-          hybrid = ComparisonCritical(NormalDraws(cs$sigma, n_draw),
-                                      cs$sigma))
 
   out <- list(
-    c_hat = c_hat, apparent = apparent, apparent_at_c_hat = at_c_hat,
-    j_at_c_hat = true_at(c_hat),
-    corrected_20 = at_c_hat - mean(opt_20), optimism_20 = mean(opt_20),
-    corrected_2 = at_c_hat - mean(opt_2), optimism_2 = mean(opt_2),
-    c_p2 = pooled$cutoff[["p2"]], gap = pooled$index[["p2"]] - apparent,
-    cover_pointwise = BandCovers(pw$lower, pw$upper, j_true),
-    cover_rubin = BandCovers(rb$lower, rb$upper, j_true),
-    width_pointwise = mean(pw$upper - pw$lower) / 2,
-    width_rubin = mean(rb$upper - rb$lower) / 2,
-    q_rubin = rb$q, q_boot = q_boot, q_hybrid = q_hybrid)
+    c_hat = res$c_hat, apparent = res$apparent,
+    apparent_at_c_hat = res$apparent_at_c_hat,
+    j_at_c_hat = true_at(res$c_hat),
+    corrected_20 = res$corrected_20, optimism_20 = res$optimism_20,
+    corrected_2 = res$corrected_2, optimism_2 = res$optimism_2,
+    c_p2 = res$c_p2, gap = res$gap,
+    cover_pointwise = BandCovers(res$pointwise$lower, res$pointwise$upper,
+                                 j_true),
+    cover_rubin = BandCovers(res$rubin$lower, res$rubin$upper, j_true),
+    width_pointwise = mean(res$pointwise$upper - res$pointwise$lower) / 2,
+    width_rubin = mean(res$rubin$upper - res$rubin$lower) / 2,
+    q_rubin = res$rubin$q, q_boot = res$boot$q, q_hybrid = res$hybrid$q)
   for (con in c("boot", "hybrid")) {
-    band <- bands[[con]]
-    band_set <- SetOnGrid(grid, band$upper >= max(band$lower), k_best)
-    comp_set <- SetOnGrid(grid, ComparisonSet(estimate, cs$sigma, qd[[con]]),
-                          k_best)
-    out[[paste0("cover_", con)]] <- BandCovers(band$lower, band$upper, j_true)
-    out[[paste0("width_", con)]] <- mean(band$upper - band$lower) / 2
+    r <- res[[con]]
+    band_set <- SetOnGrid(grid, r$band_set, k_best)
+    comp_set <- SetOnGrid(grid, r$comp_set, k_best)
+    out[[paste0("cover_", con)]] <- BandCovers(r$lower, r$upper, j_true)
+    out[[paste0("width_", con)]] <- mean(r$upper - r$lower) / 2
     out[[paste0("bandset_", con, "_contains")]] <- band_set$contains
     out[[paste0("bandset_", con, "_length")]] <- band_set$length
     out[[paste0("compset_", con, "_contains")]] <- comp_set$contains
     out[[paste0("compset_", con, "_length")]] <- comp_set$length
-    out[[paste0("q_comp_", con)]] <- qd[[con]]
+    out[[paste0("q_comp_", con)]] <- r$q_comp
   }
   out$c_star_in_grid <- truth$c_star >= grid[1] &&
     truth$c_star <= grid[grid_n]
   out$grid_lo <- grid[1]
   out$grid_hi <- grid[grid_n]
   out$miss_frac <- mean(!dat$observed)
+  # Added for the study's design (protocol.md); none draws random numbers.
+  for (con in c("boot", "hybrid")) {
+    plug <- SetOnGrid(grid, res[[con]]$comp_set_plugin, k_best)
+    out[[paste0("compplug_", con, "_contains")]] <- plug$contains
+    out[[paste0("compplug_", con, "_length")]] <- plug$length
+    out[[paste0("q_plug_", con)]] <- res[[con]]$q_comp_plugin
+  }
+  out$b_c <- res$b_c
+  out$c_bag <- res$c_bag
+  out$est_best <- res$estimate[k_best]
+  out$j_best <- j_true[k_best]
+  out$se_best <- res$se[k_best]
+  out$se_rubin_best <- res$rubin$se[k_best]
+  out$n_used <- length(d)
   as.data.frame(out)
 }

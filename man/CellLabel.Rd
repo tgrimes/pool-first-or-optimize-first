@@ -7,7 +7,8 @@
 CellLabel(design)
 }
 \arguments{
-\item{design}{A design table with \code{shape}, \code{n}, \code{miss_rate}, \code{engine}.}
+\item{design}{A design table with \code{shape}, \code{n}, \code{miss_rate}, \code{engine},
+and optionally \code{n1}.}
 }
 \value{
 A character vector, one label per cell, naming only the factors

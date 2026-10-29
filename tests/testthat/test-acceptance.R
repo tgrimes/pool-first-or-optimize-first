@@ -33,7 +33,9 @@ WithSavedRng <- function(code) {
 }
 
 test_that("the design table reproduces pilot-c's cells", {
-  expect_equal(PilotCDesignTable(), PilotDesignC())
+  d <- PilotCDesignTable()
+  expect_equal(d[, names(PilotDesignC())], PilotDesignC())
+  expect_equal(d$n1, d$n)
 })
 
 test_that("every per-cell summary of pilot-c is recomputed exactly", {
@@ -41,7 +43,7 @@ test_that("every per-cell summary of pilot-c is recomputed exactly", {
   saved <- readRDS(fixture("pilot-c-cell-summaries.rds"))
   reps <- readRDS(fixture("pilot-c-replicates.rds"))
   expect_identical(nrow(reps), 6500L)
-  again <- SummarizeAllCellsC(reps, PilotCDesignTable())
+  again <- SummarizeAllCellsC(reps, PilotDesignC())
   expect_equal(again, saved, tolerance = 1e-12)
 })
 
@@ -69,8 +71,8 @@ test_that("the first replicate of every pilot-c block is reproduced", {
 test_that("a full rerun of pilot-c reproduces every per-cell summary", {
   skip_if(acceptance != "full", "MICUTOFF_ACCEPTANCE is not full")
   saved <- readRDS(fixture("pilot-c-cell-summaries.rds"))
-  design <- PilotCDesignTable()
-  blocks <- BlockTable(design, 1300L, block_size = 100L)
+  design <- PilotDesignC()
+  blocks <- BlockTable(PilotCDesignTable(), 1300L, block_size = 100L)
   out <- RunBlocksParallel(blocks, 3L,
                            root = normalizePath(test_path("..", "..")))
   again <- SummarizeAllCellsC(out$replicates, design)

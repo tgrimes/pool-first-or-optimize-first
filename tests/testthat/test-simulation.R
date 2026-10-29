@@ -24,6 +24,7 @@ test_that("SimulationDesign's intercepts give the target missing fraction", {
   d <- SimulationDesign(data.frame(shape = "sharp", delta = 2, sigma1 = 1),
                         n = 250L, miss_rates = 0.6, engines = "pmm")
   expect_equal(d$alpha0[2], MissingIntercept(0.6, 2, 1))
+  expect_equal(d$n1, d$n)
 })
 
 test_that("CellLabel names only the factors that vary", {

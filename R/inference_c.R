@@ -58,23 +58,23 @@ NormalDraws <- function(sigma, n_draw) {
   matrix(stats::rnorm(n_draw * nrow(sigma)), n_draw) %*% t(root)
 }
 
-#' Critical value of the comparison-based set
+#' Per-point quantiles of the one-sided comparisons
 #'
 #' For each grid point \eqn{k}, the `level` quantile over draws of
-#' \eqn{\max_{j \ne k} (D_j - D_k)/s_{jk}}; the critical value is the largest
-#' of these over \eqn{k}. Pairs with \eqn{s_{jk} = 0} are left out.
+#' \eqn{\max_{j \ne k} (D_j - D_k)/s_{jk}}. Pairs with \eqn{s_{jk} = 0} are
+#' left out; a point with no pair left gets `-Inf`.
 #'
 #' @param draws A matrix of centred draws, one row per draw (bootstrap
 #'   deviations or normal draws).
 #' @param cov_scale The K x K covariance whose pairwise difference variances
 #'   standardize the draws.
 #' @param level Coverage level.
-#' @return The critical value.
+#' @return A vector of K quantiles.
 #' @export
-ComparisonCritical <- function(draws, cov_scale, level = 0.95) {
+ComparisonQuantiles <- function(draws, cov_scale, level = 0.95) {
   k_n <- ncol(draws)
   d <- diag(cov_scale)
-  q_k <- vapply(seq_len(k_n), function(k) {
+  vapply(seq_len(k_n), function(k) {
     s <- sqrt(pmax(d + d[k] - 2 * cov_scale[, k], 0))
     keep <- s > 0 & seq_len(k_n) != k
     if (!any(keep)) return(-Inf)
@@ -82,7 +82,18 @@ ComparisonCritical <- function(draws, cov_scale, level = 0.95) {
       rep(s[keep], each = nrow(draws))
     unname(stats::quantile(apply(z, 1, max), level, type = 7))
   }, numeric(1))
-  max(q_k)
+}
+
+#' Critical value of the comparison-based set
+#'
+#' The largest over grid points of `ComparisonQuantiles()`, so that the
+#' comparisons involving whichever point is best hold at the level.
+#'
+#' @inheritParams ComparisonQuantiles
+#' @return The critical value.
+#' @export
+ComparisonCritical <- function(draws, cov_scale, level = 0.95) {
+  max(ComparisonQuantiles(draws, cov_scale, level))
 }
 
 #' Comparison-based near-optimal set

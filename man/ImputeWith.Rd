@@ -8,7 +8,7 @@ ImputeWith(engine, x, d, z, n_imp)
 }
 \arguments{
 \item{engine}{\code{"none"} (copies of the data, which must be complete),
-\code{"pmm"}, \code{"norm"}, or \code{"nn"}.}
+\code{"pmm"} (5 donors), \code{"pmm10"} (10 donors), \code{"norm"}, or \code{"nn"}.}
 
 \item{x, d, z}{Marker (with \code{NA}), disease status, auxiliary.}
 

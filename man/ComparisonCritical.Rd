@@ -19,7 +19,6 @@ standardize the draws.}
 The critical value.
 }
 \description{
-For each grid point \eqn{k}, the \code{level} quantile over draws of
-\eqn{\max_{j \ne k} (D_j - D_k)/s_{jk}}; the critical value is the largest
-of these over \eqn{k}. Pairs with \eqn{s_{jk} = 0} are left out.
+The largest over grid points of \code{ComparisonQuantiles()}, so that the
+comparisons involving whichever point is best hold at the level.
 }

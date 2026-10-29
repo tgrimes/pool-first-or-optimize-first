@@ -47,12 +47,18 @@ replicate_columns_c <- c(
   "compset_boot_length", "q_comp_boot", "cover_hybrid", "width_hybrid",
   "bandset_hybrid_contains", "bandset_hybrid_length",
   "compset_hybrid_contains", "compset_hybrid_length", "q_comp_hybrid",
-  "c_star_in_grid", "grid_lo", "grid_hi", "miss_frac")
+  "c_star_in_grid", "grid_lo", "grid_hi", "miss_frac",
+  # added for the study's design (protocol.md)
+  "compplug_boot_contains", "compplug_boot_length", "q_plug_boot",
+  "compplug_hybrid_contains", "compplug_hybrid_length", "q_plug_hybrid",
+  "b_c", "c_bag", "est_best", "j_best", "se_best", "se_rubin_best",
+  "n_used")
 
 logical_columns_c <- c(
   "cover_pointwise", "cover_rubin", "cover_boot", "cover_hybrid",
   "bandset_boot_contains", "compset_boot_contains",
-  "bandset_hybrid_contains", "compset_hybrid_contains", "c_star_in_grid")
+  "bandset_hybrid_contains", "compset_hybrid_contains", "c_star_in_grid",
+  "compplug_boot_contains", "compplug_hybrid_contains")
 
 # -- PilotDesignC ---------------------------------------------------------
 

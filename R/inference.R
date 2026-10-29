@@ -246,7 +246,7 @@ ImputeNorm <- function(x, d, z, n_imp) {
 #' Impute with a named engine
 #'
 #' @param engine `"none"` (copies of the data, which must be complete),
-#'   `"pmm"`, `"norm"`, or `"nn"`.
+#'   `"pmm"` (5 donors), `"pmm10"` (10 donors), `"norm"`, or `"nn"`.
 #' @param x,d,z Marker (with `NA`), disease status, auxiliary.
 #' @param n_imp Number of imputations.
 #' @return An N x `n_imp` matrix of completed marker values.
@@ -255,6 +255,7 @@ ImputeWith <- function(engine, x, d, z, n_imp) {
   switch(engine,
          none = matrix(x, nrow = length(x), ncol = n_imp),
          pmm = ImputePmm(x, d, z, n_imp),
+         pmm10 = ImputePmm(x, d, z, n_imp, donors = 10L),
          norm = ImputeNorm(x, d, z, n_imp),
          nn = ImputeNearestNeighbour(x, d, z, n_imp),
          stop("unknown engine: ", engine))
