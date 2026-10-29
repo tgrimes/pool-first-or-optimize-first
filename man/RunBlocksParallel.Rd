@@ -9,7 +9,8 @@ RunBlocksParallel(
   n_workers,
   log_file = NULL,
   root = here::here(),
-  replicate_fun = RunReplicateC
+  replicate_fun = RunReplicateC,
+  partial_file = NULL
 )
 }
 \arguments{
@@ -22,10 +23,15 @@ RunBlocksParallel(
 \item{root}{The project root, from which the workers load the package.}
 
 \item{replicate_fun}{The function that runs one replicate.}
+
+\item{partial_file}{Optional file to which the finished blocks are
+saved, as \code{CollectBlocks()} returns them, when any block fails.}
 }
 \value{
 A list with \code{replicates} (all rows, ordered by cell, block, and
-replicate) and \code{block_seconds} (one row per block).
+replicate) and \code{block_seconds} (one row per block). A failed block
+stops the run with its cell, block, and error, after every other block
+has finished.
 }
 \description{
 Starts \code{n_workers} PSOCK workers with the BLAS pinned to one thread in

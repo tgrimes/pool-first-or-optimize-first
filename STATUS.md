@@ -5,8 +5,8 @@
 | Workflow version | 0.2.3 (2026-10-29) |
 | Project | Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data |
 | Package | micutoff |
-| Stage | 3, design stop |
-| Open stop | The design stop: the user approves or changes the design proposal (`log/03-manuscript.md`, section "3.2 The design proposal") |
+| Stage | 3, drafting |
+| Open stop | none: stage 3 in progress |
 | Last update | 2026-10-29 |
 
 The Stage row reads "stage number, state". The states a stage can be in:

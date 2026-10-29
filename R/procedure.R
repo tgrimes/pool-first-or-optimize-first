@@ -29,7 +29,8 @@
 #' @param grid_n Grid points.
 #' @param n_draw Normal draws for the Rubin's-rules and hybrid critical
 #'   values.
-#' @return A list: `grid`; `estimate` (the pooled curve on the grid); `u`
+#' @return A list: `grid`; `estimate` (the pooled curve on the grid);
+#'   `completed` (the analysis's completed datasets); `u`
 #'   and `j_bar` (the pooled step curve); `c_hat`, `apparent` (its
 #'   maximum), `apparent_at_c_hat` (the curve at the chosen cutoff);
 #'   `c_p2` and `gap` (optimize first: the mean cutoff and the mean maximum
@@ -102,7 +103,8 @@ MiYoudenInference <- function(d, impute, n_imp = 20L, n_boot = 1000L,
     hybrid = ComparisonQuantiles(NormalDraws(cs$sigma, n_draw), cs$sigma))
   k_hat <- which.max(estimate)
 
-  out <- list(grid = grid, estimate = estimate, u = emp$u,
+  out <- list(grid = grid, estimate = estimate, completed = completed,
+              u = emp$u,
               j_bar = pooled$j_bar, c_hat = c_hat,
               apparent = pooled$index[["p1"]],
               apparent_at_c_hat = at_c_hat,

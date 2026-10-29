@@ -20,4 +20,6 @@ PlotSets(s, labels, limit = 0.93)
 Left panel: the share of replicates in which each set contains the
 grid's best threshold; right panel: each set's mean length, with the
 length of the true range of thresholds within a tolerance of \eqn{J^*}.
+When the summaries carry the plug-in hybrid set (\code{compplug_hybrid}), it
+is drawn as orange diamonds.
 }

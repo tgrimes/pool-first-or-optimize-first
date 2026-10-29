@@ -93,3 +93,42 @@ SummarizeStudy <- function(replicates, design) {
   rownames(out) <- NULL
   out
 }
+
+#' One cell of the study's summaries
+#'
+#' @param s Output of `SummarizeStudy()` (or a design table).
+#' @param shape,n,miss_rate,engine The cell's levels.
+#' @param n1 Size of group 1; equal to `n` by default.
+#' @return The one matching row; an error if there is not exactly one.
+#' @export
+PickCell <- function(s, shape = "sharp", n = 250L, miss_rate = 0.4,
+                     engine = "pmm", n1 = n) {
+  n1_col <- if (is.null(s$n1)) s$n else s$n1
+  row <- s[s$shape == shape & s$n == n & n1_col == n1 &
+             abs(s$miss_rate - miss_rate) < 1e-9 & s$engine == engine, ]
+  if (nrow(row) != 1) {
+    stop("no single cell: ", shape, ", n = ", n, ", n1 = ", n1, ", ",
+         miss_rate, ", ", engine)
+  }
+  row
+}
+
+#' Slope of the optimism against group size on the log scale
+#'
+#' Weighted least squares of the log optimism on the log group size over
+#' the given cells, with weights from the delta-method variances of the log
+#' optimism, \eqn{(\mathrm{MCSE}/\mathrm{optimism})^2}; the standard error
+#' treats those variances as known. Supplementary note S1.2 predicts a
+#' slope near \eqn{-2/3}.
+#'
+#' @param s Rows of `SummarizeStudy()`, one per group size.
+#' @return A named vector with `slope` and `se`.
+#' @export
+OptimismSlope <- function(s) {
+  y <- log(s$optimism)
+  x <- log(s$n)
+  w <- 1 / (s$optimism_mcse / s$optimism)^2
+  xb <- sum(w * x) / sum(w)
+  sxx <- sum(w * (x - xb)^2)
+  c(slope = sum(w * (x - xb) * y) / sxx, se = sqrt(1 / sxx))
+}

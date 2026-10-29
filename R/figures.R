@@ -39,6 +39,8 @@ PlotBandCoverage <- function(s, labels, limits = c(0.93, 0.97),
 #' Left panel: the share of replicates in which each set contains the
 #' grid's best threshold; right panel: each set's mean length, with the
 #' length of the true range of thresholds within a tolerance of \eqn{J^*}.
+#' When the summaries carry the plug-in hybrid set (`compplug_hybrid`), it
+#' is drawn as orange diamonds.
 #'
 #' @param s Per-cell summaries.
 #' @param labels Row labels, one per cell.
@@ -56,6 +58,9 @@ PlotSets <- function(s, labels, limit = 0.93) {
   graphics::points(s$compset_hybrid, y + 0.12, pch = 17, col = "#2c7fb8")
   graphics::points(s$bandset_boot, y - 0.12, pch = 1)
   graphics::points(s$bandset_hybrid, y + 0.12, pch = 2, col = "#2c7fb8")
+  if (!is.null(s$compplug_hybrid)) {
+    graphics::points(s$compplug_hybrid, y + 0.3, pch = 5, col = "#d95f02")
+  }
   graphics::abline(v = limit, lty = 2, col = "grey40")
   graphics::axis(2, at = y, labels = labels, las = 1, cex.axis = 0.8)
   graphics::plot(s$compset_boot_length, y - 0.12,
@@ -68,6 +73,10 @@ PlotSets <- function(s, labels, limit = 0.93) {
   graphics::points(s$bandset_boot_length, y - 0.12, pch = 1)
   graphics::points(s$bandset_hybrid_length, y + 0.12, pch = 2,
                    col = "#2c7fb8")
+  if (!is.null(s$compplug_hybrid_length)) {
+    graphics::points(s$compplug_hybrid_length, y + 0.3, pch = 5,
+                     col = "#d95f02")
+  }
   graphics::points(s$true_region_length, y, pch = 3, col = "grey40")
   graphics::axis(2, at = y, labels = labels, las = 1, cex.axis = 0.8)
   invisible(NULL)
@@ -124,5 +133,69 @@ PlotNhanesCurve <- function(curve, reference_cutoff = NULL) {
     graphics::abline(v = (log10(reference_cutoff) - curve$center) /
                        curve$scale, lty = 2, col = "grey30")
   }
+  invisible(NULL)
+}
+
+#' The pooling-order gap against its quadratic approximation
+#'
+#' One point per cell with missing values: the mean gap between the
+#' optimize-first and pool-first indices against the mean of
+#' \eqn{\kappa \hat B_c / 2}, with plus and minus two MCSE, on log scales,
+#' and the identity line.
+#'
+#' @param s Per-cell summaries from `SummarizeStudy()`.
+#' @return `NULL`, invisibly.
+#' @export
+PlotGap <- function(s) {
+  s <- s[s$miss_rate > 0 & s$engine != "cc", ]
+  op <- graphics::par(mar = c(4.2, 4.4, 1, 1))
+  on.exit(graphics::par(op))
+  col <- ifelse(s$engine == "norm", "#2c7fb8", "black")
+  pch <- c(sharp = 19, flat = 17, separated = 15)[s$shape]
+  rng <- range(c(s$pred_gap, s$gap - 2 * s$gap_mcse,
+                 s$gap + 2 * s$gap_mcse))
+  rng[1] <- max(rng[1], min(s$pred_gap) / 2)
+  graphics::plot(s$pred_gap, s$gap, log = "xy", xlim = rng, ylim = rng,
+                 pch = pch, col = col,
+                 xlab = "Mean of kappa * B_c / 2", ylab = "Mean gap")
+  graphics::segments(s$pred_gap, pmax(s$gap - 2 * s$gap_mcse, rng[1]),
+                     s$pred_gap, s$gap + 2 * s$gap_mcse, col = col)
+  graphics::abline(0, 1, lty = 2, col = "grey40")
+  graphics::legend("topleft", c("sharp", "flat", "separated", "PMM",
+                                "normal"),
+                   pch = c(19, 17, 15, 19, 19),
+                   col = c("grey30", "grey30", "grey30", "black", "#2c7fb8"),
+                   bty = "n", cex = 0.8)
+  invisible(NULL)
+}
+
+#' The application's pooled curve with its band and near-optimal set
+#'
+#' @param a One analysis from `SummarizeAnalysis()`.
+#' @param construction `"hybrid"` or `"boot"`.
+#' @param benchmark Optional curve on the same grid (the complete-case
+#'   curve), drawn in grey.
+#' @param reference Optional threshold on the analysis scale, drawn dashed.
+#' @param main Panel title.
+#' @return `NULL`, invisibly.
+#' @export
+PlotApplication <- function(a, construction = "hybrid", benchmark = NULL,
+                            reference = NULL, main = "") {
+  band <- a[[construction]]
+  in_set <- a$sets[[paste0("comp_", construction)]]
+  ylim <- range(c(band$lower, band$upper, benchmark, 0))
+  graphics::plot(a$grid, a$estimate, type = "n", ylim = ylim,
+                 xlab = "log10 cotinine (ng/mL)", ylab = "Youden index J(c)",
+                 main = main, cex.main = 0.9)
+  graphics::polygon(c(a$grid, rev(a$grid)), c(band$lower, rev(band$upper)),
+                    col = "grey88", border = NA)
+  if (!is.null(benchmark)) {
+    graphics::lines(a$grid, benchmark, col = "grey45", lwd = 2)
+  }
+  graphics::lines(a$grid, a$estimate, lwd = 2)
+  graphics::points(a$grid[in_set], rep(ylim[1], sum(in_set)), pch = 15,
+                   cex = 0.8, col = "#d95f02")
+  graphics::abline(v = a$c_hat, col = "grey30")
+  if (!is.null(reference)) graphics::abline(v = reference, lty = 2)
   invisible(NULL)
 }

@@ -38,7 +38,8 @@ correction.}
 values.}
 }
 \value{
-A list: \code{grid}; \code{estimate} (the pooled curve on the grid); \code{u}
+A list: \code{grid}; \code{estimate} (the pooled curve on the grid);
+\code{completed} (the analysis's completed datasets); \code{u}
 and \code{j_bar} (the pooled step curve); \code{c_hat}, \code{apparent} (its
 maximum), \code{apparent_at_c_hat} (the curve at the chosen cutoff);
 \code{c_p2} and \code{gap} (optimize first: the mean cutoff and the mean maximum

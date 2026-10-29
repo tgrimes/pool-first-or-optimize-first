@@ -42,7 +42,7 @@ Cells where the answer is known: every cell without missing values, where the 20
 - the optimism correction: 100 further resamples imputed 20 times each, the corrected index $\bar J(\hat c) - \bar o$ with $o_b = \bar J_b(\hat c_b) - \bar J(\hat c_b)$; the same from the first 200 curve resamples with 2 imputations, as secondary;
 - optimize first: the mean of the per-dataset cutoffs and of their maxima; the bagged cutoff: the mean cutoff of the 100 matched resamples.
 
-Imputation: `mice::mice.impute.pmm()` (type 1 matching, 5 or 10 donors) or `mice::mice.impute.norm()`, once per imputation, with predictors $D$, $Z$, $D \times Z$; complete cases drop the subjects with $X$ missing and run the same procedure without imputation. Software: R 4.5.2, `mice` 3.19.0, the package `micutoff` in this repository; versions in `results/session_info.txt`.
+Imputation: `mice::mice.impute.pmm()` (type 1 matching, 5 or 10 donors) or `mice::mice.impute.norm()`, once per imputation, with predictors $D$, $Z$, $D \times Z$, less any that are constant or collinear among the observed rows (amendment of 2026-10-29, below); complete cases drop the subjects with $X$ missing and run the same procedure without imputation. Software: R 4.5.2, `mice` 3.19.0, the package `micutoff` in this repository; versions in `results/session_info.txt`.
 
 Left out, with reasons (D-S3): the kernel estimator; the nearest-neighbour engine of Long, Zhang, and Hsu (2011), not proper with one auxiliary; impute-then-bootstrap, for which the Rubin's-rules band stands, since it uses the closed-form within-imputation covariance a bootstrap of each completed dataset estimates; the complete-case intervals of Bantis, Nakas, and Reiser (2019), with complete cases entering as an engine instead; the discrete covariate, which goes to the application and the supplement; the auxiliary's strength.
 
@@ -63,6 +63,12 @@ A difference is called nonzero only when it exceeds about three Monte Carlo stan
 ## Common
 
 Seeds: replicates run in seeded blocks of 100; block $b$ of cell $k$ uses the L'Ecuyer-CMRG generator seeded with $20261101 + 1000k + b$, so results do not depend on the worker; the base seed differs from pilot-c's ($20261030$), so the 0.6 predictive-mean-matching cells are a fresh recheck of pilot-c's (D-S8 of the stage 2 log). Workers: seven PSOCK workers with the BLAS pinned to one thread, one block per task, `parLapplyLB()` with `chunk.size = 1` (the user's allowance of eight cores, D-S2). Outputs: `results/simulation_replicates.rds` (per replicate, git-ignored), `results/cell_summaries.rds` and `.csv` (committed), `results/design.rds`, `results/run_info.rds` (the run label, replicates, cells, date, `n_rep_production`), `results/session_info.txt`. The manuscript reads the summaries at render time. The application is `analysis/02_application.R`, with its own run file `results/application_run_info.rds`.
+
+## Amendments before the production run
+
+| Date | Change | Reason |
+|---|---|---|
+| 2026-10-29 | Predictors constant or collinear among the observed rows are dropped before each call of `mice.impute.pmm()` or `mice.impute.norm()` (`FullRankColumns()`); data without such columns are imputed exactly as before. The parallel runner saves finished blocks when a block fails. | The first quick run stopped in cell 27 (sharp, 100 per group, 60% missing, predictive mean matching), replicate 9, where 10 of 100 cases were observed and a resample left the predictors collinear; `mice`'s univariate functions stop on collinear predictors outside `mice()`, which would have removed them. No result of that run was read: the run saved nothing. |
 
 ## Changes after production
 

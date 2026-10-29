@@ -6,6 +6,8 @@
 #   Rscript analysis/01_simulation.R timing       # ten replicates per cell
 #   Rscript analysis/01_simulation.R quick        # the full design, n_rep_quick
 #   Rscript analysis/01_simulation.R production   # n_rep_production
+# An optional second argument sets the number of workers (default
+# n_workers); seeds are per block, so it does not change the results.
 #
 # Writes to results/: design.rds, simulation_replicates.rds (per replicate,
 # git-ignored), cell_summaries.rds and .csv, simulation.log, timing.rds
@@ -47,6 +49,7 @@ timing_reps <- 10L
 args <- commandArgs(trailingOnly = TRUE)
 mode <- if (length(args)) args[1] else "quick"
 stopifnot(mode %in% c("timing", "quick", "production"))
+if (length(args) > 1) n_workers <- as.integer(args[2])
 set.seed(base_seed)
 results_dir <- here::here("results")
 log_file <- file.path(results_dir, if (mode == "timing") "timing.log" else
@@ -64,7 +67,9 @@ blocks <- BlockTable(design, n_rep,
                      base_seed = base_seed)
 
 start <- Sys.time()
-out <- RunBlocksParallel(blocks, n_workers, log_file = log_file)
+out <- RunBlocksParallel(blocks, n_workers, log_file = log_file,
+                         partial_file = file.path(results_dir,
+                                                  "simulation_partial.rds"))
 runtime_minutes <- as.numeric(difftime(Sys.time(), start, units = "mins"))
 
 if (mode == "timing") {

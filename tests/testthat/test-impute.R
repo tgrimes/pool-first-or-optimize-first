@@ -204,3 +204,23 @@ test_that("imputation is reproducible under a seed", {
   b <- ImputeNearestNeighbour(dat$x, dat$d, dat$z, 3)
   expect_identical(a, b)
 })
+
+test_that("FullRankColumns drops constant and collinear columns only", {
+  observed <- c(TRUE, TRUE, TRUE, TRUE, FALSE)
+  p <- cbind(a = c(1, 2, 3, 4, 9), b = c(1, 1, 1, 1, 2),
+             c = c(2, 4, 6, 8, 0), e = c(1, 0, 1, 1, 5))
+  out <- FullRankColumns(p, observed)
+  expect_equal(colnames(out), c("a", "e"))
+  full <- cbind(d = rep(0:1, 5), z = 1:10, dz = rep(0:1, 5) * (1:10))
+  expect_identical(FullRankColumns(full, rep(TRUE, 10)), full)
+})
+
+test_that("both engines impute when one group has a single observed case", {
+  set.seed(21)
+  d <- rep(0:1, each = 20)
+  z <- stats::rnorm(40)
+  x <- z + d + stats::rnorm(40)
+  x[d == 1][-1] <- NA
+  expect_no_error(ImputePmm(x, d, z, 2))
+  expect_no_error(ImputeNorm(x, d, z, 2))
+})

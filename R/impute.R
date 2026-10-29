@@ -1,12 +1,37 @@
 # The two imputation engines. Each returns an N x L matrix of completed
 # marker values: observed rows are unchanged, missing rows hold the draws.
 
+#' Predictor columns of full rank among the observed rows
+#'
+#' `mice::mice.impute.pmm()` and `mice::mice.impute.norm()` stop with an
+#' error on collinear predictors when called outside `mice()`, which would
+#' remove them first. This keeps a set of columns that, with an intercept,
+#' has full rank among the observed rows (constant columns and exact
+#' linear combinations are dropped). Data without such columns are returned
+#' unchanged, so results are unchanged wherever the call would have
+#' succeeded.
+#'
+#' @param predictors A numeric matrix, one row per subject.
+#' @param observed Logical, the marker is observed.
+#' @return `predictors` with the dropped columns removed.
+#' @export
+FullRankColumns <- function(predictors, observed) {
+  obs <- predictors[observed, , drop = FALSE]
+  keep <- apply(obs, 2, function(v) length(unique(v)) > 1)
+  if (!any(keep)) return(predictors[, keep, drop = FALSE])
+  q <- qr(cbind(1, obs[, keep, drop = FALSE]))
+  cols <- sort(q$pivot[seq_len(q$rank)])
+  predictors[, which(keep)[cols[cols > 1] - 1], drop = FALSE]
+}
+
 #' Multiple imputation by predictive mean matching
 #'
 #' Calls `mice::mice.impute.pmm()` once per imputation with the predictors
 #' \eqn{D}, \eqn{Z}, and \eqn{D \times Z}. Only the marker is missing and the
 #' predictors are complete, so one call per imputation is the univariate
-#' step that `mice()` runs for this pattern.
+#' step that `mice()` runs for this pattern. Predictors that are collinear
+#' among the observed rows are dropped first (`FullRankColumns()`), as
+#' `mice()` removes collinear predictors.
 #'
 #' @param x Marker values, `NA` where missing.
 #' @param d Disease status (0 or 1).
@@ -17,7 +42,7 @@
 #' @export
 ImputePmm <- function(x, d, z, n_imp, donors = 5L) {
   observed <- !is.na(x)
-  predictors <- cbind(d = d, z = z, dz = d * z)
+  predictors <- FullRankColumns(cbind(d = d, z = z, dz = d * z), observed)
   completed <- matrix(x, nrow = length(x), ncol = n_imp)
   for (l in seq_len(n_imp)) {
     completed[!observed, l] <- mice::mice.impute.pmm(

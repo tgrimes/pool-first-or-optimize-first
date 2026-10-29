@@ -24,5 +24,7 @@ An N x \code{n_imp} matrix of completed marker values.
 Calls \code{mice::mice.impute.pmm()} once per imputation with the predictors
 \eqn{D}, \eqn{Z}, and \eqn{D \times Z}. Only the marker is missing and the
 predictors are complete, so one call per imputation is the univariate
-step that \code{mice()} runs for this pattern.
+step that \code{mice()} runs for this pattern. Predictors that are collinear
+among the observed rows are dropped first (\code{FullRankColumns()}), as
+\code{mice()} removes collinear predictors.
 }

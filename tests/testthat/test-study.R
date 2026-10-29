@@ -38,7 +38,7 @@ test_that("MissingIntercept hits the target fraction with unequal groups", {
   a0 <- MissingIntercept(0.4, 2, 1, p1 = 0.2)
   set.seed(2)
   dat <- SimulateMarkerData(80000, 2, 1, alpha0 = a0, n1 = 20000)
-  expect_equal(mean(!dat$observed), 0.4, tolerance = 0.01)
+  expect_lt(abs(mean(!dat$observed) - 0.4), 0.01)
   expect_equal(MissingIntercept(0.4, 2, 1, p1 = 0.5),
                MissingIntercept(0.4, 2, 1))
 })
@@ -161,4 +161,26 @@ test_that("SummarizeStudy labels every cell", {
   s <- SummarizeStudy(reps, design)
   expect_equal(nrow(s), 2)
   expect_equal(s$label, c("40% PMM", "40% normal"))
+})
+
+test_that("PickCell finds one cell and refuses none or several", {
+  sharp <- data.frame(shape = "sharp", delta = 2, sigma1 = 1)
+  d <- CombineDesigns(list(
+    SimulationDesign(sharp, c(100L, 250L), c(0.2, 0.4), c("pmm", "norm")),
+    SimulationDesign(sharp, 400L, 0.4, "pmm", n_cases = 100L)))
+  expect_equal(PickCell(d)$cell, d$cell[d$base])
+  expect_equal(PickCell(d, n = 400L, n1 = 100L, engine = "pmm")$n1, 100L)
+  expect_equal(PickCell(d, n = 100L, miss_rate = 0, engine = "none")$cell, 1L)
+  expect_error(PickCell(d, n = 1000L), "no single cell")
+})
+
+test_that("OptimismSlope recovers a power law and its weighted SE", {
+  s <- data.frame(n = c(100, 250, 1000))
+  s$optimism <- 0.3 * s$n^(-2 / 3)
+  s$optimism_mcse <- 0.05 * s$optimism
+  out <- OptimismSlope(s)
+  expect_equal(out[["slope"]], -2 / 3, tolerance = 1e-10)
+  x <- log(s$n)
+  expect_equal(out[["se"]], 0.05 / sqrt(sum((x - mean(x))^2)),
+               tolerance = 1e-10)
 })

@@ -21,5 +21,6 @@ An N x \code{n_imp} matrix of completed marker values.
 \description{
 Calls \code{mice::mice.impute.norm()} once per imputation with the predictors
 \eqn{D}, \eqn{Z}, and \eqn{D \times Z}: a draw of the coefficients and the
-residual variance, then normal draws for the missing values.
+residual variance, then normal draws for the missing values. Collinear
+predictors are dropped first (\code{FullRankColumns()}).
 }

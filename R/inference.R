@@ -223,7 +223,8 @@ ResampleWithinGroups <- function(d) {
 #'
 #' Calls `mice::mice.impute.norm()` once per imputation with the predictors
 #' \eqn{D}, \eqn{Z}, and \eqn{D \times Z}: a draw of the coefficients and the
-#' residual variance, then normal draws for the missing values.
+#' residual variance, then normal draws for the missing values. Collinear
+#' predictors are dropped first (`FullRankColumns()`).
 #'
 #' @param x Marker values, `NA` where missing.
 #' @param d Disease status (0 or 1).
@@ -233,7 +234,7 @@ ResampleWithinGroups <- function(d) {
 #' @export
 ImputeNorm <- function(x, d, z, n_imp) {
   observed <- !is.na(x)
-  predictors <- cbind(d = d, z = z, dz = d * z)
+  predictors <- FullRankColumns(cbind(d = d, z = z, dz = d * z), observed)
   completed <- matrix(x, nrow = length(x), ncol = n_imp)
   if (all(observed)) return(completed)
   for (l in seq_len(n_imp)) {

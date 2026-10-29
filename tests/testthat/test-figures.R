@@ -37,3 +37,17 @@ test_that("PlotNhanesCurve draws a curve with and without a reference", {
   DrawsWithoutError(PlotNhanesCurve(curve))
   DrawsWithoutError(PlotNhanesCurve(curve, reference_cutoff = 3.63))
 })
+
+test_that("PlotGap and PlotApplication draw", {
+  s <- data.frame(shape = c("sharp", "flat"), engine = c("pmm", "norm"),
+                  miss_rate = 0.4, gap = c(0.003, 0.004),
+                  gap_mcse = c(1e-4, 1e-4), pred_gap = c(0.0028, 0.0045))
+  DrawsWithoutError(PlotGap(s))
+  grid <- seq(-1, 2, length.out = 9)
+  est <- 0.6 - (grid - 0.5)^2 / 4
+  a <- list(grid = grid, estimate = est, c_hat = 0.5,
+            hybrid = list(lower = est - 0.05, upper = est + 0.05),
+            sets = list(comp_hybrid = abs(grid - 0.5) < 0.6))
+  DrawsWithoutError(PlotApplication(a, benchmark = est - 0.01,
+                                    reference = 0.56))
+})

@@ -135,6 +135,24 @@ BlasPinned <- function() {
     OMP_NUM_THREADS = "1", MKL_NUM_THREADS = "1")
 }
 
+#' Start PSOCK workers with the BLAS pinned and the package loaded
+#'
+#' @param n_workers Number of workers.
+#' @param root The project root, from which the workers load the package.
+#' @return The cluster; the caller stops it.
+#' @export
+StartWorkers <- function(n_workers, root = here::here()) {
+  do.call(Sys.setenv, as.list(BlasPinned()))
+  cl <- parallel::makePSOCKcluster(n_workers)
+  invisible(parallel::clusterCall(cl, function(lib, env, path) {
+    .libPaths(lib)
+    do.call(Sys.setenv, as.list(env))
+    suppressMessages(devtools::load_all(path, quiet = TRUE))
+    NULL
+  }, .libPaths(), BlasPinned(), root))
+  cl
+}
+
 #' Run seeded blocks on PSOCK workers
 #'
 #' Starts `n_workers` PSOCK workers with the BLAS pinned to one thread in
@@ -148,29 +166,43 @@ BlasPinned <- function() {
 #' @param log_file Optional log file.
 #' @param root The project root, from which the workers load the package.
 #' @param replicate_fun The function that runs one replicate.
+#' @param partial_file Optional file to which the finished blocks are
+#'   saved, as `CollectBlocks()` returns them, when any block fails.
 #' @return A list with `replicates` (all rows, ordered by cell, block, and
-#'   replicate) and `block_seconds` (one row per block).
+#'   replicate) and `block_seconds` (one row per block). A failed block
+#'   stops the run with its cell, block, and error, after every other block
+#'   has finished.
 #' @export
 RunBlocksParallel <- function(blocks, n_workers, log_file = NULL,
                               root = here::here(),
-                              replicate_fun = RunReplicateC) {
-  do.call(Sys.setenv, as.list(BlasPinned()))
-  cl <- parallel::makePSOCKcluster(n_workers)
+                              replicate_fun = RunReplicateC,
+                              partial_file = NULL) {
+  cl <- StartWorkers(n_workers, root)
   on.exit(parallel::stopCluster(cl), add = TRUE)
-  invisible(parallel::clusterCall(cl, function(lib, env, path) {
-    .libPaths(lib)
-    do.call(Sys.setenv, as.list(env))
-    suppressMessages(devtools::load_all(path, quiet = TRUE))
-    NULL
-  }, .libPaths(), BlasPinned(), root))
   tasks <- split(blocks, seq_len(nrow(blocks)))
   # The extra arguments must not be named `fun` or `x`, which
   # parLapplyLB() passes on to clusterApplyLB() as its own.
   runs <- parallel::parLapplyLB(cl, tasks, function(block, log_path,
                                                     one_rep) {
-    out <- RunBlock(block, replicate_fun = one_rep, log_file = log_path)
-    list(reps = out, seconds = attr(out, "seconds"))
+    tryCatch({
+      out <- RunBlock(block, replicate_fun = one_rep, log_file = log_path)
+      list(reps = out, seconds = attr(out, "seconds"))
+    }, error = function(e) {
+      list(error = conditionMessage(e), cell = block$cell,
+           block = block$block)
+    })
   }, log_path = log_file, one_rep = replicate_fun, chunk.size = 1)
+  failed <- vapply(runs, function(r) !is.null(r$error), logical(1))
+  if (any(failed)) {
+    if (!is.null(partial_file) && any(!failed)) {
+      saveRDS(CollectBlocks(runs[!failed]), partial_file)
+    }
+    stop("blocks failed: ", paste(vapply(runs[failed], function(r) {
+      paste0("cell ", r$cell, " block ", r$block, " (", r$error, ")")
+    }, character(1)), collapse = "; "),
+    if (!is.null(partial_file)) paste0("; finished blocks saved to ",
+                                       partial_file))
+  }
   CollectBlocks(runs)
 }
 

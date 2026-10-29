@@ -107,3 +107,22 @@ test_that("RunBlocksParallel runs every block on a worker, seeded per block", {
   }))
   expect_equal(out$replicates$x, serial$replicates$x)
 })
+
+test_that("RunBlocksParallel saves finished blocks and names a failed one", {
+  root <- normalizePath(test_path("..", ".."), mustWork = FALSE)
+  skip_if_not(file.exists(file.path(root, "DESCRIPTION")),
+              "the package source is not two levels up (R CMD check)")
+  Toy <- function(cell, truth) {
+    if (cell$cell == 2) stop("boom")
+    data.frame(x = 1)
+  }
+  blocks <- BlockTable(PilotDesignC()[1:2, ], 2L, block_size = 1L)
+  partial <- tempfile(fileext = ".rds")
+  expect_error(RunBlocksParallel(blocks, 1L, root = root,
+                                 replicate_fun = Toy,
+                                 partial_file = partial),
+               "cell 2 block 1 \\(boom\\)")
+  saved <- readRDS(partial)
+  expect_equal(unique(saved$replicates$cell), 1)
+  expect_equal(nrow(saved$replicates), 2)
+})
