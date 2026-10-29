@@ -377,3 +377,43 @@ DOI 10.1177/09622802251322989 (Stat Methods Med Res 34(4):796-811, online 2025-0
 - D29. Rule change by the user (rules, section 6: a comment that states a general rule is applied and proposed for the stage file; here the user adopted it outright): a supporting citation, one that says only that an approach, a result, or a dataset exists, is cited from the abstract when the abstract states the claim; a core citation needs the full text. Written into `workflow/rules.md` section 2, `workflow/01-idea-review.md` step 9, and `workflow/CHANGELOG.md` (Unreleased). Applied: Wang, Fang, and Li 2025 (the cube-root limit for a weighted Youden cutoff, stated in the abstract; the derivation of the Youden case stays in the supplement), Wang, Shi, and Qin 2025 and Jia, Wang, and Qin 2026 (Youden intervals under verification bias, stated in the abstracts), and Wirth et al. 2023 (imputed, then Youden cutoffs, stated in the abstract) return as supporting citations; the Zotero list is 38 entries with the optional review, four of them without a PDF. The template repository (`research-workflow`) does not have this change yet.
 
 Process feedback, added: 23. **The full-text rule.** Rules section 2 required full text for every citation. Three unobtainable PDFs at stop 1 showed that a supporting citation needs only what its abstract states; the user changed the rule in this round. The template should carry the change, and step 9's `citations.csv` note now says how such a row is filled.
+
+
+## Step 9. The Zotero check (2026-10-28, 22:27 to 22:35)
+
+The connector answered `pong`. STATUS set to `1, Zotero check`. Every source in the proposal's section 10 was looked up by DOI (query `q` = the DOI) and, where that found nothing, by title; the book by author. Each found record was read in full mode for its bibliographic fields and attachments; for every attached PDF one restricted full-text search pulled the supporting passage, now in `manuscript/citations.csv` with the date read. 36 of 38 items are in the library; 32 with a PDF, 4 abstract-only by design (rules, section 2, as changed at stop 1).
+
+### Missing (Stop 2)
+
+What the user must do, grouped:
+
+1. **Add to Zotero.** (a) van der Vaart, Asymptotic Statistics, Cambridge University Press, 1998: a book, no PDF needed. Not found by title or author. (b) Fluss R, Reiser B, Faraggi D, Rotnitzky A. Estimation of the ROC curve under verification bias. Biometrical Journal 2009;51(3):475-90, DOI 10.1002/bimj.200800128, open PDF at PMC3475535. Not found by DOI or title.
+2. **Enter the abstract (or attach the PDF) for Wirth et al.** Record SYXIIAIT has neither; an abstract-only citation needs the abstract in the record. The abstract is on PubMed 37924505.
+3. **Decide the ROCnReg record.** WCLA5H4T is the arXiv preprint (itemType preprint, DOI 10.48550/arXiv.2003.13111). The proposal cites the R Journal article (2021;13:525, DOI 10.32614/rj-2021-066). Either add the journal record (and keep the PDF), or the proposal cites the preprint.
+
+### Record faults, with the value to enter (never patched here)
+
+| Item | Field | Value to enter |
+|---|---|---|
+| K6CHKTHU Kim and Pollard 1990 | DOI; volume; issue; publisher | 10.1214/aos/1176347498; 18; 1; remove 'JSTOR'. Also: the PDF is a scan with no text layer, so no passage can be read through the connector; OCR it or attach a text-layer copy. |
+| GAD48MU6 von Hippel and Bartlett 2021 | title; DOI; author; publisher | "Maximum Likelihood Multiple Imputation: Faster Imputations and Consistent Standard Errors Without Posterior Draws"; 10.1214/20-sts793; family name "von Hippel" (lower-case particle); remove 'JSTOR' |
+| 386ZU8ZS Seijo and Sen 2011 | journal; volume; pages; DOI | Electronic Journal of Statistics; 5; pages from the Euclid page; 10.1214/11-EJS613 |
+| SPUB9EGM Thiele and Hirschfeld 2023 | journal; DOI; publisher | PLOS ONE; 10.1371/journal.pone.0279693; remove the address in the publisher field |
+| 68BTQRIH Long, Hsu, and Li 2012 | DOI; pages | 10.5705/ss.2010.069; the end page (the record holds 149 alone; idea.md gives 149-172, to be confirmed on the journal page) |
+| JE9DDBJN Bantis, Nakas, and Reiser 2014 | DOI | 10.1111/biom.12107 |
+| DLQ8LFPL Abdulrahman et al. 2022 | DOI | 10.1370/afm.2768 |
+| SYXIIAIT Wirth et al. 2024 | DOI; abstract | 10.1097/QAD.0000000000003779; the abstract (see Missing, item 2) |
+| 3SLKRKUQ Benowitz et al. 2009 | journal; DOI | American Journal of Epidemiology; 10.1093/aje/kwn301 |
+| L2ADE5CM Li and Ning 2015 | DOI | 10.1111/biom.12312 |
+| DXULDB7M Inácio de Carvalho et al. 2017 | authors | "Inácio de Carvalho" and "de Carvalho" (lower-case particle) |
+| WCLA5H4T ROCnReg | item | see Missing, item 3 |
+
+Not faults, but the proposal's citation years change at the rebuild to follow the records: Leyrat et al. 2019 (not 2017), Bantis, Nakas, and Reiser 2019 (not 2018), Zhang et al. 2020 (not 2019), Wirth et al. 2024 (not 2023).
+
+The library's record for Hassanzad and Hajian-Tilaki 2024 carries the DOI 10.1186/s12874-024-02198-2, which the search had not seen; recorded.
+
+Decisions: D30. The citations file grades 14 items core, 21 supporting, 3 definitional. D31. Kim and Pollard stays `usable` with the passage marked unreadable, since the PDF is attached; the claim it carries was read from the abstract on the Consensus record. D32. Wirth is `usable = no` until the abstract is in the record.
+
+Stop 2 reached; committed as "Stage 1, step 9: Zotero check, stop 2".
+
+Process feedback, added: 24. **Step 9.2, "by DOI and then by title".** The connector's general query matches the DOI field, so one DOI query per item works; eight records imported from Google Scholar had no DOI and needed the title. The stage file could say that a DOI miss usually means the record lacks the DOI, which is itself a fault to report. 25. **Step 9.3, passages.** One restricted full-text search per item (query = a phrase from the claim) is far cheaper than reading each PDF; the file could say so. A scanned PDF has no text layer and the connector returns only the scanner's notice; the file should say what to record then (done here: passage unreadable, usable kept). 26. **Record fields.** The connector's preview mode omits DOI, journal, volume, and pages; the complete mode is needed for the fault check, and the file could name it.
