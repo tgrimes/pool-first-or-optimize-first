@@ -1,9 +1,9 @@
 ---
 title: "[FILL: title that names the procedure and the condition]"
 author:
-  - name: "[FILL: first author]"
+  - name: "Tyler Grimes"
     corresponding: true
-    email: "[FILL: email]"
+    email: "tyler.grimes@unf.edu"
     affiliations:
       - name: "[FILL: affiliation]"
   - name: "[FILL: second author]"

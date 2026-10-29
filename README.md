@@ -1,8 +1,8 @@
-# [Project title]
+# Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data
 
 [One paragraph in plain language: the question this project asks and the procedure it concerns. Written by stage 1 from `idea.md`.]
 
-Authors: [names]. Target journal: [journal]. Status: see `STATUS.md`.
+Authors: Tyler Grimes, [FILL: second author]. Target journal: [journal]. Status: see `STATUS.md`.
 
 ## What this repository is
 

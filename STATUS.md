@@ -3,11 +3,11 @@
 | | |
 |---|---|
 | Workflow version | 0.2.1 (2026-10-28) |
-| Project | [FILL: short title, set by tools/init.R] |
-| Package | [FILL: package name, set by tools/init.R] |
+| Project | Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data |
+| Package | micutoff |
 | Stage | 1, proposal final |
 | Open stop | none: stage 1 complete, the proposal declared final on 2026-10-28. Stage 2 (`workflow/02-pilot.md`) starts in a new session on the user's word; `tools/init.R` has not been run (author line pending) |
-| Last update | [FILL: date, set by tools/init.R] |
+| Last update | 2026-10-28 |
 
 The Stage row reads "stage number, state". The states a stage can be in:
 

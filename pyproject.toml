@@ -4,9 +4,9 @@
 # dependency here and updates uv.lock. Commit both files; never edit uv.lock.
 
 [project]
-name = "projecttemplate"
+name = "micutoff"
 version = "0.0.0"
-description = "Python functions of the projecttemplate research compendium"
+description = "Python functions of the micutoff research compendium"
 requires-python = ">=3.12"
 dependencies = [
     "numpy>=2.5.4",
@@ -21,9 +21,9 @@ build-backend = "hatchling.build"
 
 # The package lives in inst/python/ so that it ships inside the R package and
 # load_all() and system.file() both find it; uv installs it into .venv/ in
-# editable mode, so `import projecttemplate` works in tests, scripts, and R.
+# editable mode, so `import micutoff` works in tests, scripts, and R.
 [tool.hatch.build.targets.wheel]
-packages = ["inst/python/projecttemplate"]
+packages = ["inst/python/micutoff"]
 
 [tool.pytest.ini_options]
 testpaths = ["inst/python/tests"]

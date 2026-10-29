@@ -1,4 +1,4 @@
 library(testthat)
-library(projecttemplate)
+library(micutoff)
 
-test_check("projecttemplate")
+test_check("micutoff")

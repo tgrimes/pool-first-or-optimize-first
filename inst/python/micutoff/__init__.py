@@ -1,4 +1,4 @@
-"""Python functions of the projecttemplate research compendium.
+"""Python functions of the micutoff research compendium.
 
 Functions live here, each with a docstring and a test in inst/python/tests/,
 exactly as R functions live in R/ with roxygen comments and testthat tests.
