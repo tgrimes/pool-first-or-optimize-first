@@ -77,3 +77,12 @@ The status: `piloted-fail` if Q1 fails, or Q3 fails with no deciding estimate ne
 ## 6. Reported whatever the outcome
 
 Every cell with every measure and its MCSE, the Rubin sup-t band beside the bootstrap-then-impute band, the flat and 60% cells beside the base cell, the known-answer checks, the timing run and the runtime, and any deviation from this file, marked as such.
+
+## Amendment, 2026-10-29, before any run
+
+The known-answer check "a bootstrap whose resamples reproduce the original curve has optimism exactly zero" failed on the code written from section 2 (optimism 0.01). The chosen cutoff is the mean of the midpoints of tied maximizing intervals (the first pilot's convention), so when tied intervals lie apart it can fall where the curve is below its maximum, and section 2's $o_b = A_b - \bar J(\hat c_b)$ then counts that shortfall as optimism. The correction is redefined so that every curve is read at its chosen cutoff, the usual form of a bootstrap optimism estimate:
+
+- $o_b = \bar J_b(\hat c_b) - \bar J(\hat c_b)$, the resample's pooled curve at its own chosen cutoff minus the original pooled curve there;
+- the corrected index is $\bar J(\hat c) - R_B^{-1}\sum_b o_b$.
+
+The apparent index $A = \max_c \bar J(c)$, whose optimism $A - J(\hat c)$ questions 1 to 3 judge, is unchanged, and so is the pass rule. $\bar J(\hat c)$ is saved beside $A$ in every replicate. No run of the re-pilot preceded this amendment; the check now passes.
