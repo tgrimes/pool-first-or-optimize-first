@@ -102,7 +102,7 @@ Thirteen results (the map), each with a statement, what to know first, a numbere
 One pass, `03-manuscript.md`, step 4, on the Summary, the paragraphs' closing notes, and Part C, with the source blocks' labels exempt as a template's labels.
 
 - Summary, paragraph 3: "Thirteen issues were found, none blocking and five substantive" carried typed counts; now computed from `issues.md`. Its list of the five substantive issues names each in the order of the table.
-- Part A, paragraph 1's closing note: the first draft opened with the cotinine sources; it now opens with the claim each group of sources carries, then the verdict, answer first.
+- Part A, the three closing notes: read for answer-first order; each already states the claim a group of sources carries and then the verdict, so none changed.
 - Part C, C1: "the inflation grows without bound" claimed more than the demonstration shows; now "how far the quantile moves depends on the ratio of two rounding errors, which nothing in the procedure controls", with the application's 5.15 as the observed case.
 - Part B, Result 7: "the imputation model has only an intercept" was wrong (the noise auxiliary stays in); now says the auxiliary is pure noise, so the model is correct for values missing completely at random.
 - No section changed by more than three sentences, so no second pass.
