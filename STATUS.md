@@ -5,8 +5,8 @@
 | Workflow version | 0.2.4 (2026-10-29) |
 | Project | Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data |
 | Package | micutoff |
-| Stage | 4, report at stop |
-| Open stop | The background report: the user reads `background/background.html` and `background/issues.md` (no blocking, five substantive issues), then decides the revision round and the production run |
+| Stage | 3, revision round 1 |
+| Open stop | None while the round runs: issue C1 of the background report (the code fix, the reruns of the quick run and the application, the re-render); the user is still reading the report and `background/issues.md` |
 | Last update | 2026-10-29 |
 
 The Stage row reads "stage number, state". The states a stage can be in:

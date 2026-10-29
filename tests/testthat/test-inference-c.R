@@ -82,6 +82,16 @@ RandomSigma <- function(k_n) {
   tcrossprod(a) / (k_n + 3)
 }
 
+# The covariance split of six grid points whose first three carry identical
+# curves in every resample and imputation, as when no completed value lies
+# between them (a pile-up at a limit of detection, or PMM donors).
+TiedSplit <- function() {
+  curves <- lapply(FakeBootCurves(r_b = 200L, k_n = 4L, m = 2L), function(x) {
+    0.05 * cbind(x[, 1], x[, 1], x[, 1], x[, 2:4])
+  })
+  CovarianceSplit(curves, 20L)
+}
+
 # -- GridFromCompleted ----------------------------------------------------
 
 test_that("GridFromCompleted spans the 10% and 90% quantiles of all values", {
@@ -394,6 +404,78 @@ test_that("ComparisonCritical is -Inf when no pair has positive variance", {
   expect_identical(ComparisonCritical(draws, matrix(0, 3, 3)), -Inf)
   expect_identical(ComparisonCritical(draws[, 1, drop = FALSE], matrix(1)),
                    -Inf)
+})
+
+# -- Tied grid points (issue C1 of the background report) -----------------
+
+test_that("PairSe sets the rounding error of a tied pair to zero", {
+  set.seed(60)
+  sigma <- TiedSplit()$sigma
+  # Precondition: the eigenvalue reconstruction leaves the tied pairs a
+  # rounding error, a positive variance far below the tolerance of 1e-10.
+  raw <- PairSe(sigma, 1L, tol = 0)
+  expect_gt(raw[2], 0)
+  expect_lt(max(raw[2:3]^2), 1e-12 * max(diag(sigma)))
+  s <- PairSe(sigma, 1L)
+  expect_identical(s[1:3], c(0, 0, 0))
+  # Genuine differences are untouched and match the formula.
+  d <- diag(sigma)
+  expect_identical(s[4:6], raw[4:6])
+  expect_equal(s[4:6], sqrt(d[4:6] + d[1] - 2 * sigma[4:6, 1]))
+})
+
+test_that("PairSe with tol = 0 is the formula with negatives set to zero", {
+  set.seed(61)
+  sigma <- RandomSigma(7L)
+  d <- diag(sigma)
+  for (k in c(1L, 4L, 7L)) {
+    expect_equal(PairSe(sigma, k, tol = 0),
+                 sqrt(pmax(d + d[k] - 2 * sigma[, k], 0)))
+  }
+  expect_identical(PairSe(sigma, 3L)[3], 0)
+})
+
+test_that("tied grid points add no comparison to the per-point quantiles", {
+  set.seed(62)
+  sigma <- TiedSplit()$sigma
+  draws <- NormalDraws(sigma, 4000L)
+  q <- ComparisonQuantiles(draws, sigma)
+  # Known answer: each tied point is compared with the three untied points
+  # only, so its quantile is that of the four-point problem; the untied
+  # points see one copy of the tied curve or three, with the same maximum.
+  one <- c(1L, 4L, 5L, 6L)
+  for (k in 1:3) {
+    keep <- c(k, 4L, 5L, 6L)
+    expect_equal(q[k], ComparisonQuantiles(draws[, keep],
+                                           sigma[keep, keep])[1])
+  }
+  expect_equal(q[4:6], ComparisonQuantiles(draws[, one],
+                                           sigma[one, one])[2:4])
+  expect_equal(max(q), ComparisonCritical(draws, sigma))
+})
+
+test_that("tied grid points share their membership of the set", {
+  set.seed(63)
+  sigma <- TiedSplit()$sigma
+  estimate <- c(rep(0.40, 3), 0.43, 0.41, 0.30)
+  one <- c(1L, 4L, 5L, 6L)
+  for (q in c(0, 0.5, 1.645, 3)) {
+    reduced <- ComparisonSet(estimate[one], sigma[one, one], q)
+    expect_identical(ComparisonSet(estimate, sigma, q),
+                     c(rep(reduced[1], 3), reduced[2:4]))
+  }
+})
+
+test_that("SupTCritical leaves out a coordinate with rounding-error variance", {
+  set.seed(64)
+  a <- SupTCritical(diag(c(1, 1e-20, 1)), 0.95, 3000)
+  set.seed(64)
+  b <- SupTCritical(diag(2), 0.95, 3000)
+  expect_identical(a, b)
+  # With tol = 0 the coordinate stays in and takes its own draws.
+  set.seed(64)
+  expect_false(identical(SupTCritical(diag(c(1, 1e-20, 1)), 0.95, 3000,
+                                      tol = 0), b))
 })
 
 # -- ComparisonSet --------------------------------------------------------

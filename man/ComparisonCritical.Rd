@@ -4,7 +4,7 @@
 \alias{ComparisonCritical}
 \title{Critical value of the comparison-based set}
 \usage{
-ComparisonCritical(draws, cov_scale, level = 0.95)
+ComparisonCritical(draws, cov_scale, level = 0.95, tol = 1e-10)
 }
 \arguments{
 \item{draws}{A matrix of centred draws, one row per draw (bootstrap
@@ -14,6 +14,8 @@ deviations or normal draws).}
 standardize the draws.}
 
 \item{level}{Coverage level.}
+
+\item{tol}{Relative tolerance of \code{PairSe()}.}
 }
 \value{
 The critical value.

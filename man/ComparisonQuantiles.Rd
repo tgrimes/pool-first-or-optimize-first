@@ -4,7 +4,7 @@
 \alias{ComparisonQuantiles}
 \title{Per-point quantiles of the one-sided comparisons}
 \usage{
-ComparisonQuantiles(draws, cov_scale, level = 0.95)
+ComparisonQuantiles(draws, cov_scale, level = 0.95, tol = 1e-10)
 }
 \arguments{
 \item{draws}{A matrix of centred draws, one row per draw (bootstrap
@@ -14,12 +14,15 @@ deviations or normal draws).}
 standardize the draws.}
 
 \item{level}{Coverage level.}
+
+\item{tol}{Relative tolerance of \code{PairSe()}.}
 }
 \value{
 A vector of K quantiles.
 }
 \description{
 For each grid point \eqn{k}, the \code{level} quantile over draws of
-\eqn{\max_{j \ne k} (D_j - D_k)/s_{jk}}. Pairs with \eqn{s_{jk} = 0} are
-left out; a point with no pair left gets \code{-Inf}.
+\eqn{\max_{j \ne k} (D_j - D_k)/s_{jk}}. Pairs with \eqn{s_{jk} = 0},
+after the tolerance of \code{PairSe()}, are left out; a point with no pair left
+gets \code{-Inf}.
 }

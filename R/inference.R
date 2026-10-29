@@ -50,16 +50,19 @@ YoudenCurveCov <- function(f0, f1, n0, n1) {
 #'
 #' The `level` quantile of \eqn{\max_k |Z_k| / \sqrt{\Sigma_{kk}}} for
 #' \eqn{Z \sim N(0, \Sigma)}, by simulation through the eigendecomposition of
-#' \eqn{\Sigma} (negative eigenvalues set to zero). Coordinates with zero
-#' variance are left out.
+#' \eqn{\Sigma} (negative eigenvalues set to zero). Coordinates whose
+#' variance is at most `tol` times the largest are left out, as rounding
+#' error of a zero variance.
 #'
 #' @param sigma A K x K covariance matrix.
 #' @param level Coverage level.
 #' @param n_draw Number of draws.
+#' @param tol Relative tolerance; `tol = 0` leaves out only coordinates with
+#'   variance at most zero.
 #' @return The critical value.
 #' @export
-SupTCritical <- function(sigma, level = 0.95, n_draw = 5000L) {
-  keep <- diag(sigma) > 0
+SupTCritical <- function(sigma, level = 0.95, n_draw = 5000L, tol = 1e-10) {
+  keep <- diag(sigma) > tol * max(diag(sigma), 0)
   if (!any(keep)) return(stats::qnorm(1 - (1 - level) / 2))
   sigma <- sigma[keep, keep, drop = FALSE]
   eig <- eigen(sigma, symmetric = TRUE)

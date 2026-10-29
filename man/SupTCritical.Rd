@@ -4,7 +4,7 @@
 \alias{SupTCritical}
 \title{Sup-t critical value from a normal law}
 \usage{
-SupTCritical(sigma, level = 0.95, n_draw = 5000L)
+SupTCritical(sigma, level = 0.95, n_draw = 5000L, tol = 1e-10)
 }
 \arguments{
 \item{sigma}{A K x K covariance matrix.}
@@ -12,6 +12,9 @@ SupTCritical(sigma, level = 0.95, n_draw = 5000L)
 \item{level}{Coverage level.}
 
 \item{n_draw}{Number of draws.}
+
+\item{tol}{Relative tolerance; \code{tol = 0} leaves out only coordinates with
+variance at most zero.}
 }
 \value{
 The critical value.
@@ -19,6 +22,7 @@ The critical value.
 \description{
 The \code{level} quantile of \eqn{\max_k |Z_k| / \sqrt{\Sigma_{kk}}} for
 \eqn{Z \sim N(0, \Sigma)}, by simulation through the eigendecomposition of
-\eqn{\Sigma} (negative eigenvalues set to zero). Coordinates with zero
-variance are left out.
+\eqn{\Sigma} (negative eigenvalues set to zero). Coordinates whose
+variance is at most \code{tol} times the largest are left out, as rounding
+error of a zero variance.
 }

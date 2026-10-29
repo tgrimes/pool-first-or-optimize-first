@@ -4,7 +4,7 @@
 \alias{ComparisonSet}
 \title{Comparison-based near-optimal set}
 \usage{
-ComparisonSet(estimate, sigma, q)
+ComparisonSet(estimate, sigma, q, tol = 1e-10)
 }
 \arguments{
 \item{estimate}{The pooled curve on the grid.}
@@ -12,6 +12,8 @@ ComparisonSet(estimate, sigma, q)
 \item{sigma}{Its K x K covariance.}
 
 \item{q}{Critical value from \code{ComparisonCritical()}.}
+
+\item{tol}{Relative tolerance of \code{PairSe()}.}
 }
 \value{
 Logical over the grid.
@@ -19,4 +21,6 @@ Logical over the grid.
 \description{
 A grid threshold stays in the set unless some other threshold's pooled
 curve exceeds it by more than \code{q} standard errors of their difference.
+A difference with zero standard error, after the tolerance of \code{PairSe()},
+excludes the point if it is positive.
 }

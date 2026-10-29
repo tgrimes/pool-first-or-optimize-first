@@ -14,6 +14,32 @@
 acceptance <- Sys.getenv("MICUTOFF_ACCEPTANCE")
 fixture <- function(name) test_path("fixtures", name)
 
+# The tolerance of PairSe() (issue C1 of the background report, revision
+# round 1) changes pilot-c's record where grid points tie: pilot-c kept a
+# pair whose difference variance was a rounding error. The fix only drops
+# such pairs, so the hybrid comparison critical value, the set's length, and
+# whether it holds the best point can only fall; every other column is
+# reproduced exactly.
+c1_cols <- c("q_comp_hybrid", "compset_hybrid_contains",
+             "compset_hybrid_length")
+c1_summary_cols <- c("compset_hybrid", "compset_hybrid_mcse",
+                     "compset_hybrid_length", "length_ratio_hybrid",
+                     "length_ratio_hybrid_mcse", "q_comp_hybrid")
+
+# Pilot-c's record against a rerun under the fix: exact outside the columns
+# above, and no rise in them.
+ExpectC1Fix <- function(got, want, cols, label) {
+  same <- setdiff(names(want), cols)
+  expect_equal(got[, same], want[, same], tolerance = 1e-12,
+               ignore_attr = TRUE, label = label)
+  for (col in intersect(cols, c("q_comp_hybrid", "compset_hybrid_length",
+                                "compset_hybrid_contains", "compset_hybrid",
+                                "length_ratio_hybrid"))) {
+    expect_true(all(got[[col]] <= want[[col]] + 1e-12),
+                label = paste(label, col))
+  }
+}
+
 PilotCDesignTable <- function() {
   SimulationDesign(data.frame(shape = "sharp", delta = 2, sigma1 = 1),
                    n = 250L, miss_rates = c(0.4, 0.6),
@@ -61,9 +87,13 @@ test_that("the first replicate of every pilot-c block is reproduced", {
       want <- reps[reps$cell == block$cell & reps$block == block$block &
                      reps$rep == 1, ]
       rownames(want) <- NULL
-      expect_equal(got[, names(want)], want, tolerance = 1e-12,
-                   ignore_attr = TRUE,
-                   label = paste("cell", block$cell, "block", block$block))
+      label <- paste("cell", block$cell, "block", block$block)
+      ExpectC1Fix(got[, names(want)], want, c1_cols, label)
+      # Where the critical value is unchanged, so is the set.
+      if (abs(got$q_comp_hybrid - want$q_comp_hybrid) < 1e-12) {
+        expect_equal(got[, c1_cols], want[, c1_cols], tolerance = 1e-12,
+                     ignore_attr = TRUE, label = label)
+      }
     }
   })
 })
@@ -76,5 +106,5 @@ test_that("a full rerun of pilot-c reproduces every per-cell summary", {
   out <- RunBlocksParallel(blocks, 3L,
                            root = normalizePath(test_path("..", "..")))
   again <- SummarizeAllCellsC(out$replicates, design)
-  expect_equal(again, saved, tolerance = 1e-12)
+  ExpectC1Fix(again, saved, c1_summary_cols, "pilot-c summaries")
 })
