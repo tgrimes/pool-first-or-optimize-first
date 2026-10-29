@@ -14,9 +14,23 @@ bibliography: references.bib
 link-citations: true
 # csl: copy the file named in the journal's profile (workflow/journals/) beside this
 # file and name it here for the submission render; the draft renders in Quarto's default author-date style.
+# A memo (03-manuscript.md, memo mode) copies workflow/journals/csl/apa.csl beside this file and sets csl: apa.csl.
 params:
   draft: true
+  memo: false
   journal: "[FILL: journal slug from workflow/journals/journals.csv]"
+crossref:
+  custom:
+    - kind: float
+      key: sfig
+      reference-prefix: "Figure S"
+      caption-prefix: "Figure S"
+      space-before-numbering: false
+    - kind: float
+      key: stbl
+      reference-prefix: "Table S"
+      caption-prefix: "Table S"
+      space-before-numbering: false
 format:
   html:
     toc: true
@@ -55,7 +69,10 @@ HOW TO USE THIS FILE (the manual is workflow/03-manuscript.md)
 - The proofs go in _supplement.qmd, included after the references as the supplementary note.
 - Render: quarto render manuscript.qmd            (draft mode, with the banner and gap table)
           quarto render manuscript.qmd -P draft:false   (final mode, when production numbers exist)
+          quarto render manuscript.qmd -P draft:false -P memo:true   (memo mode: a pilot's numbers, no marks)
+- Supplementary figures and tables take the labels sfig-... and stbl-... (Figure S1, Table S1); see _supplement.qmd.
 - Check:  python3 -I check-manuscript.py manuscript.qmd manuscript.html --citations citations.csv --bib references.bib --journals ../workflow/journals/journals.csv --journal <slug>
+          (add --final for the final render, or --memo and no --journal for a memo)
 -->
 
 ```{r}
@@ -63,9 +80,10 @@ HOW TO USE THIS FILE (the manual is workflow/03-manuscript.md)
 #| include: false
 
 source("manuscript-helpers.R")
-prov_set_mode(params$draft)
-ri <- read_run_info()   # results/run_info.rds, written by the analysis scripts
-if (!params$draft) check_no_markers("manuscript.qmd")
+prov_set_mode(params$draft, memo = params$memo)
+# results/run_info.rds, written by the analysis scripts; a memo reads the last pilot's run file instead
+ri <- if (params$memo) read_run_info(pilot_path("run_info.rds")) else read_run_info()
+if (!params$draft || params$memo) check_no_markers("manuscript.qmd")
 
 # [FILL] Load every results file here and compute every quoted number from these objects.
 # reps <- read_results("simulation_replicates.rds")
@@ -75,9 +93,17 @@ if (!params$draft) check_no_markers("manuscript.qmd")
 ```{r}
 #| label: draft-banner
 #| results: asis
-#| eval: !expr params$draft
+#| eval: !expr params$draft && !params$memo
 
 cat(draft_banner(qmd = "manuscript.qmd"))
+```
+
+```{r}
+#| label: memo-note
+#| results: asis
+#| eval: !expr params$memo
+
+cat(memo_note())
 ```
 
 # Abstract {.unnumbered}
@@ -272,7 +298,7 @@ novelty_table(data.frame(Element = c("[FILL]"), `Prior literature` = c("[FILL]")
 ```{r}
 #| label: gap-table
 #| results: asis
-#| eval: !expr params$draft
+#| eval: !expr params$draft && !params$memo
 
 cat(gap_table())
 cat("\n")

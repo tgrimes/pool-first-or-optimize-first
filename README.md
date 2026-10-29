@@ -36,7 +36,7 @@ uv sync
 |---|---|---|---|
 | 1. Idea review | `workflow/01-idea-review.md` | "look at idea.md" | `proposal.md`: novelty, fit, theory, datasets, a pilot plan with pass criteria, and a list of items to add to Zotero |
 | 2. Pilot | `workflow/02-pilot.md` | "the proposal is final" | `project-spec.md`, the pre-registered pilot in `pilot/`, its report, and a pass or fail |
-| 3. Manuscript | `workflow/03-manuscript.md` | "the pilot passed" | `manuscript/manuscript.html`, then revision rounds on your comments, then the production run and the final render |
+| 3. Manuscript | `workflow/03-manuscript.md` | "the pilot passed", or "dropped" or "parked" for a memo | `manuscript/manuscript.html`, then revision rounds on your comments, then the production run and the final render; after a dropped or parked pilot, the memo of the study, written once |
 | 4. Background report | `workflow/04-background-report.md` | "the manuscript is settled" | `background/background.html`, with the literature in full and every proof walked through; an issues list if it found errors |
 | 5. Mock review | `workflow/05-mock-review.md` | "run the review" | `review/round-1/reviewer_1.md`, `_2`, `_3`; then responses and further rounds |
 | 6. Slides | `workflow/06-slides.md` | "make the slides" | `slides/` (not yet written) |
