@@ -4,7 +4,7 @@
 |---|---|
 | From | `idea.md`, 2026-10-28 |
 | Written | 2026-10-28, workflow 0.2.0 |
-| Status | final 2026-10-28 |
+| Status | final 2026-10-28; re-scoped 2026-10-29 (section 12) |
 
 ## 1. Summary and verdict
 
@@ -191,3 +191,68 @@ Not on the list, because the proposal does not cite them: the `mice` reference p
 - 2026-10-28, stop 1, fifth round. Wirth et al. 2024 dropped (no obtainable full text); Atlantis et al. 2016, open in PubMed Central and read in full, is the second applied example in sections 3, 5, and 10, with the wording changed from "a Youden cutoff" to "an optimal cutoff" because Atlantis et al. use the equal-sensitivity-and-specificity criterion.
 - 2026-10-28, stop 1, sixth round. The user changed the rule: a supporting citation is cited from its abstract when the abstract states the claim; full text is needed for a core citation (`workflow/rules.md`, section 2; `01-idea-review.md`, step 9; `CHANGELOG.md`). Wang, Fang, and Li 2025; Wang, Shi, and Qin 2025; Jia, Wang, and Qin 2026; and Wirth et al. 2024 return as supporting citations marked "abstract suffices" in sections 3, 4, 5, and 10. Fluss et al. 2009 and Atlantis et al. 2016 stay.
 - 2026-10-28, step 9, the Zotero check. All 38 sources are in the library; stop 2 was needed once (the van der Vaart book and Fluss et al. 2009 added, the Wirth abstract entered, the ROCnReg journal record added). Citations rebuilt from the keys in `manuscript/citations.csv`: the years now follow the records (Leyrat et al. 2019, Bantis, Nakas, and Reiser 2019, Zhang et al. 2020, Wirth et al. 2024, van der Vaart 2000). Section 10 carries the keys. Record faults are deferred to the manuscript stage by the user. Proposal final.
+- 2026-10-29, after the stage 2 pilot (`piloted-fail`): re-scoped by the user's decision, with Aim 2 leading; section 12 holds the revision and the re-pilot's plan.
+
+## 12. Revision 2026-10-29: re-scope after the pilot
+
+The user's decision at the stop of stage 2: re-scope, with Aim 2 (inference and the optimism correction under imputation) leading and the pooling-order result as a closed-form note, then re-pilot in `pilot-b/`. The sections above stand as the record of the first proposal; where this section differs, this section governs.
+
+### What the first pilot showed
+
+From `pilot/results/verdict.csv` and `pilot/results/cell_summaries.csv` (500 replicates per cell, run label `pilot`; the report is `pilot/pilot-report.html`). The status was `piloted-fail`.
+
+- The pooling-order gap exists and follows its closed form: in the base cell it is 0.0028 (MCSE 0.0001), zero without missing values, correlated 0.65 with the spread of the cutoffs, not shrinking as $L$ grows, and for the kernel curve with 40% missing within 3% of $\hat\kappa \hat B_c / 2$ once the pooled curve's own curvature is used.
+- It is small: below 0.005 in every predictive-mean-matching cell, so it cannot carry the paper.
+- Most of the reported index's upward bias is the ordinary optimism of a maximum: in the base cell the pool-first index exceeds $J^*$ by 0.019 and the empirical maximum without any missing data already by 0.017. Pooling first removes about 13% of it.
+- Optimizing in each completed dataset and averaging the cutoffs gives a more accurate cutoff for the empirical curve (root mean squared error 0.80 to 0.90 of pool first's), a resampling effect of the kind Zhang et al. (2020) report for the bagged cutoff.
+- Pointwise Rubin's-rules intervals for $J(c)$ cover near 0.95 at 40% missing and undercover at 60% (0.88 to 0.89 at $c^*$ for the sharp shape, lower at $c^* + 0.5$ and for the flat shape), where the predictive-mean-matching imputations are biased because donors are sparse.
+
+### The re-scoped question
+
+**Question (one sentence):** When a biomarker is missing at random and multiply imputed, how should the Youden curve, its maximum, and the optimal cutoff be reported so that the uncertainty of the curve is covered at the nominal rate and the reported index does not overstate the accuracy the chosen cutoff achieves?
+
+**Why it matters:** An analyst who imputes and reports an optimal cutoff now reports an index that overstates the cutoff's accuracy by the optimism of a maximum, about two points of the Youden index at 250 per group in the first pilot, and no interval for anything; no published method gives a band for the curve, a set of near-optimal thresholds, or an optimism-corrected index from imputed data (sections 3 and 5 above). If the procedure works, the analyst reports the pooled curve with a simultaneous band, the set of thresholds the band cannot separate from the best one, and a corrected index.
+
+### Aims, re-ordered
+
+1. **Aim 1 (primary, the first proposal's Aim 2).** Inference for the pooled Youden curve under multiple imputation: a simultaneous 95% band for $J(c)$ over a range of thresholds; the near-optimal set $\{c : U(c) \ge \max_{c'} L(c')\}$, with $U$ and $L$ the band's limits, which contains $c^*$ whenever the band covers $J$ (if $U \ge J \ge L$ everywhere, then $U(c^*) \ge J^* \ge J(c') \ge L(c')$ for every $c'$); and an optimism-corrected index for the chosen cutoff. Two band constructions are compared: Rubin's rules extended to the whole curve (the within-imputation covariance of the empirical curve, which is binomial and known in closed form, plus the between-imputation covariance of the completed curves, with a sup-t critical value simulated from the resulting normal law), and bootstrap-then-impute (Bartlett and Hughes 2020; von Hippel and Bartlett 2021), with two imputations per bootstrap resample and the pointwise variance split into its bootstrap and imputation parts. The optimism correction is a bootstrap estimate of the optimism inside the imputation loop: in each bootstrap resample, impute, pool, maximize, and record how far the resample's maximum exceeds the original pooled curve at the resample's cutoff; subtract the average from the apparent index `[CITE: a source for the bootstrap optimism correction; not in the Zotero library]{.cite}`. Because the empirical cutoff is a cube-root estimator for which the standard bootstrap is inconsistent (Cattaneo, Jansson, and Nagasawa 2020), whether the correction removes the optimism is an open question the re-pilot answers, not an assumption.
+2. **Aim 2 (secondary, a closed-form note; the first proposal's Aim 1).** The pooling-order gap $L^{-1}\sum_l (\kappa_l/2)(\hat c_l - \tilde c)^2 \approx \kappa \hat B_c / 2$, its $n$ and $L$ behaviour, and the finding that averaging the per-dataset cutoffs is more accurate than the pooled argmax for the step curve. The first pilot's results are this aim's evidence; the full design adds sizes and shapes.
+3. **Aim 3 (secondary, unchanged).** The discrete covariate, with the supplement as fallback.
+
+The paper stays a constructive method paper. The paper test's rows change as follows: row 1, the gap the existing methods leave is now inference (no band, no near-optimal set, no optimism correction from imputed data); row 2, the procedure is Aim 1 above; row 4, the band's coverage under proper imputation and the optimism correction's bias are the properties to show, the gap formula a lemma; rows 3, 5, 6, and 7 stand. The target journal stands: Statistical Methods in Medical Research publishes inference under imputation (section 8).
+
+### The re-pilot (`pilot-b/`)
+
+**First simulation:** the marker model, the auxiliary, and the missingness model of section 7, at 250 per group, with the empirical estimator only (the most common one, Fluss, Faraggi, and Reiser 2005, and the one whose within-imputation covariance is known in closed form).
+
+| Factor | Levels | Reason |
+|---|---|---|
+| Shape | sharp symmetric; flat asymmetric (section 7) | as before |
+| Missing fraction | 0% (null), 40% (base), 60% | the band and the correction must work without imputation first; 60% is where the first pilot's intervals undercovered |
+| Imputation engine | predictive mean matching (`mice`, 5 donors, predictors $D$, $Z$, $D \times Z$); Bayesian normal linear regression (`mice::mice.impute.norm`, same predictors) | predictive mean matching is the default an analyst uses; the normal model is correctly specified for this design, so it separates failures of the inference from bias of the imputations |
+| $L$ | 20 for the point estimate and Rubin's rules | as before |
+| Bootstrap | 200 resamples within each disease group, 2 imputations each | the minimum that gives a 95% sup-t quantile with some stability within the time box |
+| Grid | 41 equally spaced thresholds between the 10% and 90% quantiles of the observed marker | the range where a cutoff is reported, computed from the observed data |
+| Replicates | 500 per cell, seeded from the design table, unless the timing run shows they exceed the hour | Monte Carlo standard error of a coverage near 0.95: 0.010 |
+
+Ten data cells (the 0% cells need no imputation, one per shape), 5,000 replicates. Measures, each with its Monte Carlo standard error: the bias of the apparent index (the pooled maximum) against the true accuracy of the chosen cutoff, $J(\hat c)$, and against $J^*$; the same for the corrected index; the simultaneous coverage over the grid of the pointwise Rubin's intervals read as a band, of the Rubin sup-t band, and of the bootstrap-then-impute band, with their mean half-widths; the coverage of $c^*$ by the near-optimal set of each band and the set's mean length; the pointwise coverage at $c^*$; and, for the note, the gap and the root mean squared error ratio of the two orders.
+
+Known answers: the 0% cells, where the bands are complete-data bands and the gap is exactly zero; the closed-form covariance of an empirical distribution function; the sup-t critical value for independent coordinates, $\{\Phi^{-1}((1 + 0.95^{1/K})/2)\}$ for $K$ points, and 1.96 for one; the variance split on synthetic data with known parts; a noiseless curve, whose optimism is zero; the normal imputation's conditional mean and variance under the correct model.
+
+**The three questions and the pass rule, decided before any run:**
+
+1. Does the problem exist? Pass if, in the base cell (sharp, 40% missing, 250 per group, predictive mean matching), the apparent index exceeds the true accuracy of the chosen cutoff by more than three Monte Carlo standard errors, and the pointwise Rubin's intervals read as a band cover $J$ over the grid in less than 0.90 of replicates.
+2. Is it large enough to matter? Pass if the apparent index's optimism against $J(\hat c)$ is at least 0.01 (the first proposal's one point, decision D16 of stage 1) in the base cell, or at least 0.01 in the 60% cell.
+3. Is there a fix? Pass if (a) in the base cell the corrected index's absolute bias against $J(\hat c)$ is at most half the apparent index's; (b) the bootstrap-then-impute band covers $J$ over the grid in 0.92 to 0.98 of the base cell's replicates for both engines; and (c) its near-optimal set contains $c^*$ in at least 0.92 of the base cell's replicates for both engines. The Rubin sup-t band is reported beside it and decides nothing.
+
+The rules are judged on the base cell; the flat shape and the 60% cells are reported beside it, the 60% predictive-mean-matching cells as the stress case in which the imputations themselves are biased. The status combines the answers as in the first pre-registration: a fail of question 1 or a clear fail of question 3 is a fail; a pass of all three with no deciding estimate within three Monte Carlo standard errors of its threshold is a pass; anything else is a close call stated both ways.
+
+**Runtime**, from the first pilot's timings (about 5 ms per imputation at 250 per group): 420 imputations per replicate, about 2 seconds, so about 45 minutes on three cores for 5,000 replicates; a timing run sets the replicate count against the one-hour box.
+
+### What is out of scope for the re-pilot
+
+The kernel and Box-Cox estimators, 1,000 per group, impute-then-bootstrap (invalid under uncongeniality, Bartlett and Hughes 2020), the nearest-neighbour engine (with one auxiliary its bootstrap step does not change the donors, decisions log D5 of the first pilot), and the application. All return in the full design.
+
+### Open questions for the user
+
+- `[TO CONFIRM: the re-pilot's three questions and pass rule above were written by the agent and pre-registered without a stop, at the user's instruction to re-pilot after the revision]{.tc}`

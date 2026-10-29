@@ -91,3 +91,16 @@ What in the stage file, the templates, or the rules left the agent guessing, was
 19. **A fail by a clause that presumes the answer.** Question 3(a) required pooling first to remove half the index's bias, which presumes the gap is most of that bias; the pilot shows it is not. The rule decided the status as written, and the decisions log gives the reading that keeps the project (D1). The stage file's close-call status covers an estimate near its threshold, not a clause whose premise fails; the user's decision at the stop is the place for that, and the stop message says so.
 20. **The report's forecasts.** Sections written during the run (potential impact) forecast what the pilot would decide and had to be rewritten after it. The README could say to write the impact section after the verdict.
 21. **Time.** The stage took about 1 h 24 min of wall time, 42 min of it the run; the agent's own work, about 40 min, was spread around the run. The working-day box is far above what it needed.
+
+## Stop: the user's answer (2026-10-29, 00:33)
+
+- D-S1. The user chose the re-scope: revise the proposal with Aim 2 (inference and the optimism correction under imputation) leading and the pooling-order result as a closed-form note, then re-pilot in `pilot-b/`. The revision is `proposal.md`, section 12, dated, at the end; the sections before it stand as the record. The user asked for the re-pilot to follow the revision directly, so the revised proposal and the re-pilot's pass rule were not shown to the user before the re-pilot ran; the revision carries a `[TO CONFIRM]` marker saying so, and the stop message names it.
+- D-S2. `STATUS.md` returned to `2, spec`, with the stage record keeping the `piloted-fail` line of the first pilot.
+
+# Re-pilot (`pilot-b/`)
+
+## Time per step
+
+| Step | Started | Ended | Agent time | Notes |
+|---|---|---|---|---|
+| 0. Decision recorded; proposal revision (section 12) | 00:33 | 00:40 | 7 min | |

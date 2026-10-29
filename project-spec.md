@@ -2,49 +2,42 @@
 
 | | |
 |---|---|
-| Proposal | `proposal.md`, final 2026-10-28 |
+| Proposal | `proposal.md`, final 2026-10-28, re-scoped 2026-10-29 (section 12) |
 | Authors | as in `DESCRIPTION` |
-| Written | 2026-10-28 |
+| Written | 2026-10-28; rewritten for the re-scope 2026-10-29 |
 | Status | draft 2026-10-28 |
 
 ## 1. Question and why it matters
 
-**Question (one sentence):** When a biomarker is missing at random and multiply imputed, does maximizing the Youden curve in each completed dataset and averaging (optimize first) report a larger index than maximizing the averaged curve (pool first), by about half the curvature times the between-imputation variance of the cutoffs, and can the cutoff, its index, and their uncertainty be reported from the pooled curve instead?
+**Question (one sentence):** When a biomarker is missing at random and multiply imputed, do a simultaneous band for the pooled Youden curve, the set of thresholds the band cannot separate from the best one, and a bootstrap-then-impute correction of the reported index give the curve's uncertainty at the nominal rate and an index that does not overstate the accuracy of the chosen cutoff?
 
-**Why it matters:** An analyst who imputes a missing marker and reports an optimal cutoff picks one of the two orders, and published papers that do this leave the order unstated (Abdulrahman et al. 2022; Atlantis et al. 2016). If the orders differ, the analyst reads the index off the pooled curve, which removes an overstatement that more imputations do not shrink. The analyst also reports a band for the curve and a set of near-optimal thresholds in place of an interval for the cutoff, because Rubin's rules cannot supply an interval for an argmax.
+**Why it matters:** An analyst who imputes a missing marker and reports an optimal cutoff reports an index that overstates the cutoff's accuracy, by about two points of the Youden index at 250 per group in the first pilot, and no interval for the curve or the cutoff, because no method for either exists under imputation. If the procedure works, the analyst reports the pooled curve with its band, the near-optimal thresholds, and a corrected index; the order of pooling, which the first pilot showed changes the index by less than half a point, becomes a closed-form note.
 
 ## 2. Mechanism we suspect
 
-The mean of the per-dataset maxima is never below the maximum of the mean curve, because each completed dataset has its own accuracy curve and its maximum sits where that curve happened to be high. Write the true Youden curve as $J(c) = F_0(c) - F_1(c)$, with $F_d$ the distribution function of the marker $X$ in group $D = d$, its maximizer $c^*$, and its maximum $J^*$. With $L$ completed curves $\hat J_l$ whose maximizers are $\hat c_l$, the optimize-first index is $L^{-1}\sum_l \max_c \hat J_l(c)$ and the pool-first index is $\max_c \bar J(c)$ with $\bar J = L^{-1}\sum_l \hat J_l$. The first is at least the second in every dataset. If each curve is quadratic near its peak with curvature $\kappa_l$, the gap is exactly
-
-$$
-\frac{1}{L}\sum_{l=1}^{L} \frac{\kappa_l}{2}\,(\hat c_l - \tilde c)^2,
-\qquad \tilde c = \frac{\sum_l \kappa_l \hat c_l}{\sum_l \kappa_l},
-$$
-
-which is about $\kappa \hat B_c / 2$ with equal curvatures, $\hat B_c$ being the spread of the $\hat c_l$ across imputations. $\hat B_c$ estimates the between-imputation variance of the cutoff given the observed data, which does not fall as $L$ grows. So the gap shrinks with the sample size and not with the number of imputations. A third-order term $\tau = J'''(c^*)$ moves the pool-first cutoff away from the mean of the $\hat c_l$ by about $\tau \hat B_c / (2\kappa)$, which is zero for a symmetric peak. The gap is zero when nothing is missing (every completed dataset is the same) and large when the cutoffs scatter across imputations: high missingness near $c^*$, a weak auxiliary, a flat peak. For the empirical curve, a step function with no curvature, the cutoff is a cube-root estimator (Kim and Pollard 1990) and the gap should be positive and of order $n^{-2/3}$ rather than $\kappa \hat B_c / 2$. If the mechanism is wrong, the gap does not track $\hat B_c$ across replicates, or it shrinks as $L$ grows.
+The reported index is the maximum of a noisy curve, so it sits above the true accuracy of the threshold it picks: the maximum rewards the threshold where sampling noise happened to push the curve up. With $J(c) = F_0(c) - F_1(c)$, the pooled curve $\bar J$ of $L$ completed datasets, its maximizer $\hat c$, and its maximum $\max_c \bar J(c)$, the optimism is $\max_c \bar J(c) - J(\hat c) \ge 0$ in expectation; it is present without any missing data (Fluss, Faraggi, and Reiser 2005 report the empirical method's poor performance) and imputation adds the pooling-order gap $\kappa \hat B_c / 2$ on top of it for an analyst who optimizes first. A bootstrap that repeats the whole analysis, imputation included, estimates that optimism if the resample's maximum relates to the original curve as the original maximum relates to $J$; for a cube-root estimator the standard bootstrap is inconsistent (Cattaneo, Jansson, and Nagasawa 2020), so the correction may remove only part of it. For the curve itself, $\bar J(c)$ at a fixed $c$ is an average of differences of proportions, regular, so a band built from Rubin's rules (the binomial covariance of the empirical curve within imputations plus the covariance of the curves between imputations) or from bootstrap-then-impute should cover $J$ over a range of thresholds at the nominal rate when the imputations are proper and unbiased. When the imputations are biased, as predictive mean matching was where donors are sparse in the first pilot, no variance method restores coverage, which is why the correctly specified normal imputation is in the design. If the band covers, the near-optimal set $\{c : U(c) \ge \max_{c'} L(c')\}$ contains $c^*$, because $U(c^*) \ge J^* \ge J(c') \ge L(c')$ for every $c'$.
 
 ## 3. Pilot
 
-Filled twice: the plan when the spec is written, the answers after the verdict (stage 2, step 5).
+Filled twice: the plan when the spec is written, the answers after the verdict (stage 2, step 5). The first pilot (`pilot/`, `piloted-fail`) and its answers are in `pilot/pilot-report.html`; this section is the re-pilot's.
 
-**Code:** `pilot/pilot.R`, run from the project root with `Rscript pilot/pilot.R`; it calls the functions in `R/` (data generation, the two imputation engines, the two curve estimators, the three pooling rules, the cell summaries). `pilot/verdict.R` applies the pass rule to the saved summaries.
+**Code:** `pilot-b/pilot.R`, run from the project root with `Rscript pilot-b/pilot.R`; it calls the functions in `R/` (the first pilot's, plus the curve on a grid, the two bands, the near-optimal set, the optimism correction, and the normal imputation). `pilot-b/verdict.R` applies the pass rule to the saved summaries.
 
-**Pass rule:** from the proposal, section 7, made exact in `pilot/preregistration.md`. The base cell is the sharp symmetric peak, 40% missing, 250 per group, the empirical estimator, predictive mean matching, $L = 20$. The rules are judged on the predictive-mean-matching cells; the nearest-neighbour cells are reported beside them.
+**Pass rule:** from `proposal.md`, section 12, made exact in `pilot-b/preregistration.md`. The base cell is the sharp symmetric peak, 40% missing, 250 per group, predictive mean matching, $L = 20$, the empirical estimator.
 
-1. The effect exists if the mean optimize-first minus pool-first difference in the reported index is positive by more than three Monte Carlo standard errors in the base cell, and the difference is exactly zero in every replicate of the 0%-missing cell.
-2. It is large enough if that mean difference is at least 0.01 in the base cell for at least one estimator, or at least 0.02 in the 60% cell, or the root mean squared error of the cutoff differs between the two orders by at least 10% in some cell. Otherwise Aim 1 is a negative result and the weight moves to Aim 2: the close-call outcome.
-3. There is a fix and a diagnostic if (a) the absolute bias of the pool-first index against $J^*$ is at most half of the optimize-first one in the base cell, both beyond three Monte Carlo standard errors; (b) the correlation between $\hat B_c$ and the difference across the base cell's replicates is at least 0.5, and for the kernel estimator the ratio of the mean difference to the mean of $\kappa \hat B_c / 2$ lies between 0.5 and 2; and (c) the pointwise 95% Rubin's-rules interval for $J(c^*)$ from the kernel curves contains the true value in 92% to 98% of the base cell's replicates.
+1. The problem exists if, in the base cell, the apparent index exceeds the true accuracy of the chosen cutoff by more than three Monte Carlo standard errors, and the pointwise Rubin's intervals read as a band cover $J$ over the grid in less than 0.90 of replicates.
+2. It is large enough if the apparent index's optimism is at least 0.01 in the base cell or in its 60% twin.
+3. There is a fix if (a) the corrected index's absolute bias against the true accuracy of the chosen cutoff is at most half the apparent index's in the base cell; (b) the bootstrap-then-impute band covers $J$ over the grid in 0.92 to 0.98 of the base cell's replicates for both engines; and (c) its near-optimal set contains $c^*$ in at least 0.92 of the base cell's replicates for both engines.
 
-**Verdict file:** `pilot/results/verdict.rds` (with `pilot/results/verdict.csv`), written by `pilot/verdict.R` after the run.
+**Verdict file:** `pilot-b/results/verdict.rds` (with `pilot-b/results/verdict.csv`), written by `pilot-b/verdict.R` after the run.
 
-**Plot:** `pilot/results/gap-by-cell.png`, the mean difference in the reported index with its Monte Carlo error in every cell, written by `pilot/verdict.R`.
+**Plot:** `pilot-b/results/coverage-by-cell.png`, the simultaneous coverage of each band in every cell, written by `pilot-b/verdict.R`.
 
-**The three pilot answers:** status `piloted-fail`, by the pre-registered rule, from `pilot/results/verdict.rds`; 500 replicates per cell, run label `pilot`.
+**The three pilot answers:** after the run.
 
-1. Does the effect exist? Yes. In the base cell the mean optimize-first minus pool-first difference in the index is 0.0028 (MCSE 0.0001), and it is exactly zero in all 500 replicates of the null cell.
-2. Is it large enough to matter at realistic sample sizes? Not as a difference in the index: the base cell's mean difference is 0.0028 for the empirical and 0.0007 for the kernel estimator, and the largest in any predictive-mean-matching cell is 0.0049 (60% missing, 250 per group, empirical), below the 0.01 and 0.02 thresholds and below the 0.005 negative-result line. The rule passes through its third clause: the root mean squared error of the cutoff is lower for optimize first, a ratio of 0.80 (MCSE 0.02) to pool first in the base cell.
-3. Is there an obvious fix or diagnostic? A diagnostic, yes: the correlation of $\hat B_c$ with the difference is 0.65 (MCSE 0.03), the kernel ratio to $\kappa \hat B_c / 2$ is 0.84 (MCSE 0.02), and the kernel interval for $J(c^*)$ covers in 0.932 (MCSE 0.011) of replicates, near the 0.92 limit. A fix, no: the pool-first index is biased upward by 0.0190 and the optimize-first index by 0.0218, a ratio of 0.87 (MCSE 0.01) against the required 0.5.
+1. Does the effect exist? [after the run]
+2. Is it large enough to matter at realistic sample sizes? [after the run]
+3. Is there an obvious fix or diagnostic? [after the run]
 
 ## 4. ADEMP skeleton
 
@@ -52,21 +45,21 @@ This becomes `protocol.md` at the design stop of stage 3.
 
 **Aims.**
 
-1. Does the optimize-first index exceed the pool-first index by $\kappa B_c / 2$ for smooth curves and by an amount of order $n^{-2/3}$ for the empirical curve, without shrinking as $L$ grows? Which of the pooling rules (pool first; optimize then mean; optimize then median; optimize then vote for a discrete marker) has the smallest error in the cutoff and the smallest regret?
-2. Do the pointwise and simultaneous bands for $J(c)$, the near-optimal set of thresholds, and the regret bound reach their nominal coverage under Rubin's rules, impute-then-bootstrap, and bootstrap-then-impute?
-3. For a discrete covariate $V$, how far apart are the stratum-specific and the population-optimal cutoffs, and do the pooled procedures recover each?
+1. Do the Rubin's-rules and the bootstrap-then-impute bands cover the Youden curve over a range of thresholds at 95%, and does the near-optimal set derived from each contain the optimal cutoff at least as often, across shapes, sizes, missing fractions, and imputation engines?
+2. Does the bootstrap-then-impute optimism correction remove the overstatement of the reported index, against the true accuracy of the chosen cutoff and against the maximum of the curve?
+3. As a closed-form note: how large is the pooling-order gap against $\kappa B_c / 2$, and is the averaged cutoff more accurate than the pooled argmax? For a discrete covariate (Aim 3 of the proposal), do the procedures recover the stratum-specific and the population-optimal cutoffs?
 
 **Data-generating mechanisms.**
 
-- Factors varied, with levels: the peak shape (sharp symmetric and flat asymmetric binormal, plus a shape with two near-equal maxima for the consistency question); the missing fraction (0%, 20%, 40%, 60%); the sample size per group (100, 250, 1,000, 4,000); the strength of the auxiliary (within-group correlation with the marker from weak to strong); the imputation engine (predictive mean matching, the nearest-neighbour method of Long, Zhang, and Hsu 2011); $L$ (5, 20, 100); the within-dataset estimator (empirical, Gaussian kernel, Box-Cox binormal); for Aim 3, two to four strata with the prevalence ratio varied.
-- Factors fixed, and why: missingness at random through the auxiliary and the disease status, because the paper's claims are made under that assumption; the disease status always observed, because a missing status is the verification-bias problem, a different paper; equal group sizes in the base design, with one unbalanced arm at fixed total, because the stacking lemma and the gap formula are stated for fixed group sizes.
-- A cell where the answer is known: 0% missing, where every pooling rule gives the same cutoff and the gap is exactly zero; the sharp binormal cell, with $c^* = 1$ and $J^* = 2\Phi(1) - 1$; synthetic quadratic curves, where the gap equals the formula exactly; for Aim 3, normal strata with a common variance, where $c_{\mathrm{pop}}(v) - c_{\mathrm{cs}}(v) = \sigma^2 \log\{w_0(v)/w_1(v)\} / \{\mu_1(v) - \mu_0(v)\}$.
+- Factors varied, with levels: the peak shape (sharp symmetric, flat asymmetric, two near-equal maxima); the missing fraction (0%, 20%, 40%, 60%); the sample size per group (100, 250, 1,000); the strength of the auxiliary; the imputation engine (predictive mean matching, normal linear regression, the nearest-neighbour method of Long, Zhang, and Hsu 2011 with several auxiliaries); the within-dataset estimator (empirical, Gaussian kernel); the number of bootstrap resamples and imputations per resample; for Aim 3, two to four strata with the prevalence ratio varied.
+- Factors fixed, and why: missingness at random through the auxiliary and the disease status, because the claims are made under that assumption; the disease status always observed (verification bias is a different paper); equal group sizes in the base design, with one unbalanced arm at fixed total size.
+- A cell where the answer is known: 0% missing, where the bands are complete-data bands and the pooling-order gap is exactly zero; a noiseless curve, whose optimism is zero; independent grid points, where the sup-t critical value has a closed form.
 
-**Estimands.** The Youden curve $J(c) = F_0(c) - F_1(c)$ at each threshold; its maximizer $c^*$ and maximum $J^*$; the true accuracy $J(\hat c)$ of a chosen threshold and its regret $J^* - J(\hat c)$; for Aim 3, $c_{\mathrm{cs}}(v)$ and $c_{\mathrm{pop}}(v)$.
+**Estimands.** The Youden curve $J(c)$ over a range of thresholds; its maximizer $c^*$ and maximum $J^*$; the true accuracy $J(\hat c)$ of a chosen threshold and the regret $J^* - J(\hat c)$; for Aim 3, $c_{\mathrm{cs}}(v)$ and $c_{\mathrm{pop}}(v)$.
 
-**Methods compared.** Pool first (argmax of $\bar J$); optimize then mean; optimize then median; optimize then vote (discrete marker only); for each, the empirical, kernel (Gaussian, Silverman's bandwidth per group), and Box-Cox binormal curves; for inference, pointwise Rubin's rules with the binomial within-imputation variance, a sup-t band by bootstrap-then-impute, impute-then-bootstrap, the complete-data intervals of Bantis, Nakas, and Reiser (2019) on the complete cases, and the bagged cutoff of Zhang et al. (2020); predictive mean matching from `mice` with 5 donors and the nearest-neighbour method with $K = 3$ and its bootstrap step.
+**Methods compared.** For the curve: pointwise Rubin's intervals (the default), the Rubin's-rules sup-t band, the bootstrap-then-impute sup-t band, and impute-then-bootstrap; the near-optimal set from each band; for the index: the apparent pooled maximum, the bootstrap-then-impute optimism-corrected index, and the complete-data intervals of Bantis, Nakas, and Reiser (2019) on the complete cases; for the cutoff: pool first, optimize then mean, optimize then median, and the bagged cutoff of Zhang et al. (2020).
 
-**Performance measures.** Bias, empirical standard error, and root mean squared error of the cutoff; bias of the reported index against $J^*$; the true accuracy of the chosen cutoff and the regret; the optimize-first minus pool-first gap against $\kappa \hat B_c / 2$; coverage and width of the pointwise and simultaneous bands; coverage of $c^*$ by the near-optimal set. No method in the design is a hypothesis test, so no power cells are planned; if a test is added (for example a test that the two orders agree), its power cells follow `workflow/rules.md`, section 3.
+**Performance measures.** Simultaneous coverage and mean half-width of each band; coverage of $c^*$ by each near-optimal set and its mean length; bias of each index against $J(\hat c)$ and against $J^*$; bias, empirical standard error, and root mean squared error of the cutoff and the regret; the pooling-order gap against its closed form. No method in the design is a hypothesis test, so no power cells are planned; if a test is added, its power cells follow `workflow/rules.md`, section 3.
 
 **Replicates and Monte Carlo SE target.** [TO CONFIRM: 2,000 replicates per cell in the production run, which gives a Monte Carlo standard error of about 0.005 for a coverage near 0.95; idea.md planned 1,000, which gives about 0.007]{.tc}
 
@@ -107,13 +100,13 @@ The project must not add:
 - A second application dataset: ADNI and the Pima data were set aside at stage 1.
 - A continuous covariate for Aim 3: Aim 3 is restricted to a discrete covariate (stage 1).
 - Missing disease status (the verification-bias problem) or missingness not at random: each is its own paper.
-- Cutoff criteria other than the Youden index and its population-weighted form of Aim 3 (closest to the top-left corner, equal sensitivity and specificity, cost-weighted): a natural sequel, parked.
-- A theory result beyond the closed-form gap, the stacking lemma, the binormal stratum gap, and the Youden case of the cube-root limit in the supplement: the limit law of the gap under imputation is a separate theory paper, parked.
+- Cutoff criteria other than the Youden index and its population-weighted form of Aim 3: a natural sequel, parked.
+- A theory of the bootstrap for cube-root estimators under imputation (for example a subsampling or modified-bootstrap correction in the manner of Cattaneo, Jansson, and Nagasawa 2020): if the re-pilot shows the plain correction falls short, that theory is a separate paper, parked.
 - A software paper or a CRAN release: the package `micutoff` is the compendium's byproduct.
-- A reporting checklist for applied users (`idea.md` lists one): a separate applied note, parked.
+- A reporting checklist for applied users: a separate applied note, parked.
 
 ## 9. Reading
 
-1. Long, Zhang, and Hsu 2011. After reading, a reader can answer: how are the imputed datasets combined into one ROC curve, and what is reported for the uncertainty of the threshold the paper calls the unanimous optimum?
-2. Leyrat et al. 2019. After reading, a reader can answer: why are propensity scores averaged across imputations not balancing scores, and what plays the role of that argument for a cutoff?
-3. Fluss, Faraggi, and Reiser 2005. After reading, a reader can answer: which complete-data estimator of the Youden index has the largest bias, and in which direction?
+1. Bartlett and Hughes 2020. After reading, a reader can answer: why does imputing and then bootstrapping give invalid variances under uncongeniality, and which bootstrap-then-impute variants stay valid?
+2. Fluss, Faraggi, and Reiser 2005. After reading, a reader can answer: which complete-data estimator of the Youden index has the worst performance, and in which direction is the empirical index biased?
+3. Long, Zhang, and Hsu 2011. After reading, a reader can answer: how are the imputed datasets combined into one ROC curve, and what is reported for the uncertainty of the threshold the paper calls the unanimous optimum?
