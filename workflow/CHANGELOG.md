@@ -2,6 +2,10 @@
 
 Dated lessons. Each line says what changed in which file and which project taught it.
 
+## Unreleased
+
+- 2026-10-28, project pool-first-or-optimize-first, stage 1: `rules.md`, section 2, and `01-idea-review.md`, step 9, now let a supporting citation (one that says only that an approach, a result, or a dataset exists) be cited from its abstract without a PDF; a core citation still needs the full text. Taught by three papers at stop 1 whose PDFs the user could not obtain and whose abstracts stated all the proposal used them for.
+
 ## 0.2.0 (2026-10-28)
 
 Reorganized for the agent after a review of 0.1.0 as the agent that runs it. The files in `workflow/` and `templates/` are written for the agent; the user reads `STATUS.md` and the deliverables; the clean copy for publication is a stage of its own.

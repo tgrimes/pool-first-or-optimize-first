@@ -85,8 +85,8 @@ A "no" on question 3 or 4 is stated plainly; it is the most common reason an ide
 **9. The Zotero check.** When told the library is updated:
 
 1. Set `STATUS.md` to `1, Zotero check`.
-2. Look each cited source up by DOI and then by title. A source is available when the item is there, its record is complete enough to cite, and a PDF with full text is attached (a pre-1980 record or a book counts without one).
-3. Start `manuscript/citations.csv` with one row per source, under the header the skeleton ships: `key, zotero_item, grade, section, why, origin, identifier, identifier_source, pdf, usable, deviations_from_record, support_passage, read_date, verified_by, verified_date`. Grade is `core` or `supporting`; section is the proposal's section; the passage is the one that supports the claim, with the date read; `verified_by` and `verified_date` stay empty.
+2. Look each cited source up by DOI and then by title. A source is available when the item is there, its record is complete enough to cite, and either a PDF with full text is attached or the citation is supporting and the abstract in the record states the claim (`rules.md`, section 2); a pre-1980 record or a book counts without a PDF.
+3. Start `manuscript/citations.csv` with one row per source, under the header the skeleton ships: `key, zotero_item, grade, section, why, origin, identifier, identifier_source, pdf, usable, deviations_from_record, support_passage, read_date, verified_by, verified_date`. Grade is `core` or `supporting`; a supporting citation without a PDF has `pdf` = `no` and its passage taken from the abstract; section is the proposal's section; the passage is the one that supports the claim, with the date read; `verified_by` and `verified_date` stay empty.
 4. Report record faults with the value to enter.
 5. If any source is missing, **Stop 2** (at most twice): return the missing list grouped by what the user must do, and wait.
 6. Rebuild the proposal's citations from the checklist keys, add a dated entry to the proposal's Revisions section, set `STATUS.md` to `1, proposal final`, and commit ("Stage 1, step 9: proposal final").
