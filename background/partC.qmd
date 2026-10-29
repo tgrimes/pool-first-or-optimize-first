@@ -1,6 +1,6 @@
 # Part C. Issues found
 
-The issues are listed in `background/issues.md`, the same table as below. None is blocking; five are substantive. The first is a flaw in the code, shown here on a small case where the answer is known.
+The issues are listed in `background/issues.md`, the same table as below. None is blocking; five are substantive. The first is a flaw in the code, shown here on a small case where the answer is known, and fixed since in stage 3's revision round 1.
 
 ```{r}
 #| label: check-c1
@@ -13,13 +13,17 @@ eg <- eigen(S0, symmetric = TRUE)
 Sr <- eg$vectors %*% (pmax(eg$values, 0) * t(eg$vectors))
 dd <- diag(Sr)
 s12 <- sqrt(pmax(dd[1] + dd[2] - 2 * Sr[1, 2], 0))
-qr_tied <- ComparisonQuantiles(NormalDraws(Sr, 5000), Sr)
+dr <- NormalDraws(Sr, 5000)
+qr_tied <- ComparisonQuantiles(dr, Sr, tol = 0)
+qr_fixed <- ComparisonQuantiles(dr, Sr)
 Sx <- S0
 Sx[1:3, 1:3] <- S0[1, 1]
 qr_exact <- ComparisonQuantiles(NormalDraws(Sx, 5000), Sx)
 ```
 
-**C1, shown.** Six grid points, of which the first three carry identical curves (a point mass below them), so the differences among the three have variance zero. After the eigenvalue reconstruction that `CovarianceSplit()` applies, the standard error of the first two points' difference is `r prov(s12, 12)` rather than zero, and the pair stays in the comparison. The per-point quantiles at the tied points were `r prov(text = paste(fmt(qr_tied[1:3], 2), collapse = ", "))`, against `r prov(text = paste(fmt(qr_exact[1:3], 2), collapse = ", "))` when the covariance holds the ties exactly; how far the quantile moves depends on the ratio of two rounding errors, which nothing in the procedure controls, and in the application's imposed analysis it reached 5.15 at the first grid point, against 2.61 once the tied pair is dropped (the replay is in the stage log).
+**C1, shown.** Six grid points, of which the first three carry identical curves (a point mass below them), so the differences among the three have variance zero. After the eigenvalue reconstruction that `CovarianceSplit()` applies, the standard error of the first two points' difference is `r prov(s12, 12)` rather than zero. Under the rule of the first draft, which kept every pair with a positive standard error (`tol = 0` below), the pair stays in the comparison, and the per-point quantiles at the tied points were `r prov(text = paste(fmt(qr_tied[1:3], 2), collapse = ", "))`, against `r prov(text = paste(fmt(qr_exact[1:3], 2), collapse = ", "))` on draws from the covariance that holds the ties exactly. How far the quantile moves depends on the ratio of two rounding errors, which nothing in the procedure controlled; in the application's imposed analysis the first draft's critical value at the first grid point was about twice that of the other points (the replay is in the stage log).
+
+The flaw was not confined to the application, as the first version of this part said. Predictive mean matching imputes observed values, and complete cases use only observed values, so two adjacent grid points with no observed value between them tie in the same way, and so do they without missing values; it happens most often with few observed values. In the first quick run the hybrid critical values were inflated in some replicates wherever the completed values were observed values (predictive mean matching, complete cases, no missing values), most in the smallest cells with the most missing, and in no replicate under normal imputation. Stage 3's revision round 1 fixed it: a difference variance below a small fraction of the largest variance is taken as zero (`PairSe()`). On the same draws as the first draft's rule, the fixed quantiles at the tied points are `r prov(text = paste(fmt(qr_fixed[1:3], 2), collapse = ", "))`: equal at the three tied points, as identical curves require, and within Monte Carlo error of the exact covariance's on its own draws. The quick run and the application were run again under the fix.
 
 ```{r}
 #| label: issues-table

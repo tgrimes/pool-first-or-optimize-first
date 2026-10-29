@@ -6,7 +6,7 @@
 | Project | Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data |
 | Package | micutoff |
 | Stage | 3, revision round 1 |
-| Open stop | None while the round runs: issue C1 of the background report (the code fix, the reruns of the quick run and the application, the re-render); the user is still reading the report and `background/issues.md` |
+| Open stop | Revision round 1 done (issue C1: fixed, the quick run and the application rerun, the report corrected and re-rendered); the user's comments on the other issues of `background/issues.md` make the next round, then the report is declared done and production is run on the user's word |
 | Last update | 2026-10-29 |
 
 The Stage row reads "stage number, state". The states a stage can be in:
@@ -39,3 +39,4 @@ One line per stage boundary, newest last: the date, the stage reached, the path 
 | 2026-10-29 | 3, draft at stop | `manuscript/manuscript.html` (draft mode, quick run of 100 replicates per cell; qmd `manuscript/manuscript.qmd`; log `log/03-manuscript.md`; protocol `protocol.md`) | The first draft: the user comments in revision rounds or declares the draft settled; seven `[TO CONFIRM]` and ten `[CITE]` markers are open |
 | 2026-10-29 | 3, settled | `manuscript/manuscript.html` (the first draft, 375b006) | none: the user, "I have no comments at this time", then asked for the background report on this version before the production run (workflow 0.2.4 order) |
 | 2026-10-29 | 4, report at stop | `background/background.html` (issues: `background/issues.md`; log: `log/04-background-report.md`) | The report's stop: five substantive issues send the manuscript to a stage 3 revision round before the production run (about 12 hours at 2,000 replicates on seven workers) |
+| 2026-10-29 | 3, revision round 1 | `manuscript/manuscript.html` (issue C1 fixed and both runs repeated; log `log/03-manuscript.md`, Revision 1; the report re-rendered with C1 corrected, `background/background.html`) | The user's comments on issues C2 to C13 (further rounds), then the report done and the production run (about 12 hours at 2,000 replicates on seven workers) |
