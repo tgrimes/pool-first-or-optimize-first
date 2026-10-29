@@ -1,0 +1,145 @@
+## Paragraph 2: what the reported index estimates, and what is known
+
+The paragraph claims that the reported index overstates the accuracy of the threshold it picks (the manuscript's own two-line argument, Part B, Result 3), that complete-data inference for the index and the threshold exists, that the empirical threshold is a cube-root estimator for which Rubin's rules and the standard bootstrap fail, that the neighbouring problem of a missing disease status has been worked out, and that with a missing marker the literature stops at the ROC curve and its area.
+
+### Fluss, Faraggi, and Reiser, 2005: estimating the Youden index and its cutoff
+
+Fluss R, Faraggi D, Reiser B. Estimation of the Youden index and its associated cutoff point. *Biometrical Journal* 2005; 47(4): 458 to 472. Read from the full text; the extracted text drops minus signs in the tables, so only the directions the prose names are relied on.
+
+**What it did.** It compared four estimators of the Youden index and its cutoff (normal, Box-Cox transformed normal, empirical, and Gaussian kernel) by bias and root mean squared error, over normal, skewed, and mixture scenarios with 20 to 100 per group, and reworked a clinical example.
+
+**What it did not do.** No missing data, no Monte Carlo standard errors, no interval. The empirical estimator is not the most biased in every scenario.
+
+**The passage.** "N, TN and K have similar very small biases although K's bias is usually negative while the others have a positive bias. The EMP method is, in terms of bias, the worst method with substantially higher values of bias" (Section 4.1.1, normal scenario). And, of the empirical method: "has the worst performance and is not recommended unless sample size is very large" (Section 5).
+
+**How the manuscript uses it.** For "the empirical index has the largest upward bias of the usual estimators", which holds for normal data, where the empirical bias is positive and the largest, and holds for performance overall; not for every scenario (issue C6).
+
+### Bantis, Nakas, and Reiser, 2019: intervals for the maximum Youden index and its cutoff
+
+Bantis LE, Nakas CT, Reiser B. Construction of confidence intervals for the maximum of the Youden index and the corresponding cutoff point of a continuous biomarker. *Biometrical Journal* 2019; 61(1): 138 to 156. Read from the full text (the early-view version).
+
+**What it did.** It built intervals for the maximum Youden index and its cutoff by a delta method under normality, a Box-Cox version, kernel-based bootstrap intervals, and a spline approach, and compared them by simulation with earlier intervals, recommending a Box-Cox delta interval when the transformation works.
+
+**What it did not do.** No missing data; it sets aside bootstrap intervals built on the empirical curve, the estimator the manuscript uses.
+
+**The passage.** "we provide new methods for constructing confidence intervals for both the Youden index and its corresponding cutoff point" (Abstract).
+
+**How the manuscript uses it.** For "intervals exist for the index and the threshold", which it supports, for smooth or parametric estimators.
+
+### Bantis, Nakas, and Reiser, 2014: confidence regions after estimating the cutoff
+
+Bantis LE, Nakas CT, Reiser B. Construction of confidence regions in the ROC space after the estimation of the optimal Youden index-based cut-off point. *Biometrics* 2014; 70(1): 212 to 223. Read from the full text.
+
+**What it did.** It showed that sensitivity and specificity at an estimated Youden cutoff are correlated, so independent binomial intervals undercover, and built rectangular and elliptical regions for the pair that account for the cutoff's estimation.
+
+**What it did not do.** Its target is the pair at the population-optimal cutoff, not at the estimated one; no missing data.
+
+**The passage.** "intervals for sensitivity and specificity computed at the Youden Index based optimal cut-off point has not been addressed in the literature" (Section 1, p. 213).
+
+**How the manuscript uses it.** For "confidence regions exist for the sensitivity and specificity at the estimated threshold", which holds with "optimal" in place of "estimated" (issue C7).
+
+### Cattaneo, Jansson, and Nagasawa, 2020: the bootstrap and cube-root asymptotics
+
+Cattaneo MD, Jansson M, Nagasawa K. Bootstrap-based inference for cube root asymptotics. *Econometrica* 2020; 88(5): 2203 to 2219. Read from the full text (the arXiv version).
+
+**What it did.** For M-estimators that maximize a sample mean of a non-smooth criterion, which converge at the cube-root rate to a Chernoff-type limit (Kim and Pollard 1990), it recalled that the standard bootstrap is inconsistent and proposed a bootstrap of a reshaped criterion that is consistent, with examples from maximum score estimation and threshold classification.
+
+**What it did not do.** The words Youden, ROC, and cutoff do not occur in it (checked by search), and it has no two-sample setting. Covering the empirical Youden threshold, the argmax of $\hat F_0 - \hat F_1$, is the manuscript's step, sketched in S1.2. It cites earlier work for the bootstrap's inconsistency rather than proving it.
+
+**The passage.** "These estimators not only have a non-standard rate of convergence, but also have the property that rather than being Gaussian their limiting distributions are of Chernoff (1964) type" (Section 1). And: "As is well documented, however, this estimator is inconsistent under cube root asymptotics" (Section 2, of the nonparametric bootstrap).
+
+**How the manuscript uses it.** With Kim and Pollard (1990), which has no readable text, for the cube-root rate of the empirical threshold, and alone for the bootstrap's inconsistency. Both hold for the class it covers; the application to the Youden threshold should be attributed to the manuscript's own sketch (issue C3).
+
+### Wang, Fang, and Li, 2025: weighted Youden index maximization
+
+Wang S, Fang F, Li J. Optimal linear combination of biomarkers by weighted Youden index maximization. *Statistics in Medicine* 2025; 44(15 to 17): e70182. Read from the abstract in the record.
+
+**What it did.** By its abstract, it maximizes a weighted Youden index over linear combinations of biomarkers and a cutoff, showing that the coefficients and the cutoff have cube-root asymptotics with a joint limit, and that the optimal in-sample index is asymptotically normal.
+
+**What it did not do.** The abstract does not call the cutoff's limit non-normal, and the setting is a combination with a weighted index, not one marker with the plain index.
+
+**The passage.** "The estimated combination coefficients and cut-off point are shown to have cube root asymptotics, and their joint limiting distribution is established rigorously" (Abstract).
+
+**How the manuscript uses it.** For "as does a weighted Youden threshold", which the abstract supports for the rate.
+
+### Leyrat et al., 2019: multiple imputation with propensity scores
+
+Leyrat C, Seaman SR, White IR, et al. Propensity score analysis with partially observed covariates: how should multiple imputation be used? *Statistical Methods in Medical Research* 2019; 28(1): 3 to 19. Read from the full text (the accepted manuscript).
+
+**What it did.** It compared pooling treatment-effect estimates, propensity scores, or propensity-model parameters across imputations for inverse-probability weighting with missing covariates, and recommended pooling the effect estimates by Rubin's rules.
+
+**What it did not do.** Nothing on thresholds or non-regular estimators; the normality premise is one sentence.
+
+**The passage.** "Rubin's Rules are based on the assumption that θˆk is approximately normally distributed" (Section 4.3). It also names a second premise: "theoretical justification for Rubin's rules relies on the parameter of interest being estimated with maximum likelihood" (Section 1).
+
+**How the manuscript uses it.** For "Rubin's rules assume approximately normal estimates", which it supports; that the rules therefore do not apply to the threshold is the manuscript's inference. In Methods 2.2 it is also cited for Rubin's rules applying under proper imputation, which is Rubin's own result (issue C9).
+
+### Fluss, Reiser, Faraggi, and Rotnitzky, 2009: the ROC curve under verification bias
+
+Fluss R, Reiser B, Faraggi D, Rotnitzky A. Estimation of the ROC curve under verification bias. *Biometrical Journal* 2009; 51(3): 475 to 490. Read from the full text (the author manuscript).
+
+**What it did.** It extended a doubly robust estimator of the area under the curve to the whole ROC curve when the disease status is verified for a subset, with asymptotic normality and pointwise confidence regions.
+
+**What it did not do.** No threshold, no Youden index, no missing marker; it points to a bootstrap band for the ROC curve in other work (Campbell 1994) without treating one.
+
+**The passage.** "Estimation of the ROC curve based on data only from subjects with verified disease status may be badly biased" (Abstract).
+
+**How the manuscript uses it.** For the ROC curve when the disease status is missing, which it supports.
+
+### Wang, Shi, and Qin, 2025, and Jia, Wang, and Qin, 2026: Youden intervals under verification bias
+
+Wang S, Shi S, Qin G. Interval estimation for the Youden index of a continuous diagnostic test with verification biased data. *Statistical Methods in Medical Research* 2025; 34(4): 796 to 811. Jia S, Wang S, Qin G. Methodological approaches for the estimation of confidence intervals on partial Youden index under verification bias. *Pharmaceutical Statistics* 2026; 25(2): e70079. Both read from the abstracts in the records.
+
+**What they did.** By their abstracts, both build bootstrap and MOVER intervals from four estimators that correct for verification bias under missingness at random; the first for the Youden index, the second for the partial Youden index over a range of false positive rates.
+
+**What they did not do.** No missing marker, no threshold, no band.
+
+**The passages.** "we propose bias-corrected interval estimation methods for the Youden index of a continuous test under the missing-at-random assumption" (first, Abstract). "adapting and applying these four bias-correction techniques to estimate the partial Youden Index and its confidence interval" (second, Abstract).
+
+**How the manuscript uses them.** For intervals for the Youden index under a missing disease status: the first supports it; the second is about the partial index (issue C10).
+
+### Karakaya, Karabulut, and Yucel, 2015, and Cheng and Tang, 2020: ROC analysis with a missing marker
+
+Karakaya J, Karabulut E, Yucel RM. Sensitivity to imputation models and assumptions in receiver operating characteristic analysis with incomplete data. *Journal of Statistical Computation and Simulation* 2015; 85(17): 3498 to 3511. Cheng W, Tang N. Smoothed empirical likelihood inference for ROC curve in the presence of missing biomarker values. *Biometrical Journal* 2020; 62(4): 1038 to 1059. Both read from the full text.
+
+**What they did.** The first studied multiple-imputation inference for the area under the curve when the test result or the reference standard is missing, with Rubin's rules over ten imputations. The second built smoothed empirical likelihood intervals for the ROC curve at a fixed false positive rate with the marker missing at random, using imputation inside estimating equations.
+
+**What they did not do.** The first gives the area only; the second gives the curve only, pointwise, and pools its imputations inside the estimating equations, not by Rubin's rules. Neither treats a threshold or a band.
+
+**The passages.** "we study the performance of multiple imputation (MI) inference in ROC analysis" (first, Abstract). "This paper considers statistical inference for the receiver operating characteristic (ROC) curve in the presence of missing biomarker values" (second, Abstract).
+
+**How the manuscript uses them.** With Long, Zhang, and Hsu (2011), for "imputation methods give the ROC curve and its area": the first carries the area, the second the curve (issue C10).
+
+### What the paragraph rests on
+
+The paragraph's first claim, the optimism of the reported index, is the manuscript's own argument; the literature it cites documents the empirical index's bias in complete data, for normal data in particular, and a source on the bias of data-driven cutoffs (Leeflang et al. 2008, in Thiele and Hirschfeld's references) would carry it more directly (issue C5). Complete-data intervals rest on smooth estimators, not on the empirical one. The cube-root claim rests on a general theory whose application to the Youden threshold is the manuscript's own sketch, and the original source is not readable. The missing-disease-status and missing-marker sentences are supported once each source is attached to the part it shows. The closing claim that no method gives a band, a near-optimal set, or a corrected index under imputation rests on absence: the sources read here are consistent with it, and the stage 1 search found nothing to the contrary.
+
+## Paragraph 3: what this paper does
+
+The paragraph names the band's construction, the set's, and the correction's, and the application.
+
+### Montiel Olea and Plagborg-Møller, 2019: simultaneous confidence bands
+
+Montiel Olea JL, Plagborg-Møller M. Simultaneous confidence bands: theory, implementation, and an application to SVARs. *Journal of Applied Econometrics* 2019; 34(1): 1 to 17. Read from the full text (the authors' version).
+
+**What it did.** For a finite vector of parameters with an asymptotically normal estimator, it showed that the sup-t band, the estimate plus or minus a common multiple of the pointwise standard errors chosen so that the largest standardized deviation is covered, is the narrowest band of its kind, and gave a plug-in implementation by draws from the estimated normal law and a bootstrap or Bayesian calibration.
+
+**What it did not do.** Nothing on imputation, a maximum, or a non-smooth estimator.
+
+**The passage.** "The sup-t band is obtained by choosing c = q1−α(Σ) (the sup-t critical value), yielding a simultaneous coverage probability of precisely 1 − α" (Section 2).
+
+**How the manuscript uses it.** For the sup-t critical value. The setting fits: the band is over a finite grid of thresholds. The hybrid band is the paper's plug-in algorithm with a covariance from bootstrapping and imputing, which is the manuscript's own construction (issue C11).
+
+### Hsu, 1996: multiple comparisons
+
+Hsu JC. *Multiple comparisons: theory and methods*. CRC Press, 1996. Not readable: a book with no attachment.
+
+**What it did, and did not do.** Not assessed.
+
+**The passage.** None.
+
+**How the manuscript uses it.** With Hsu (1984), which has no PDF in the library, for multiple comparisons with the best, the idea behind the comparison-based set. Neither could be read, so the attribution is unverified; the set's guarantee is proved in the manuscript itself (S1.5, Part B, Result 11).
+
+### What the paragraph rests on
+
+Only the sup-t clause has a readable source. The near-optimal set's method attribution rests on two unreadable sources, the correction's on two sources without readable text (Efron 1983; Harrell, Lee, and Mark 1996), and the data's on items not yet in the library (issue C4). Each construction's own properties are shown in the manuscript (the supplement and the simulation), not borrowed from these sources.

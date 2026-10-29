@@ -1,0 +1,115 @@
+## Paragraph 1: why a threshold matters, how it is chosen, and what imputed studies report
+
+The paragraph claims that a threshold on a biomarker decides who has a condition, that one criterion maximizes sensitivity plus specificity, that multiple imputation is a popular remedy for a missing marker, that the method paper which pools curves across imputations reported its threshold without uncertainty, and that applied studies do the same.
+
+### Benowitz et al., 2009: cotinine cutpoints in NHANES 1999 to 2004
+
+Benowitz NL, Bernert JT, Caraballo RS, Holiday DB, Wang J. Optimal serum cotinine levels for distinguishing cigarette smokers and nonsmokers within different racial/ethnic groups in the United States between 1999 and 2004. *American Journal of Epidemiology* 2009; 169(2): 236 to 248. Read from the full text.
+
+**What it did.** The paper asked which serum cotinine cutpoint best separates cigarette smokers from nonsmokers now that exposure to secondhand smoke has fallen. It used NHANES adults and adolescents, with smoking defined by self-report over the previous five days and users of other nicotine products excluded. A survey-weighted ROC analysis chose the cutpoint that maximizes the total probability of correct classification, overall and by race/ethnicity, and a weighted bootstrap gave intervals for it.
+
+**What it did not do.** Participants without a cotinine value were excluded, so the analysis is of complete cases. The criterion is total correct classification, not the Youden index. The intervals for the cutpoints are in web tables, not in the article.
+
+**The passage.** "The optimal serum cotinine cutpoint for discriminating adult smokers from adult nonsmokers was 3.08 ng/mL" (Results, p. 239). And: "Because there is no formula for determining the standard error of the optimal cutpoint itself, we used a bootstrap approach" (Statistical analysis, p. 238).
+
+**How the manuscript uses it.** As one of the two estimates of a cotinine threshold from national survey data, the setting of the application.
+
+### Tompkins, Beltran, and Bedno, 2019: cotinine cut points in NHANES 2009 to 2014
+
+Tompkins EL, Beltran TA, Bedno SA. Differentiating between smokers and nonsmokers using serum cotinine. *Biomarkers in Medicine* 2019; 13(12): 1025 to 1033. Read from the full text.
+
+**What it did.** The paper re-estimated cotinine cut points on later NHANES cycles, with ROC curves from survey-weighted logistic regression and the cut point chosen by the Youden index, overall and by sex and race/ethnicity, and compared them with the earlier published cut points.
+
+**What it did not do.** It reports no interval for any cut point, only for the AUC. Values below the limit of detection were replaced once by the limit over the square root of two, and participants without a cotinine value were dropped.
+
+**The passage.** "the overall optimal serum cotinine cut point for discriminating smokers from nonsmokers was 3.63 ng/ml" (Results, p. 1030). And: "Youden's J statistic was used in conjunction with ROC curve analysis to identify optimal cut points" (Statistical analysis, p. 1026).
+
+**How the manuscript uses it.** As the second estimate of the threshold, and as the published adult cutoff the application tests against its near-optimal set.
+
+### Hassanzad and Hajian-Tilaki, 2024: methods for an optimal cut-point
+
+Hassanzad M, Hajian-Tilaki K. Methods of determining optimal cut-point of diagnostic biomarkers with application of clinical data in ROC analysis: an update review. *BMC Medical Research Methodology* 2024; 24: 84. Read from the full text.
+
+**What it did.** A narrative review of ten criteria for an optimal cut-point (the Youden index, the Euclidean distance to the corner, the index of union, cost-based and likelihood-ratio criteria, and others), with a worked example on inflammatory markers; the Youden, Euclidean, product, and union criteria agree for binormal data with equal variances and can disagree for skewed data.
+
+**What it did not do.** Nothing on missing data or on the uncertainty of the cut-point; it is a secondary source for the Youden index, whose origin is Youden (1950).
+
+**The passage.** "the optimal cut-off point is calculated by maximizing Se + Sp at different cut-off points" (section "Youden's J statistic", p. 5), with the display "Youden Index = Se + Sp − 1" (same section).
+
+**How the manuscript uses it.** For the criterion and the index's definition.
+
+### Bartlett and Hughes, 2020: the bootstrap and multiple imputation
+
+Bartlett JW, Hughes RA. Bootstrap inference for multiple imputation under uncongeniality and misspecification. *Statistical Methods in Medical Research* 2020; 29(12): 3533 to 3546. Read from the full text.
+
+**What it did.** It asked which combinations of the bootstrap with multiple imputation give valid variances when the imputation and analysis models are uncongenial or misspecified. By theory and two simulation studies it found that imputing first and then bootstrapping generally fails there, while bootstrapping first and imputing each resample, with a moderate number of imputations or with the variance-components variant of von Hippel and Bartlett, reaches nominal coverage when the point estimator is consistent.
+
+**What it did not do.** It treats a scalar estimand. It has nothing on a function-valued estimate, a covariance across thresholds, a simultaneous band, or a non-smooth maximum.
+
+**The passage.** "Multiple imputation has become one of the most popular approaches for handling missing data in statistical analyses" (Abstract, p. 3533). And: "only the Boot MI percentile (with moderate M) and von Hippel approaches give intervals with nominal coverage (provided the point estimator is consistent)" (Discussion, p. 3544).
+
+**How the manuscript uses it.** In paragraph 1 for the popularity of multiple imputation, the authors' own assertion; in paragraph 3 and the Methods for bootstrapping before imputing. The extension to a covariance of a whole curve, with the imputation variance rescaled from two imputations to the analysis's twenty (Part B, Result 8), is the manuscript's own.
+
+### Long, Zhang, and Hsu, 2011: nonparametric multiple imputation for ROC analysis
+
+Long Q, Zhang X, Hsu C-H. Nonparametric multiple imputation for receiver operating characteristics analysis when some biomarker values are missing at random. *Statistics in Medicine* 2011; 30(26): 3149 to 3161. Read from the full text (the author manuscript).
+
+**What it did.** It proposed nearest-neighbour imputation matched on a prediction score, alone or with a propensity score, with a bootstrap step, for a biomarker missing at random given fully observed auxiliaries; it combined the area under the curve across imputations by Rubin's rules and, for the curve, averaged the true and false positive rates over the imputed datasets at each threshold. Simulations favoured the proposed methods over the existing ones. The application imputed the Edinburgh Postnatal Depression Scale in a study of depression in pregnancy and plotted sensitivity plus specificity against the score.
+
+**What it did not do.** No standard error or interval is given for the threshold anywhere. The number of imputations in the application is not stated (the simulations used ten). It calls the plain nearest-neighbour method "standard", so it proposed new nonparametric methods rather than nonparametric imputation for ROC analysis as such.
+
+**The passage.** "We find that an EPDS score of 16 is the unanimous optimum threshold that attains the maximum sum among all methods" (Section 4). And: "By varying the value of the threshold, we can plot the entire ROC curve for multiply imputed datasets" (Section 2.5).
+
+**How the manuscript uses it.** As the published example of the procedure: curves averaged across imputations and a threshold read off with no uncertainty; and in paragraph 2 for the ROC curve and its area under imputation. "Unanimous" in the quotation means agreement across the methods compared, not across the imputed datasets, which the manuscript's sentence leaves open.
+
+### Abdulrahman et al., 2022: a cognitive screening test in primary care
+
+Abdulrahman H, Jansen E, Hoevenaar-Blom M, et al. Diagnostic accuracy of the telephone interview for cognitive status for the detection of dementia in primary care. *Annals of Family Medicine* 2022; 20(2): 130 to 136. Read from the full text.
+
+**What it did.** In a trial follow-up, a telephone cognitive test was given to older adults, and dementia was verified in records for nearly all low scorers and a random subsample of high scorers. To correct the resulting verification bias, the authors imputed dementia status for the unverified participants 100 times, combined the estimates by Rubin's rules, and reported sensitivity and specificity at each cutoff of the test, with an optimum before and after imputation.
+
+**What it did not do.** The imputed variable is the disease status, not the test score; no interval is given for the cutoff.
+
+**The passage.** "After imputation, estimates of the 100 imputed data sets were combined using Rubin's rules" (Methods, Statistical analysis, p. 131).
+
+**How the manuscript uses it.** As an applied study that imputes and then reports an optimal cutoff, and as one of the two "whose full text was read" and which "do not say how the completed datasets were combined". The second use does not hold: the study states Rubin's rules and reads its cutoff off the pooled sensitivity and specificity. And it imputed the disease status, which is the neighbouring problem of paragraph 2, not a missing marker (issue C2).
+
+### Atlantis et al., 2016: serum testosterone and type 2 diabetes in men
+
+Atlantis E, Fahey P, Martin S, et al. Predictive value of serum testosterone for type 2 diabetes risk assessment in men. *BMC Endocrine Disorders* 2016; 16: 26. Read from the full text.
+
+**What it did.** In a cohort of men without diabetes, logistic models tested whether total testosterone adds to existing risk models; missing predictor values were imputed in five datasets, and testosterone cutoffs were compared on sensitivity and specificity, with the cutoff that equalizes them declared optimal.
+
+**What it did not do.** The table of cutoffs is headed "Raw data", with no imputed columns, so the cutoff appears to come from the unimputed data; no interval is given for it; the paper states a combining rule for the area under the curve (the median over the five datasets) but none for the cutoff.
+
+**The passage.** "Missing data on predictor variables were replaced through multiple imputations with five versions of the data set" (Statistical analyses, p. 4). The cutoff table's column headings read "Raw data" (Table 3).
+
+**How the manuscript uses it.** As an applied study that imputes and reports a cutoff, and one whose combining of the datasets is unstated. Both hold only in part: the marker was imputed as one predictor among several, the cutoff seems not to come from the imputed data, and a combining rule is stated for another quantity (issue C2).
+
+### Wirth et al., 2024: a steatosis risk model in people with HIV
+
+Wirth M, Ruckes C, Michel M, Schattenberg JM. Development and validation of a multivariable risk prediction model for hepatic steatosis in patients with HIV infection. *AIDS* 2024; 38(4): 447 to 454. Read from the abstract in the record (no attachment).
+
+**What it did.** By its abstract, a prospective cohort, three logistic risk models with missing values multiply imputed, cutoffs from Youden indices, and internal validation by the bootstrap with an optimism correction of the c-statistic.
+
+**What it did not do.** The abstract does not say how the imputed datasets were combined, whether the cutoff was found within each or after pooling, or what its uncertainty is; the thresholded quantity appears to be a model score, not a raw marker.
+
+**The passage.** "Missing values were imputed with multiple imputation. Cut-offs were derived based on Youden-Indices" (Abstract, Methods).
+
+**How the manuscript uses it.** As an applied study that imputes and then reports a Youden cutoff, which the abstract supports; whether the marker itself was imputed it does not say.
+
+### Thiele and Hirschfeld, 2023: intervals for optimal cutpoints
+
+Thiele C, Hirschfeld G. Confidence intervals and sample size planning for optimal cutpoints. *PLOS ONE* 2023; 18(1): e0279693. Read from the full text.
+
+**What it did.** By simulation, it compared the delta method and the parametric and nonparametric bootstrap for intervals around the Youden-optimal cutpoint, with empirical, normal, and transformed-normal estimators, and proposed a simulation-based sample-size method. The empirical cutpoint's bootstrap distribution was irregular, with several local maxima.
+
+**What it did not do.** It does not count how many studies omit the precision; the statement is the authors' observation. Nothing on missing data.
+
+**The passage.** "many authors fail to report the precision at which these optimal cutpoints are being estimated" (Abstract, p. 1).
+
+**How the manuscript uses it.** For "many studies do not report the precision of their cutpoints at all", which it supports as an assertion.
+
+### What the paragraph rests on
+
+The cotinine claim rests on two survey-based studies, both read in full; only the second uses the Youden index, and the first did report bootstrap intervals for its cutpoints, so cutpoint uncertainty has been reported in the application's own literature, without missing data. The criterion rests on a review; the original is Youden (1950), which is not in the library. The popularity of imputation rests on an assertion, adequate for an opening. The central example, Long, Zhang, and Hsu (2011), carries its weight: its threshold has no uncertainty anywhere, and the wording "the paper that proposed nonparametric multiple imputation" overstates its claim to priority (issue C8). The applied-study sentence is over-weighted: none of the three studies imputes the marker whose cutoff it reports, and one of the two "whose full text was read" does say how it combined the datasets (issue C2). What those studies do support is narrower: imputation precedes a cutoff with no interval for it.

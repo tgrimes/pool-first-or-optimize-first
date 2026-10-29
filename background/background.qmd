@@ -1,0 +1,82 @@
+---
+title: "Background report: inference for the Youden curve of a multiply imputed biomarker"
+subtitle: "The literature and the theory behind the manuscript, in full"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    theme: cosmo
+    embed-resources: true
+    code-fold: true
+    fig-cap-location: bottom
+    include-in-header:
+      - text: |
+          <style>
+            .prov-pilot, .prov-quick { background: #fff3cd; border-bottom: 2px solid #e0a800; padding: 0 0.15em; }
+            .prov-quick::after { content: " [quick]"; font-size: 0.7em; color: #8a6d00; }
+            .cite { background: #fde2e1; border-left: 4px solid #c0392b; padding: 0 0.35em; }
+            .tc { background: #fff3cd; border-left: 4px solid #e0a800; padding: 0 0.35em; }
+          </style>
+bibliography: ../manuscript/references.bib
+csl: ../manuscript/sage-vancouver.csl
+execute:
+  echo: false
+  warning: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+source(file.path("..", "manuscript", "manuscript-helpers.R"))
+prov_set_mode(TRUE)
+ri <- read_run_info()
+suppressMessages(devtools::load_all(project_root(), quiet = TRUE))
+# Every number in this report is computed here from results/ or from the package's functions.
+s <- read_results("cell_summaries.rds")
+app <- read_results("application.rds")
+# The sources of Part A and how each was read (stage 4 log, step 2).
+srcs <- data.frame(
+  key = c("benowitz2009", "tompkins2019", "hassanzad2024", "bartlett2020",
+          "long2011", "abdulrahman2022", "atlantis2016", "wirth2024",
+          "thiele2023", "fluss2005", "bantis2019", "bantis2014",
+          "cattaneo2020", "wang2025weighted", "leyrat2019", "fluss2009",
+          "wang2025interval", "jia2026", "karakaya2015", "cheng2020",
+          "montielolea2019", "hsu1996"),
+  read = c(rep("full", 7), "abstract", rep("full", 5), "abstract", "full",
+           "full", "abstract", "abstract", "full", "full", "full", "none"))
+n_sources <- nrow(srcs)
+n_readable <- sum(srcs$read == "full")
+n_abstract <- sum(srcs$read == "abstract")
+n_unread <- sum(srcs$read == "none")
+n_results <- length(grep("^## Result", readLines("partB.qmd")))
+iss_rows <- grep("^\\| C[0-9]+ \\|", readLines("issues.md"), value = TRUE)
+n_issues <- length(iss_rows)
+n_substantive <- sum(grepl("\\| substantive \\|", iss_rows))
+n_blocking <- sum(grepl("\\| blocking \\|", iss_rows))
+```
+
+# Summary {.unnumbered}
+
+This report is the companion to the manuscript "Inference for the Youden curve of a multiply imputed biomarker" as committed at 375b006, the first draft, before the production run. Its numbers come from the quick run of 100 replicates per cell and carry the quick label; it is rendered again after the production run.
+
+It is written for a reader with graduate training in statistics who has not worked on diagnostic cutoffs or on multiple imputation, and it does three things. Part A goes through the literature the Introduction cites, paragraph by paragraph: for each source, what it did, what it did not do, the passage the manuscript's sentence rests on, read in the library's full text in this stage, and how the manuscript uses it. Part B proves every result the manuscript uses, one step per line with the reason for the step, and checks each one numerically when this page renders. Part C lists what the first two parts found wrong or missing.
+
+In brief: `r prov(n_sources, 0)` sources were covered, `r prov(n_readable, 0)` of them read in full and `r prov(n_abstract, 0)` from their abstracts, with `r prov(n_unread, 0)` not readable, and five more cited only as markers because the library holds no readable copy; `r prov(n_results, 0)` results were walked through, and every numerical check agreed with its result. `r prov(n_issues, 0)` issues were found, `r prov(n_blocking, 0)` blocking and `r prov(n_substantive, 0)` substantive: a numerical flaw in the comparison critical value when grid points tie, which inflated the application's hybrid set; the Introduction's sentence on applied studies, which the studies do not bear out; the attribution of the cube-root rate to sources that do not cover the Youden threshold; the six sources the library lacks; and a direct source for the optimism of data-driven cutoffs, which the Introduction should cite.
+
+How to read it: start with Part C, then the parts it points to. Terms a reader may not know are explained where they first appear.
+
+# Part A. The literature of the Introduction
+
+{{< include partA1.qmd >}}
+
+{{< include partA2.qmd >}}
+
+{{< include partB.qmd >}}
+
+{{< include partC.qmd >}}
+
+# References {.unnumbered}
+
+::: {#refs}
+:::

@@ -5,8 +5,8 @@
 | Workflow version | 0.2.4 (2026-10-29) |
 | Project | Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data |
 | Package | micutoff |
-| Stage | 4, in progress |
-| Open stop | none: stage 4 in progress, on the first draft before the production run (stage 3, step 6 waits) |
+| Stage | 4, report at stop |
+| Open stop | The background report: the user reads `background/background.html` and `background/issues.md` (no blocking, five substantive issues), then decides the revision round and the production run |
 | Last update | 2026-10-29 |
 
 The Stage row reads "stage number, state". The states a stage can be in:
@@ -37,3 +37,5 @@ One line per stage boundary, newest last: the date, the stage reached, the path 
 | 2026-10-29 | 3, drafting | `log/03-manuscript.md`, section "Step 2: references" (the three lists) | Step 2, references: the user adds the NHANES data items, attaches or fixes four PDFs, completes one record, and corrects ten record fields |
 | 2026-10-29 | 3, design stop | `log/03-manuscript.md`, section "3.2 The design proposal" (the Introduction's purpose draft in `manuscript/manuscript.qmd`) | The design stop: the user approves or changes the design; `protocol.md` follows |
 | 2026-10-29 | 3, draft at stop | `manuscript/manuscript.html` (draft mode, quick run of 100 replicates per cell; qmd `manuscript/manuscript.qmd`; log `log/03-manuscript.md`; protocol `protocol.md`) | The first draft: the user comments in revision rounds or declares the draft settled; seven `[TO CONFIRM]` and ten `[CITE]` markers are open |
+| 2026-10-29 | 3, settled | `manuscript/manuscript.html` (the first draft, 375b006) | none: the user, "I have no comments at this time", then asked for the background report on this version before the production run (workflow 0.2.4 order) |
+| 2026-10-29 | 4, report at stop | `background/background.html` (issues: `background/issues.md`; log: `log/04-background-report.md`) | The report's stop: five substantive issues send the manuscript to a stage 3 revision round before the production run (about 12 hours at 2,000 replicates on seven workers) |

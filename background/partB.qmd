@@ -1,0 +1,459 @@
+# Part B. The theory
+
+Each result below is stated in the manuscript's notation, walked through one step per line with the reason for each step, and checked numerically when this report renders, from the package's functions or from `results/`. The order follows the manuscript: the simulation's model first, then the claims about the reported index, then the pieces of the band, the sets, and the correction, and last the strata.
+
+## Result 1: the binormal curve and its closed forms
+
+**Statement.** With $X \mid D = 0 \sim N(0, 1)$, $X \mid D = 1 \sim N(\delta, \sigma_1^2)$, and $u = (c - \delta)/\sigma_1$, the Youden curve is $J(c) = \Phi(c) - \Phi(u)$; its maximizer $c^*$ solves $\phi(c) = \phi(u)/\sigma_1$; its curvature is $\kappa = -J''(c^*) = c^* \phi(c^*) - u^* \phi(u^*)/\sigma_1^2$. With equal variances ($\sigma_1 = 1$), $c^* = \delta/2$, $J^* = 2\Phi(\delta/2) - 1$, and $\kappa = \delta\,\phi(\delta/2)$.
+
+**What to know first.**
+
+- The normal density $\phi$ and distribution function $\Phi$, and $\phi'(x) = -x\phi(x)$.
+- The chain rule for $\Phi\{(c - \delta)/\sigma_1\}$.
+
+**Walkthrough.**
+
+1. $J(c) = P(X \le c \mid D = 0) - P(X \le c \mid D = 1) = \Phi(c) - \Phi\{(c - \delta)/\sigma_1\}$. *Because* a person is called positive when $X > c$, so specificity is $F_0(c)$ and one minus sensitivity is $F_1(c)$; standardize each normal.
+2. $J'(c) = \phi(c) - \phi(u)/\sigma_1$. *Because* the derivative of $\Phi(u)$ in $c$ is $\phi(u)\,du/dc$ and $du/dc = 1/\sigma_1$.
+3. $J''(c) = -c\,\phi(c) + u\,\phi(u)/\sigma_1^2$. *Because* $\phi'(x) = -x\phi(x)$, applied to each term with the chain rule again.
+4. With $\sigma_1 = 1$, $J'(c) = 0$ means $\phi(c) = \phi(c - \delta)$, so $c^2 = (c - \delta)^2$ and $c^* = \delta/2$. *Because* $\phi$ depends on its argument only through its square, and $c = c - \delta$ is impossible for $\delta \ne 0$.
+5. $J^* = \Phi(\delta/2) - \Phi(-\delta/2) = 2\Phi(\delta/2) - 1$. *Because* $u^* = -\delta/2$ and $\Phi(-x) = 1 - \Phi(x)$.
+6. $\kappa = (\delta/2)\phi(\delta/2) + (\delta/2)\phi(\delta/2) = \delta\,\phi(\delta/2)$. *Because* line 3 at $c^* = \delta/2$, $u^* = -\delta/2$, $\sigma_1 = 1$, and $\phi$ is even.
+
+**Assumptions.** Normal groups (lines 1 to 3); a single interior maximum, which holds for equal variances and for the unequal-variance shapes used, whose second root of $J' = 0$ lies far in the tail and is a minimum (`MarkerTruth()` searches between $-2$ and $\delta + 4\sigma_1$ for that reason).
+
+**Numerical check.**
+
+```{r}
+#| label: check-binormal
+chk1 <- do.call(rbind, lapply(list(c(2, 1), c(3, 1)), function(p) {
+  t <- MarkerTruth(p[1], p[2])
+  data.frame(delta = p[1], c_err = t$c_star - p[1] / 2,
+             j_err = t$j_star - (2 * pnorm(p[1] / 2) - 1),
+             k_err = t$kappa - p[1] * dnorm(p[1] / 2))
+}))
+tf <- MarkerTruth(1.5, 2.5)
+h <- 1e-4
+k_num <- -(TrueYouden(tf$c_star + h, 1.5, 2.5) - 2 * tf$j_star +
+             TrueYouden(tf$c_star - h, 1.5, 2.5)) / h^2
+grad_flat <- dnorm(tf$c_star) - dnorm((tf$c_star - 1.5) / 2.5) / 2.5
+```
+
+For the sharp and separated shapes, the computed $c^*$, $J^*$, and $\kappa$ differ from the closed forms by at most `r prov(max(abs(unlist(chk1[, -1]))), 12)`. For the flat shape, which has no closed form, the first-order condition holds to `r prov(abs(grad_flat), 12)` at the computed $c^*$, and the analytic curvature `r prov(tf$kappa, 4)` agrees with a numerical second difference, `r prov(k_num, 4)`.
+
+**Where the manuscript uses it.** The design table's $J^*$ and $\kappa$; the known answers of the simulation; $\kappa$ in the pooling-order formula.
+
+## Result 2: the missingness intercept
+
+**Statement.** If $X$ is missing with probability $\mathrm{expit}(\alpha_0 + b_z Z + b_d D)$, $Z = X + e$ with $e \sim N(0, 1)$ independent of $X$, and group 1 makes up a share $p_1$ of the sample, the expected missing fraction is
+$$
+\begin{aligned}
+m_0(\alpha_0) &= \textstyle\int \mathrm{expit}(\alpha_0 + b_z z)\, \phi(z / \sqrt 2)/\sqrt 2 \, dz, \\
+m_1(\alpha_0) &= \textstyle\int \mathrm{expit}(\alpha_0 + b_z z + b_d)\, \phi\{(z - \delta)/\sqrt{\sigma_1^2 + 1}\}/\sqrt{\sigma_1^2 + 1}\, dz, \\
+m(\alpha_0) &= (1 - p_1)\, m_0(\alpha_0) + p_1\, m_1(\alpha_0),
+\end{aligned}
+$$
+and `MissingIntercept()` solves $m(\alpha_0) = $ the target.
+
+**What to know first.** The sum of independent normals is normal, with the means and the variances added; the law of total probability.
+
+**Walkthrough.**
+
+1. $Z \mid D = 0 \sim N(0, 2)$ and $Z \mid D = 1 \sim N(\delta, \sigma_1^2 + 1)$. *Because* $Z = X + e$ with $e$ independent standard normal.
+2. $P(\text{missing} \mid D = d) = \mathrm{E}\{\mathrm{expit}(\alpha_0 + b_z Z + b_d d) \mid D = d\}$. *Because* missingness depends on the data only through $Z$ and $D$.
+3. $P(\text{missing}) = (1 - p_1) m_0 + p_1 m_1$. *Because* of the law of total probability over $D$.
+4. $m$ increases in $\alpha_0$ from 0 to 1, so the root is unique. *Because* $\mathrm{expit}$ is increasing and bounded.
+
+**Assumptions.** Missingness at random given $Z$ and $D$ (line 2); the group shares fixed by design (line 3).
+
+**Numerical check.**
+
+```{r}
+#| label: check-missingness
+set.seed(20261102)
+chk2 <- do.call(rbind, lapply(c(0.2, 0.6), function(rate) {
+  a0 <- MissingIntercept(rate, 2, 1, p1 = 0.2)
+  dat <- SimulateMarkerData(160000, 2, 1, alpha0 = a0, n1 = 40000)
+  data.frame(rate = rate, simulated = mean(!dat$observed),
+             se = sqrt(rate * (1 - rate) / 200000))
+}))
+```
+
+With 100,000 subjects of whom a fifth are cases, the simulated missing fractions at targets `r lvl(100 * chk2$rate[1])`% and `r lvl(100 * chk2$rate[2])`% were `r prov(chk2$simulated[1], 4)` and `r prov(chk2$simulated[2], 4)`, within `r prov(max(abs(chk2$simulated - chk2$rate) / chk2$se), 1)` binomial standard errors of the targets.
+
+**Where the manuscript uses it.** The simulation's design (every cell with missing values); the missing shares by group in the Results and in the application's placement table.
+
+## Result 3: the reported index is optimistic
+
+**Statement** (Supplementary note, S1.1). If $\mathrm{E}\{\bar J(c^*)\} = J^*$, then $\mathrm{E}\{\max_c \bar J(c)\} \ge \mathrm{E}\{J(\hat c)\}$.
+
+**What to know first.** The maximum of a function is at least its value at any point; expectation preserves inequalities (monotonicity).
+
+**Walkthrough.**
+
+1. $\max_c \bar J(c) \ge \bar J(c^*)$. *Because* $c^*$ is one of the points over which the maximum is taken.
+2. $\mathrm{E}\{\max_c \bar J(c)\} \ge \mathrm{E}\{\bar J(c^*)\} = J^*$. *Because* expectation is monotone, and the premise.
+3. $J^* \ge J(\hat c)$ for every realization of $\hat c$. *Because* $J^*$ is the maximum of $J$.
+4. $J^* \ge \mathrm{E}\{J(\hat c)\}$. *Because* line 3 holds pointwise, so it holds in expectation.
+5. $\mathrm{E}\{\max_c \bar J(c)\} - \mathrm{E}\{J(\hat c)\} \ge 0$. *Because* lines 2 and 4.
+
+**Assumptions.** The premise in line 2. Without missing values $\bar J(c^*)$ averages unbiased proportions and the premise holds exactly. With imputation it holds when the imputed values reproduce the conditional distribution of the marker, which proper imputation from a correct model gives; predictive mean matching with sparse donors breaks it, and the bias can be negative and larger than the optimism (the flat shape at 60% missing).
+
+**Numerical check.**
+
+```{r}
+#| label: check-optimism-sign
+null_cells <- s[s$engine == "none", ]
+z_opt <- null_cells$optimism / null_cells$optimism_mcse
+```
+
+In every one of the `r prov(nrow(null_cells), 0)` cells without missing values, the mean optimism of the reported index was positive, at `r prov(min(z_opt), 1)` to `r prov(max(z_opt), 1)` Monte Carlo standard errors from zero (quick run).
+
+**Where the manuscript uses it.** The Introduction's second paragraph, the Methods (2.2), and the reason for a correction.
+
+## Result 4: the optimism is of order $n^{-2/3}$ (a sketch)
+
+**Statement** (S1.2, labelled a sketch). Without missing data, with a unique maximum, $\kappa > 0$, and positive densities at $c^*$, $\mathrm{E}\{\max_c \hat J(c) - J(\hat c)\} = O(n^{-2/3})$, with $n$ the size of each group.
+
+**What to know first.**
+
+- Cube-root asymptotics: an argmax of an empirical criterion built from indicator functions converges at rate $n^{-1/3}$ to the maximizer of a Gaussian process minus a quadratic, a Chernoff-type limit. The source is Kim and Pollard (1990), which has no readable text in the library [CITE: Kim and Pollard 1990]{.cite}; Cattaneo, Jansson, and Nagasawa (2020) restate it in their introduction and display (2) [@cattaneo2020].
+- The modulus of continuity of the empirical process: $\mathrm{Var}\{\hat F(b) - \hat F(a)\} = \{F(b) - F(a)\}\{1 - F(b) + F(a)\}/n$ for $a \le b$, of order $\lvert b - a \rvert / n$ near a point where the density is positive (Result 6 gives the covariance).
+
+**Walkthrough.** With $G = \hat J - J$:
+
+1. $\max_c \hat J(c) - J(\hat c) = \{\max_c \hat J(c) - \hat J(\hat c)\} + G(\hat c)$. *Because* add and subtract $\hat J(\hat c)$.
+2. The braced term is zero when the maximum is reached at $\hat c$. *Because* $\hat c$ is the midpoint of a maximizing interval; with tied intervals apart it is of lower order, since ties occur on a lattice of step $1/n$.
+3. $G(\hat c) = G(c^*) + \{G(\hat c) - G(c^*)\}$. *Because* add and subtract $G(c^*)$.
+4. $\mathrm{E}\{G(c^*)\} = 0$. *Because* $\hat F_d(c^*)$ is an unbiased proportion.
+5. $\hat c - c^* = O_p(n^{-1/3})$. *Because* of cube-root asymptotics: the quadratic loss $\kappa (c - c^*)^2/2$ balances fluctuations of $G$ of order $(\lvert c - c^* \rvert/n)^{1/2}$ when $\lvert c - c^* \rvert \asymp n^{-1/3}$.
+6. $G(\hat c) - G(c^*) = O_p\{(n^{-1/3}/n)^{1/2}\} = O_p(n^{-2/3})$. *Because* the modulus of continuity at distance $n^{-1/3}$.
+7. $\mathrm{E}\{\max_c \hat J(c) - J(\hat c)\} = O(n^{-2/3})$. *Because* lines 1 to 6, with uniform integrability of $n^{2/3}$ times the increment, assumed.
+
+**Assumptions.** A unique maximum (line 5; with two near-equal maxima the limit changes, Seijo and Sen 2011, not cited in the draft); $\kappa > 0$ (line 5); positive densities at $c^*$ (line 6); uniform integrability (line 7), assumed and not shown. With imputation the sketch needs the joint law of the completed curves, which it does not derive.
+
+**Numerical check.** A complete-data simulation at four group sizes, at render time, for the sharp shape:
+
+```{r}
+#| label: check-cube-root
+set.seed(20261111)
+sizes <- c(100, 400, 1600, 6400, 25600)
+reps <- c(2000, 2000, 2000, 1000, 400)
+opt_by_n <- vapply(seq_along(sizes), function(i) {
+  n <- sizes[i]
+  o <- replicate(reps[i], {
+    x <- c(rnorm(n), rnorm(n, 2))
+    d <- rep(0:1, each = n)
+    emp <- EmpiricalCurves(matrix(x), d)
+    m <- MaximizeStep(emp$u, emp$values[1, ])
+    m$value - TrueYouden(m$cutoff, 2, 1)
+  })
+  c(mean(o), sd(o) / sqrt(reps[i]))
+}, numeric(2))
+scaled <- opt_by_n[1, ] * sizes^(2 / 3)
+scaled_se <- opt_by_n[2, ] * sizes^(2 / 3)
+local_slopes <- diff(log(opt_by_n[1, ])) / diff(log(sizes))
+slope_fit <- OptimismSlope(data.frame(n = sizes, optimism = opt_by_n[1, ],
+                                      optimism_mcse = opt_by_n[2, ]))
+sim_slope <- OptimismSlope(s[s$shape == "sharp" & s$engine == "none" &
+                               s$n == s$n1, ])
+```
+
+If the excess is of order $n^{-2/3}$, then $n^{2/3}$ times the mean optimism settles to a constant. Over group sizes from `r lvl(min(sizes))` to `r lvl(max(sizes))`, with `r lvl(min(reps))` to `r lvl(max(reps))` complete-data datasets each, it was `r prov(text = range_mcse(scaled, scaled_se, 2, 2))`, with no trend; the slopes on the log scale between neighbouring sizes were `r prov(text = paste(fmt(local_slopes, 2), collapse = ", "))`, and the weighted fit over all five gave `r prov(text = mcse(slope_fit[["slope"]], slope_fit[["se"]], 2, 3))`, against the sketch's $-2/3$. The study's three sizes gave `r prov(text = mcse(sim_slope[["slope"]], sim_slope[["se"]], 2, 3))` (quick run), from 100 replicates per cell.
+
+**Where the manuscript uses it.** Methods (2.2) and the Results' slope, which carries a `[TO CONFIRM]` marker.
+
+## Result 5: the order of pooling
+
+**Statement** (S1.3). The mean of the per-dataset maxima is never below the maximum of the mean curve; for curves $\hat J_l(c) = m_l - (\kappa_l/2)(c - \hat c_l)^2$ the gap equals $L^{-1}\sum_l (\kappa_l/2)(\hat c_l - \tilde c_\kappa)^2$, with $\tilde c_\kappa = \sum_l \kappa_l \hat c_l / \sum_l \kappa_l$, and with equal curvatures $\kappa \hat B_c / 2$.
+
+**What to know first.** A maximum of an average is at most the average of maxima (a form of Jensen's inequality for the convex functional max); completing the square.
+
+**Walkthrough.**
+
+1. $\hat J_l(c) \le \max_{c'} \hat J_l(c')$ for every $c$ and $l$. *Because* of the definition of a maximum.
+2. $\bar J(c) \le L^{-1} \sum_l \max_{c'} \hat J_l(c')$ for every $c$. *Because* average line 1 over $l$.
+3. $\max_c \bar J(c) \le L^{-1} \sum_l \max_{c'} \hat J_l(c')$. *Because* line 2 holds at every $c$, so at the maximizer.
+4. $\bar J(c) = \bar m - (2L)^{-1}\sum_l \kappa_l (c - \hat c_l)^2$. *Because* average the quadratic curves.
+5. $\bar J'(c) = -L^{-1}\sum_l \kappa_l (c - \hat c_l) = 0$ at $c = \tilde c_\kappa$. *Because* differentiate line 4 and solve.
+6. $L^{-1}\sum_l m_l - \bar J(\tilde c_\kappa) = (2L)^{-1}\sum_l \kappa_l (\tilde c_\kappa - \hat c_l)^2$. *Because* $\bar m = L^{-1}\sum_l m_l$ is the mean of the per-dataset maxima, and line 4 at $\tilde c_\kappa$.
+7. With $\kappa_l = \kappa$: $\tilde c_\kappa = \tilde c$ and the gap is $(\kappa/2)\, L^{-1}\sum_l (\hat c_l - \tilde c)^2 = \kappa \hat B_c / 2$. *Because* the weights in line 5 are equal.
+
+**Assumptions.** None for lines 1 to 3. Lines 4 to 7 need curves that are quadratic where the maximizers lie; the empirical curve is a step function, so for it the formula is an approximation.
+
+**Numerical check.**
+
+```{r}
+#| label: check-gap
+set.seed(20261104)
+L <- 7
+cl <- rnorm(L, 1, 0.2); kl <- runif(L, 0.3, 0.6); ml <- runif(L, 0.6, 0.7)
+qf <- function(cc, l) ml[l] - kl[l] / 2 * (cc - cl[l])^2
+pq <- PoolSmoothCurves(qf, L, seq(0, 2, length.out = 201))
+ck <- sum(kl * cl) / sum(kl)
+gap_formula <- mean(kl / 2 * (cl - ck)^2)
+gap_code <- pq$index[["p2"]] - pq$index[["p1"]]
+steps <- replicate(500, {
+  v <- matrix(runif(5 * 40), 5)
+  mean(apply(v, 1, max)) - max(colMeans(v))
+})
+gap_cells <- s[s$miss_rate > 0 & s$engine != "cc", ]
+```
+
+On `r lvl(L)` quadratic curves with unequal curvatures, the pooled code's gap and the formula differ by `r prov(abs(gap_code - gap_formula), 12)`. On 500 sets of random step curves, the smallest gap was `r prov(min(steps), 4)`, never negative. In the simulation, the observed gap was `r prov(text = fmt_range(gap_cells$gap_ratio, 2))` times its approximation across cells with imputed values (quick run).
+
+**Where the manuscript uses it.** Methods (2.2, 2.6), Results (the order of pooling), Figure 4.
+
+## Result 6: the covariance of an empirical distribution function
+
+**Statement.** For $n$ independent draws from $F$ and $a \le b$, $\mathrm{Cov}\{\hat F(a), \hat F(b)\} = \{F(a) - F(a) F(b)\}/n$; the covariances of $\hat J = \hat F_0 - \hat F_1$ add over the two independent groups.
+
+**What to know first.** The covariance of two indicators; the variance of a mean of independent terms.
+
+**Walkthrough.**
+
+1. $\hat F(a) = n^{-1} \sum_i 1\{X_i \le a\}$. *Because* of the definition.
+2. $\mathrm{Cov}(1\{X \le a\}, 1\{X \le b\}) = P(X \le a, X \le b) - F(a) F(b) = F(a) - F(a)F(b)$. *Because* $\mathrm{Cov}(U, V) = \mathrm{E}(UV) - \mathrm{E}U\,\mathrm{E}V$, and $\{X \le a\} \subseteq \{X \le b\}$ when $a \le b$.
+3. $\mathrm{Cov}\{\hat F(a), \hat F(b)\} = n^{-2}\sum_i \{F(a) - F(a)F(b)\} = \{F(a) - F(a)F(b)\}/n$. *Because* terms for different $i$ are independent, so cross-covariances vanish.
+4. $\mathrm{Cov}\{\hat J(a), \hat J(b)\} = \mathrm{Cov}\{\hat F_0(a), \hat F_0(b)\} + \mathrm{Cov}\{\hat F_1(a), \hat F_1(b)\}$. *Because* the groups are independent and the minus sign enters twice.
+
+**Assumptions.** Independent draws within each group, independent groups. The Rubin's-rules band plugs in the completed datasets' $\hat F$; a nonparametric bootstrap of each completed dataset estimates the same covariance, which is why that band stands for impute-then-bootstrap.
+
+**Numerical check.**
+
+```{r}
+#| label: check-edf-cov
+set.seed(20261105)
+gr <- c(0, 1, 2)
+sims <- t(replicate(20000, {
+  x <- c(rnorm(100), rnorm(100, 2)); d <- rep(0:1, each = 100)
+  GridCurves(matrix(x), d, gr)$j[1, ]
+}))
+cov_mc <- cov(sims)
+cov_th <- YoudenCurveCov(pnorm(gr), pnorm(gr - 2), 100, 100)
+# One dataset: a bootstrap within groups against the plug-in formula.
+x1 <- c(rnorm(200), rnorm(200, 2)); d1 <- rep(0:1, each = 200)
+g1 <- GridCurves(matrix(x1), d1, gr)
+boot1 <- t(replicate(4000, {
+  idx <- ResampleWithinGroups(d1)
+  GridCurves(matrix(x1[idx]), d1[idx], gr)$j[1, ]
+}))
+cov_plug <- YoudenCurveCov(g1$f0[1, ], g1$f1[1, ], 200, 200)
+boot_ratio <- diag(cov(boot1)) / diag(cov_plug)
+```
+
+Over 20,000 simulated datasets of 100 per group, the Monte Carlo covariance of the empirical curve at three thresholds differs from the formula by at most `r prov(max(abs(cov_mc - cov_th)), 5)`, against entries of at most `r prov(max(cov_th), 4)`. On one dataset of 200 per group, 4,000 bootstrap resamples within groups gave variances `r prov(text = fmt_range(boot_ratio, 2))` times the plug-in formula's at the three thresholds, which is why a bootstrap of each completed dataset adds nothing to the closed form.
+
+**Where the manuscript uses it.** Methods (2.3): the within-imputation covariance of the Rubin's-rules band and the binomial variance of the pointwise intervals.
+
+## Result 7: Rubin's rules for one estimand
+
+**Statement.** With per-imputation estimates $\hat Q_l$ and variances $U_l$, $\bar Q = L^{-1}\sum_l \hat Q_l$, $\bar U = L^{-1}\sum_l U_l$, and $B$ the sample variance of the $\hat Q_l$, the variance of $\bar Q$ is estimated by $T = \bar U + (1 + 1/L) B$ [@rubin1987].
+
+**What to know first.** Proper multiple imputation (the imputations are draws from the posterior predictive distribution of the missing values); the law of total variance.
+
+**Walkthrough.**
+
+1. $\bar Q - Q = (\bar Q_\infty - Q) + (\bar Q - \bar Q_\infty)$, with $\bar Q_\infty$ the mean over infinitely many imputations. *Because* add and subtract.
+2. $\mathrm{Var}(\bar Q_\infty - Q) \approx \bar U + B_\infty$. *Because* under proper imputation the complete-data variance plus the between-imputation variance is the posterior variance of $Q$ given the observed data, to first order (Rubin 1987, chapter 3).
+3. $\mathrm{Var}(\bar Q - \bar Q_\infty) = B_\infty / L$. *Because* $\bar Q$ averages $L$ draws whose spread about $\bar Q_\infty$ is $B_\infty$.
+4. $T = \bar U + (1 + 1/L) B$. *Because* add lines 2 and 3, the two parts being uncorrelated, and estimate $B_\infty$ by $B$.
+
+**Assumptions.** Proper imputation and a congenial imputation model (line 2); an approximately normal $\hat Q$, which holds for $\bar J(c)$ at a fixed threshold and fails for the threshold itself [@leyrat2019]. Line 2 is a statement of Rubin's theory, which this report cites and does not re-derive.
+
+**Numerical check.** A normal mean with 30% of values missing completely at random, imputed by `mice::mice.impute.norm()`, $L = 5$:
+
+```{r}
+#| label: check-rubin
+set.seed(20261106)
+rr <- t(replicate(1000, {
+  y <- rnorm(200, 1); miss <- runif(200) < 0.3
+  yo <- ifelse(miss, NA, y)
+  comp <- ImputeNorm(yo, rep(0L, 200), rnorm(200), 5)
+  q <- colMeans(comp); u <- apply(comp, 2, var) / 200
+  c(mean(q), mean(u) + (1 + 1 / 5) * var(q))
+}))
+rubin_ratio <- mean(rr[, 2]) / var(rr[, 1])
+```
+
+Over 1,000 datasets, the mean of $T$ was `r prov(rubin_ratio, 3)` times the Monte Carlo variance of $\bar Q$. (Here the disease status is constant, which `ImputeNorm()` drops, and the auxiliary is pure noise, so the imputation model is correct for values missing completely at random.)
+
+**Where the manuscript uses it.** Methods (2.3): the pointwise intervals and the Rubin's-rules band.
+
+## Result 8: the covariance split
+
+**Statement** (S1.4). If the $m$-th imputation of resample $b$ is $\hat J_{bm} = A_b + e_{bm}$, with the $e_{bm}$ independent of $A_b$ and of each other, mean zero, and covariance $W$, then $\mathrm{Cov}(A_b) + W/L = V - W/M + W/L$, with $V = \mathrm{Cov}(\bar J_b)$ and $W$ estimated by the within-resample covariance.
+
+**What to know first.** The covariance of a sum of independent terms; the unbiasedness of a sample covariance.
+
+**Walkthrough.**
+
+1. $\bar J_b = A_b + M^{-1}\sum_m e_{bm}$. *Because* average the $M$ imputations.
+2. $V = \mathrm{Cov}(A_b) + W/M$. *Because* the noise is independent of $A_b$ and across $m$.
+3. $\mathrm{E}\{(M - 1)^{-1}\sum_m (\hat J_{bm} - \bar J_b)(\hat J_{bm} - \bar J_b)^\top\} = W$. *Because* the sample covariance of $M$ independent draws about their mean is unbiased, and $A_b$ cancels in the deviations.
+4. $\mathrm{Cov}(A_b) + W/L = V - W/M + W/L$. *Because* solve line 2 for $\mathrm{Cov}(A_b)$.
+
+**Assumptions.** Imputation noise with a common covariance across resamples (line 3); the bootstrap reproducing the sampling covariance of the data's curve (the use of $\mathrm{Cov}(A_b)$ for it). The estimate can have negative eigenvalues; they are set to zero, which only widens.
+
+**Numerical check.**
+
+```{r}
+#| label: check-split
+set.seed(20261107)
+s_s <- matrix(c(4, 2, 2, 3), 2) * 1e-4
+s_w <- matrix(c(9, -3, -3, 6), 2) * 1e-4
+a_b <- NormalDraws(s_s, 40000)
+split <- CovarianceSplit(lapply(1:2, function(m) a_b + NormalDraws(s_w, 40000)), 20)
+split_err <- max(abs(split$sigma - (s_s + s_w / 20)))
+```
+
+On 40,000 synthetic resamples with known parts, the estimated $\Sigma$ differs from $\Sigma_s + \Sigma_w / 20$ by at most `r prov(split_err, 6)`, against entries of `r prov(min(abs(s_s + s_w / 20)), 5)` to `r prov(max(s_s + s_w / 20), 5)`. In the simulation, the Monte Carlo spread of the averaged curve at the best threshold was `r prov(text = fmt_range(s$sd_se_ratio[s$engine %in% c("pmm", "pmm10", "norm")], 2))` times the mean standard error from $\Sigma$ (quick run).
+
+**Where the manuscript uses it.** Methods (2.3): the bootstrap and hybrid bands, and both comparison-based sets.
+
+## Result 9: the sup-t band
+
+**Statement.** If $\bar J - J$ on the grid is approximately $N(0, \Sigma)$ and $q$ is the 95% quantile of $\max_k \lvert Z_k \rvert / \mathrm{SE}_k$ for $Z \sim N(0, \Sigma)$, then $\bar J(c_k) \pm q\,\mathrm{SE}_k$ covers $J$ at every grid point at once with probability about 95%; for independent coordinates $q = \Phi^{-1}\{(1 + 0.95^{1/K})/2\}$.
+
+**What to know first.** Simultaneous coverage as the event that the largest standardized error is below the critical value [@montielolea2019]; the distribution of a maximum of independent variables.
+
+**Walkthrough.**
+
+1. The band covers at every point iff $\max_k \lvert \bar J(c_k) - J(c_k) \rvert / \mathrm{SE}_k \le q$. *Because* each point's condition is $\lvert \cdot \rvert \le q\,\mathrm{SE}_k$.
+2. $P(\text{cover}) \approx P(\max_k \lvert Z_k \rvert / \mathrm{SE}_k \le q) = 0.95$. *Because* of the normal approximation and the choice of $q$.
+3. For independent coordinates $P(\max_k \lvert Z_k \rvert / \mathrm{SE}_k \le q) = \{2\Phi(q) - 1\}^K$. *Because* the coordinates are independent and each standardized one is standard normal.
+4. $q = \Phi^{-1}\{(1 + 0.95^{1/K})/2\}$. *Because* solve $\{2\Phi(q) - 1\}^K = 0.95$.
+
+**Assumptions.** Joint normality of the pooled curve on the grid (line 2). The empirical curve is a step function whose increments between nearby thresholds are counts of few subjects, so the approximation is coarse at small sizes; the hybrid band relies on it, the bootstrap band reads $q$ from the resamples instead.
+
+**Numerical check.**
+
+```{r}
+#| label: check-supt
+set.seed(20261108)
+q_closed <- qnorm((1 + 0.95^(1 / 41)) / 2)
+q_code <- SupTCritical(diag(41), n_draw = 200000)
+```
+
+For 41 independent coordinates, the code's critical value is `r prov(q_code, 3)` against the closed form `r prov(q_closed, 3)`.
+
+**Where the manuscript uses it.** Methods (2.3): the hybrid band and the Rubin's-rules band; the bootstrap band's critical value is the same quantile read from resamples.
+
+## Result 10: the band-based set holds the best grid threshold when the band covers
+
+**Statement.** If $L_k \le J(c_k) \le U_k$ for every $k$, then $k^* = \arg\max_k J(c_k)$ belongs to $\{k : U_k \ge \max_j L_j\}$.
+
+**What to know first.** Nothing beyond the definitions.
+
+**Walkthrough.**
+
+1. $U_{k^*} \ge J(c_{k^*})$. *Because* the band covers at $k^*$.
+2. $J(c_{k^*}) \ge J(c_j) \ge L_j$ for every $j$. *Because* $k^*$ is best, and the band covers at $j$.
+3. $U_{k^*} \ge \max_j L_j$. *Because* lines 1 and 2.
+
+**Assumptions.** Coverage at every grid point. The guarantee is for the grid's best threshold, not for $c^*$ between grid points.
+
+**Numerical check.**
+
+```{r}
+#| label: check-bandset
+bs_ok <- all(s$bandset_hybrid >= s$cover_hybrid - 1e-12) &&
+  all(s$bandset_boot >= s$cover_boot - 1e-12)
+```
+
+The implication requires that a set's coverage be at least its band's in every cell; in the quick run it was, for both constructions: `r if (bs_ok) "true" else "false"` in all `r prov(nrow(s), 0)` cells.
+
+**Where the manuscript uses it.** Methods (2.4), as the set the comparison-based set is measured against.
+
+## Result 11: the comparison-based set holds the best grid threshold
+
+**Statement** (S1.5). If $\{\bar J(c_j) - \bar J(c_{k^*})\} - \{J(c_j) - J(c_{k^*})\} \le q_D\,\mathrm{SE}_{jk^*}$ for every $j \ne k^*$, then $k^* \in S_C$; when the differences are jointly normal and $q_D \ge q_{k^*}$, that event has probability at least 95% in the limit.
+
+**What to know first.** Multiple comparisons with the best [@hsu1996]; one-sided simultaneous bounds.
+
+**Walkthrough.**
+
+1. The event above. *Because* it is the premise.
+2. $J(c_j) - J(c_{k^*}) \le 0$ for every $j$. *Because* $k^*$ is best.
+3. $\bar J(c_j) - \bar J(c_{k^*}) \le q_D\,\mathrm{SE}_{jk^*}$ for every $j \ne k^*$. *Because* add lines 1 and 2.
+4. $k^* \in S_C$. *Because* line 3 is the membership condition.
+5. $P(\text{line 1}) \ge 0.95$ asymptotically when $q_D \ge q_{k^*}$. *Because* $q_{k^*}$ is the 95% quantile of $\max_{j \ne k^*}(D_j - D_{k^*})/s_{jk^*}$ under the normal law, and a larger critical value only enlarges the event; $q_D = \max_k q_k$ meets this whichever $k$ is best.
+
+**Assumptions.** Joint normality of the differences (line 5); the per-point quantile computed under the right covariance. The plug-in $q_{\hat k}$ meets the condition only when $\hat k = k^*$ or $q_{\hat k} \ge q_{k^*}$.
+
+**Numerical check.**
+
+```{r}
+#| label: check-compset
+set.seed(20261109)
+q_two <- ComparisonCritical(matrix(rnorm(400000), ncol = 2), diag(2))
+g41 <- seq(-1, 3, length.out = 41)
+j41 <- TrueYouden(g41, 2, 1)
+holds <- ComparisonSet(j41, diag(41) * 1e-4, 2)[which.max(j41)]
+```
+
+For two independent coordinates the code's critical value is `r prov(q_two, 3)` against $\Phi^{-1}(0.95) =$ `r prov(qnorm(0.95), 3)`; a set built on the true curve holds the best grid point (`r if (holds) "true" else "false"`); and in the quick run the hybrid comparison-based set held the best threshold in `r prov(text = range_mcse(s$compset_hybrid, s$compset_hybrid_mcse, 2, 3))` of replicates across cells.
+
+**Where the manuscript uses it.** Methods (2.4), the Results on the sets, Figure 2.
+
+## Result 12: the correction is zero for a reproducing bootstrap
+
+**Statement.** If every resample's pooled curve equals the original's, every $o_b = 0$ and $\hat J_{\mathrm{corr}} = \bar J(\hat c)$.
+
+**What to know first.** The definition of $o_b$ (Methods 2.5).
+
+**Walkthrough.**
+
+1. $\bar J_b = \bar J$ implies $\hat c_b = \hat c$. *Because* the maximizer is a function of the curve.
+2. $o_b = \bar J_b(\hat c_b) - \bar J(\hat c_b) = \bar J(\hat c) - \bar J(\hat c) = 0$. *Because* of line 1 and the definition.
+3. $\hat J_{\mathrm{corr}} = \bar J(\hat c)$. *Because* the mean of zeros is zero.
+
+**Assumptions.** None. The check matters because the first definition of the correction, which started from the maximum rather than from the curve at the chosen cutoff, failed it when tied intervals lay apart (a decision of the second pilot).
+
+**Numerical check.**
+
+```{r}
+#| label: check-reproducing
+set.seed(20261110)
+datr <- SimulateMarkerData(100, 2, 1)
+cop <- matrix(datr$x_full, nrow = nrow(datr), ncol = 20)
+empr <- EmpiricalCurves(cop, datr$d)
+same <- list(u = empr$u, j_bar = PoolMean(empr$values))
+opt_rep <- max(abs(BootOptimism(list(same, same, same), empr$u, same$j_bar)))
+```
+
+The largest optimism of three reproducing resamples is `r prov(opt_rep, 12)`.
+
+**Where the manuscript uses it.** Methods (2.5): the correction's definition.
+
+## Result 13: one cutoff per stratum
+
+**Statement** (S1.6). A rule with one cutoff $c(v)$ per value $v$ of a discrete covariate has Youden index $\sum_v \{w_0(v) F_0(c(v) \mid v) - w_1(v) F_1(c(v) \mid v)\}$, with $w_d(v) = P(V = v \mid D = d)$; it is maximized stratum by stratum; at the stratum's own Youden cutoff the population criterion's derivative is $\{w_0(v) - w_1(v)\} f_0$.
+
+**What to know first.** The law of total probability; separability of a sum of functions of different arguments.
+
+**Walkthrough.**
+
+1. $P\{X \le c(V) \mid D = d\} = \sum_v w_d(v) F_d(c(v) \mid v)$. *Because* condition on $V$.
+2. $J_{\mathrm{rule}} = \sum_v \{w_0(v) F_0(c(v) \mid v) - w_1(v) F_1(c(v) \mid v)\}$. *Because* line 1 for $d = 0$ minus line 1 for $d = 1$.
+3. $\max J_{\mathrm{rule}} = \sum_v \max_c \{w_0(v) F_0(c \mid v) - w_1(v) F_1(c \mid v)\}$. *Because* each term depends on its own cutoff only.
+4. The stratum's maximizer solves $w_0(v) f_0(c \mid v) = w_1(v) f_1(c \mid v)$. *Because* set the derivative of its term to zero.
+5. At the stratum's own Youden cutoff, where $f_0 = f_1$, the derivative is $\{w_0(v) - w_1(v)\} f_0(c \mid v)$. *Because* substitute $f_1 = f_0$ into line 4's derivative.
+
+**Assumptions.** Densities (lines 4, 5); one peak per stratum, so that the sign of the derivative at the stratum's cutoff gives the direction of the population-optimal one.
+
+**Numerical check.** Two binormal strata with unequal shares, a brute-force search over pairs of cutoffs against the stratum-by-stratum maxima:
+
+```{r}
+#| label: check-strata
+w0 <- c(0.7, 0.3); w1 <- c(0.4, 0.6); dl <- c(2, 1.5)
+gs <- seq(-2, 4, by = 0.01)
+term <- function(v, cc) w0[v] * pnorm(cc) - w1[v] * pnorm(cc - dl[v])
+best_pair <- max(outer(term(1, gs), term(2, gs), "+"))
+best_sep <- max(term(1, gs)) + max(term(2, gs))
+c_pop1 <- gs[which.max(term(1, gs))]
+```
+
+The best pair of cutoffs and the sum of the per-stratum maxima agree to `r prov(abs(best_pair - best_sep), 12)`. In stratum 1, which holds a larger share of the controls than of the cases, the population-optimal cutoff is `r prov(c_pop1, 2)`, above the stratum's own Youden cutoff `r prov(dl[1] / 2, 2)`, as line 5 says.
+
+**Where the manuscript uses it.** Methods (2.7), the Application's strata (Table 4).
