@@ -96,6 +96,8 @@ What in the stage file, the templates, or the rules left the agent guessing, was
 
 - D-S1. The user chose the re-scope: revise the proposal with Aim 2 (inference and the optimism correction under imputation) leading and the pooling-order result as a closed-form note, then re-pilot in `pilot-b/`. The revision is `proposal.md`, section 12, dated, at the end; the sections before it stand as the record. The user asked for the re-pilot to follow the revision directly, so the revised proposal and the re-pilot's pass rule were not shown to the user before the re-pilot ran; the revision carries a `[TO CONFIRM]` marker saying so, and the stop message names it.
 - D-S2. `STATUS.md` returned to `2, spec`, with the stage record keeping the `piloted-fail` line of the first pilot.
+- D-S3. The re-pilot's report reads the first pilot's NHANES description from `pilot/results/` read-only, rather than copying the script and its output into `pilot-b/`.
+- D-S4. The test subagent's mutation checks found one change its tests cannot see: starting the corrected index from the maximum rather than from the pooled curve at the chosen cutoff, which differs only when tied maximizing intervals lie apart. The reproducing-bootstrap known-answer check covers `BootOptimism()`; the starting point in `RunReplicateB()` is checked by reading the code.
 
 # Re-pilot (`pilot-b/`)
 
@@ -103,4 +105,30 @@ What in the stage file, the templates, or the rules left the agent guessing, was
 
 | Step | Started | Ended | Agent time | Notes |
 |---|---|---|---|---|
-| 0. Decision recorded; proposal revision (section 12) | 00:33 | 00:40 | 7 min | |
+| 0. Decision recorded; proposal revision (section 12) | 00:33 | 00:35 | 2 min | committed with the spec as a revision round, 3a801c7 |
+| 1. The spec, rewritten | 00:35 | 00:36 | 1 min | sections 1 to 4, 8, 9; 5 to 7 carried over |
+| 2. Pre-registration, commit | 00:36 | 00:37 | 1 min | 057ad2c at 00:37:25 |
+| 3. Code, known answers, amendment, timing, tests, check | 00:37 | 00:52 | 15 min | the reproducing-bootstrap check failed on the first definition of the optimism; amendment 5626ff5 at 00:40:34, before any run; timing at 00:41 (7 minutes projected for 500 replicates); unit tests by a Sonnet subagent (00:41 to 00:51, 657 expectations, with mutation checks); the coordinator waited for it before the run; `devtools::test()` 0 failures and `devtools::check()` 0/0/0 at 00:52 |
+| 4. Run | 00:52 | 01:01 | 9.1 min of compute | three PSOCK workers, one cell per task; the report's static sections written meanwhile |
+| 5. Verdict | 01:01 | 01:02 | 1 min | `piloted-close-call` |
+| 6. Decisions log, spec section 3 | 01:02 | 01:03 | 1 min | |
+| 7. Report: fill, render, check, look, revise | 01:03 | 01:04 | 2 min | three renders, checker clean each time |
+| 8. STATUS, log, commit | 01:04 | 01:06 | 2 min | |
+| Total, re-pilot | 00:33 | 01:06 | about 33 min | of which 9 min the run |
+
+The run (`pilot-b/results/run_info.rds`) finished in 9.1 minutes against a projection of 7, with one cell per task. The verdict: question 1 passes (optimism of the reported index, and pointwise intervals that cover the whole curve in well under 0.90 of replicates), question 2 passes, and question 3 fails only on clause (b) in the base cell with predictive mean matching, within its MCSE of the 0.92 limit, so the status is a close call (`pilot-b/decisions.md`, D1). Workflow 0.2.2 was committed into this repository by another session at 01:03, during step 7 (`workflow/` only: memo mode after a dropped or parked decision, and more banned workflow words); nothing in the re-pilot's procedure changed, the stop message lists the new options, and the version row of `STATUS.md` was updated.
+
+### Revision pass (re-pilot report)
+
+- Summary, status: "within its Monte Carlo error" said less than the number; now the distance in MCSE, computed. "Covers between 0.91 to 0.94" was ungrammatical; reworded.
+- Findings: finding 5's bold claim carried typed numbers; rewritten without them. "1.000 to 1.000" for a constant now reads "every replicate of every cell", computed. Finding 10 cited a table without the gap; the gap and the RMSE ratio were added to the cell table. A finding was added from the replicate scatter: the correction does not track a study's own optimism (correlation computed); D1's failing reading now names it.
+- Potential impact: written after the run, with the numbers the re-pilot found and cross-references, the first pilot's lesson 20.
+- "Precision of cutpoints often goes unreported" used a justify-or-replace word; now "many authors do not report", the passage's own claim.
+- No section changed by more than three sentences after the first pass, so no second pass.
+22. **Who revises the proposal at a re-scope.** The stop says "the user revises the proposal (a dated revision section at its end)"; here the user asked the agent to. No step says how the agent writes that section (which sections it may change, whether stage 1's revision pass applies); a dated section 12 that governs where it differs, with the body kept as the record, was the reading used.
+23. **A stop for the revised proposal.** The user asked for the re-pilot to follow the revision directly, so the revised proposal and the re-pilot's pass rule reached the user only at the re-pilot's stop. The stage file could say whether a revised proposal needs its own stop before a re-pilot; the rules say the user reviews every deliverable, and a `[TO CONFIRM]` marker in the revision carried the gap.
+24. **Where a re-pilot's log goes.** The re-pilot was logged in `log/02-pilot.md` under its own heading, with the user's answer to the first stop as D-S1 to D-S4 and the stage record keeping both stop lines. The stage file could say so.
+25. **An amendment before any run.** A known-answer check failed after the pre-registration was committed and before the run; the fix was a dated amendment in the pre-registration, committed before the run. `rules.md` speaks of changes after production results, not of an amendment before a pilot runs; one line allowing it, with the commit order as the safeguard, would settle it.
+26. **A coverage criterion without a width criterion.** The re-pilot's clause on the near-optimal set passed because the sets are wide, about two-thirds of the grid; coverage alone cannot fail a set that includes nearly everything. The stage 1 guidance on pass rules could ask for a size criterion beside every coverage criterion.
+27. **Two sessions in one repository.** Workflow 0.2.2 was committed here by another session at 01:03, while this session was in step 7; it touched only `workflow/`, so nothing collided, but `STATUS.md`'s version row went stale until updated here. A template sync could update that row itself, or wait for a stop.
+28. **Time.** The re-pilot took about 33 minutes from the user's answer to the commit, 9 of them the run; the whole stage, both pilots, about 2 hours.

@@ -136,18 +136,22 @@ RunReplicate <- function(cell, truth,
 #' Seeds the L'Ecuyer-CMRG generator with the cell's own seed, so the
 #' result does not depend on the worker that runs it.
 #'
-#' @param cell One row of `PilotDesign()`.
+#' @param cell One row of `PilotDesign()` or `PilotDesignB()`.
 #' @param n_rep Number of replicates.
-#' @return A data frame with one row per replicate and estimator, with the
-#'   cell number, the replicate number, and the elapsed seconds.
+#' @param replicate_fun The function that runs one replicate,
+#'   `RunReplicate()` for the first pilot, `RunReplicateB()` for the
+#'   re-pilot.
+#' @return A data frame with one row per replicate (and estimator, for the
+#'   first pilot), with the cell number, the replicate number, and the
+#'   elapsed seconds.
 #' @export
-RunDataCell <- function(cell, n_rep) {
+RunDataCell <- function(cell, n_rep, replicate_fun = RunReplicate) {
   RNGkind("L'Ecuyer-CMRG")
   set.seed(cell$seed)
   truth <- MarkerTruth(cell$delta, cell$sigma1)
   start <- proc.time()[["elapsed"]]
   reps <- lapply(seq_len(n_rep), function(r) {
-    out <- RunReplicate(cell, truth)
+    out <- replicate_fun(cell, truth)
     out$rep <- r
     out
   })

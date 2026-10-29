@@ -33,11 +33,11 @@ Filled twice: the plan when the spec is written, the answers after the verdict (
 
 **Plot:** `pilot-b/results/coverage-by-cell.png`, the simultaneous coverage of each band in every cell, written by `pilot-b/verdict.R`.
 
-**The three pilot answers:** after the run.
+**The three pilot answers:** status `piloted-close-call`, by the pre-registered rule, from `pilot-b/results/verdict.rds`; 500 replicates per cell, run label `pilot`.
 
-1. Does the effect exist? [after the run]
-2. Is it large enough to matter at realistic sample sizes? [after the run]
-3. Is there an obvious fix or diagnostic? [after the run]
+1. Does the effect exist? Yes. In the base cell the reported index exceeds the true accuracy of the chosen cutoff by 0.0261 (MCSE 0.0017), and the pointwise Rubin's intervals read as a band contain the true curve at all 41 thresholds in 0.414 (MCSE 0.022) of replicates.
+2. Is it large enough to matter at realistic sample sizes? Yes: the optimism is 0.0261 in the base cell and 0.0301 (MCSE 0.0022) with 60% missing, above 0.01.
+3. Is there an obvious fix or diagnostic? Partly. The bootstrap-then-impute correction leaves a bias of 0.15 (MCSE 0.06) of the optimism in the base cell, and its near-optimal set contains $c^*$ in 1.000 of replicates with both engines. The bootstrap-then-impute band covers in 0.910 (MCSE 0.013) of replicates with predictive mean matching, below and near the 0.92 limit, and in 0.944 (MCSE 0.010) with normal imputation.
 
 ## 4. ADEMP skeleton
 

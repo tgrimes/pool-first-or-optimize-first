@@ -4,16 +4,21 @@
 \alias{RunDataCell}
 \title{Run every replicate of one data cell}
 \usage{
-RunDataCell(cell, n_rep)
+RunDataCell(cell, n_rep, replicate_fun = RunReplicate)
 }
 \arguments{
-\item{cell}{One row of \code{PilotDesign()}.}
+\item{cell}{One row of \code{PilotDesign()} or \code{PilotDesignB()}.}
 
 \item{n_rep}{Number of replicates.}
+
+\item{replicate_fun}{The function that runs one replicate,
+\code{RunReplicate()} for the first pilot, \code{RunReplicateB()} for the
+re-pilot.}
 }
 \value{
-A data frame with one row per replicate and estimator, with the
-cell number, the replicate number, and the elapsed seconds.
+A data frame with one row per replicate (and estimator, for the
+first pilot), with the cell number, the replicate number, and the
+elapsed seconds.
 }
 \description{
 Seeds the L'Ecuyer-CMRG generator with the cell's own seed, so the

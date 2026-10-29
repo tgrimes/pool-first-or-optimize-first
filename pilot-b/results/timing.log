@@ -1,0 +1,21 @@
+2026-10-29 00:41:40 start, timing 
+2026-10-29 00:41:432026-10-29 00:41:43  cellcell  21  started
+started
+2026-10-29 00:41:45 cell 1 done in 2 s
+2026-10-29 00:41:45 cell 3 started
+2026-10-29 00:41:46 cell 2 done in 3 s
+2026-10-29 00:41:46 cell 4 started
+2026-10-29 00:41:48 cell 3 done in 2 s
+2026-10-29 00:41:48 cell 5 started
+2026-10-29 00:41:49 cell 4 done in 2 s
+2026-10-29 00:41:49 cell 6 started
+2026-10-29 00:41:50 cell 5 done in 2 s
+2026-10-29 00:41:50 cell 7 started
+2026-10-29 00:41:50 cell 6 done in 1 s
+2026-10-29 00:41:50 cell 8 started
+2026-10-29 00:41:53 cell 7 done in 3 s
+2026-10-29 00:41:53 cell 9 started
+2026-10-29 00:41:53 cell 8 done in 2 s
+2026-10-29 00:41:53 cell 10 started
+2026-10-29 00:41:55 cell 10 done in 2 s
+2026-10-29 00:41:55 cell 9 done in 2 s
