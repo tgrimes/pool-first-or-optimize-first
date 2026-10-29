@@ -3,7 +3,7 @@
 Usage:
   python3 -I check-manuscript.py manuscript.qmd manuscript.html
           [--citations citations.csv] [--bib references.bib]
-          [--journals workflow/journals/journals.csv --journal <slug>] [--final]
+          [--journals workflow/journals/journals.csv --journal <slug>] [--final | --memo]
 
 Exit status is 1 if any ERROR is found. WARN lines need a human look. INFO lines are counts.
 The checker reads the qmd for what was written and the HTML for what rendered. It ignores the
@@ -24,10 +24,12 @@ qmd_path, html_path = args[0], args[1]
 def opt(flag, default=None):
     if flag in args:
         i = args.index(flag)
-        return True if flag == "--final" else args[i + 1]
+        return True if flag in ("--final", "--memo") else args[i + 1]
     return default
 cit_path = opt("--citations"); bib_path = opt("--bib"); journals_path = opt("--journals"); journal = opt("--journal")
 final = bool(opt("--final", False))
+memo = bool(opt("--memo", False))   # the memo of a study not carried further: pilot numbers without marks, no markers, no journal
+mode = "memo" if memo else "final" if final else "draft"
 
 import os as _os
 qmd = open(qmd_path, encoding="utf-8").read()
@@ -50,6 +52,7 @@ def _expand_includes(text, base):
             return ""
     return re.sub(r"\{\{<\s*include\s+([^>]+?)\s*>\}\}", rep, text)
 body = _expand_includes(body, os.path.dirname(os.path.abspath(qmd_path)))
+body = re.sub(r"<!--.*?-->", "", body, flags=re.S)   # comments inside included files too
 chunks = re.findall(r"```\{r[^\n]*\}\n(.*?)```", body, flags=re.S)
 prose = re.sub(r"```\{r[^\n]*\}\n.*?```", "\n", body, flags=re.S)           # prose with chunks removed
 prose = re.sub(r"\{\{<\s*include[^>]*>\}\}", "", prose)
@@ -58,7 +61,7 @@ prose_plain = re.sub(r"`r [^`]*`", " INLINE ", prose_no_markers)              # 
 prose_plain = re.sub(r"\$\$.*?\$\$", " MATH ", prose_plain, flags=re.S)
 prose_plain = re.sub(r"\$[^$\n]+\$", " MATH ", prose_plain)
 prose_plain = re.sub(r"`[^`\n]+`", " CODE ", prose_plain)
-prose_plain = re.sub(r"@(fig|tbl|eq|sec)-[\w-]+", " XREF ", prose_plain)
+prose_plain = re.sub(r"@(fig|tbl|eq|sec|sfig|stbl)-[\w-]+", " XREF ", prose_plain)
 prose_plain = re.sub(r"\[?-?@[A-Za-z][\w:.-]*(;\s*-?@[A-Za-z][\w:.-]*)*(,[^\]]*)?\]?", " CITE ", prose_plain)
 prose_plain = re.sub(r"^#+ .*$", "", prose_plain, flags=re.M)
 
@@ -82,7 +85,7 @@ def plainify(text):
     text = re.sub(r"\$\$.*?\$\$", " MATH ", text, flags=re.S)
     text = re.sub(r"\$[^$\n]+\$", " MATH ", text)
     text = re.sub(r"`[^`\n]+`", " CODE ", text)
-    text = re.sub(r"@(fig|tbl|eq|sec)-[\w-]+", " XREF ", text)
+    text = re.sub(r"@(fig|tbl|eq|sec|sfig|stbl)-[\w-]+", " XREF ", text)
     return text
 
 # results-like sections: any heading at any level whose title contains "Results"
@@ -144,8 +147,8 @@ if n_fill:
 n_tc = len(re.findall(r"\[TO CONFIRM", _whole)); n_cite = len(re.findall(r"\[CITE", _whole))
 r_tc = len(re.findall(r'class="tc"', page)); r_cite = len(re.findall(r'class="cite"', page))
 info.append(f"markers: {n_tc} to confirm, {n_cite} claims without a source, {n_fill} unfilled (in the source); rendered: {r_tc} to confirm, {r_cite} without a source")
-if final and (n_tc or n_cite or n_fill):
-    errors.append("final mode: markers remain")
+if (final or memo) and (n_tc or n_cite or n_fill):
+    errors.append(f"{mode} mode: markers remain")
 
 # ---- hand-typed numbers ---------------------------------------------------------------------------
 def number_hits(text):
@@ -168,7 +171,7 @@ elif hits_all:
 _cite_src = prose + "\n" + "\n".join(c for c in chunks)
 _cite_src = re.sub(r"[\w.+-]+@[\w-]+\.[\w.]+", " ", _cite_src)
 cited = sorted(set(re.findall(r"@([A-Za-z][\w:.-]*?)(?=[\s;,\]\.\)\"\'])", _cite_src)) - {"fig", "tbl", "eq", "sec"})
-cited = [k for k in cited if not re.match(r"(fig|tbl|eq|sec)-", k)]
+cited = [k for k in cited if not re.match(r"(fig|tbl|eq|sec|sfig|stbl)-", k)]
 bib_keys = set()
 if bib_path:
     bib_keys = set(re.findall(r"^@\w+\{([^,]+),", open(bib_path, encoding="utf-8").read(), flags=re.M))
@@ -211,6 +214,12 @@ refs = set(re.findall(r"@((?:fig|tbl)-[\w-]+)", prose))
 unref = [l for l in labels if l not in refs]
 if unref:
     errors.append(f"figures or tables never referenced in the text: {', '.join(unref)}")
+# Supplementary floats are fenced divs with ids sfig-... and stbl-... (Figure S1, Table S1), referenced as @sfig-...
+sdivs = re.findall(r"^:::\s*\{#((?:sfig|stbl)-[\w-]+)\}", body, flags=re.M)
+srefs = set(re.findall(r"@((?:sfig|stbl)-[\w-]+)", prose))
+sunref = [l for l in sdivs if l not in srefs]
+if sunref:
+    errors.append(f"supplementary figures or tables never referenced in the text: {', '.join(sunref)}")
 
 # ---- voice and style --------------------------------------------------------------------------------
 own_prose = re.sub(r"\\\(.*?\\\)|\\\[.*?\\\]", " ", own)
@@ -225,7 +234,7 @@ for n, t in secs:
         if re.match(r"^\*\*[^*]+\*\*[.:]", p):
             errors.append(f"bold lead-in in section '{n}': {p[:60]!r}")
             break
-wf = re.findall(r"\b(harness(?: checks?)?|pilots?|cards?|workers?|quick runs?|specs?|the report|too small to matter)\b", prose_plain, flags=re.I)
+wf = re.findall(r"\b(harness(?: checks?)?|pilots?|re-pilots?|cards?|workers?|quick runs?|specs?|the report|too small to matter|pre-?registered|pre-?registrations?|pass rules?)\b", prose_plain, flags=re.I)
 if wf:
     errors.append(f"workflow words in the paper's own text: {', '.join(sorted(set(w.lower() for w in wf)))}")
 delete_words = ["considerably", "dramatically", "enormously", "exceptionally", "extremely", "highly", "quite", "remarkably",
@@ -290,6 +299,8 @@ if not re.search(r"`r\s+(prov|fpc|fint|range_mcse|lvl)\(", abstract_text):
     warns.append("the Abstract carries no computed number: every claim needs a numeric result with its uncertainty, through prov()")
 if final and (n_pilot or n_quick):
     errors.append("final mode: numbers not labeled production remain")
+if memo and (n_pilot or n_quick):
+    errors.append("memo mode: highlighted numbers remain; render with -P draft:false -P memo:true")
 
 # ---- journal limits -----------------------------------------------------------------------------------
 def words(t): return len(re.findall(r"\b\w+\b", t))
@@ -301,7 +312,9 @@ for s in html_secs[1:]:
     txt = re.sub(r"\s+", " ", htmlmod.unescape(re.sub(r"<[^>]+>", " ", s.split("</h1>", 1)[1])))
     sec_words[name] = words(txt)
 info.append("words per section: " + ", ".join(f"{k} {v}" for k, v in sec_words.items()))
-if journals_path and journal:
+if memo:
+    info.append("memo mode: no journal limits apply")
+elif journals_path and journal:
     rows = [r for r in csv.DictReader(open(journals_path, encoding="utf-8")) if r.get("slug") == journal]
     if not rows:
         warns.append(f"journal slug '{journal}' not found in {journals_path}")
@@ -318,7 +331,7 @@ if journals_path and journal:
         info.append(f"journal {prof['journal']}: abstract {prof.get('abstract_format', '')}; length: {prof.get('length_limit', '') or 'not stated by the journal'}")
 
 # ---- counts ------------------------------------------------------------------------------------------
-info.append(f"{page.count('<img')} images, {len(re.findall(r'<table', own_html))} tables, {len(labels)} figure or table chunks")
+info.append(f"{page.count('<img')} images, {len(re.findall(r'<table', own_html))} tables, {len(labels)} figure or table chunks, {len(sdivs)} supplementary floats")
 
 for label, items in (("ERROR", errors), ("WARN", warns), ("INFO", info)):
     for it in items:

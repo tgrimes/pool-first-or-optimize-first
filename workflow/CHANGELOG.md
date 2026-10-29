@@ -2,6 +2,15 @@
 
 Dated lessons. Each line says what changed in which file and which project taught it.
 
+## Unreleased: changes to make after the stage 2 test run
+
+- The author line is not needed until the final draft. Today `tools/init.R` asks for `--author` at setup and stage 1 reminds the user of it in its first message, which held the first project's stage 2 on a question nobody needed answered yet. Change: `init.R` takes the package name and the title only and leaves the author slots as placeholders that pass `R CMD check` (the `Authors@R` person, the LICENSE holder, the README line, the manuscript YAML); a script `tools/authors.R` writes the author line into those four places; `03-manuscript.md`, step 6, runs it before the final render, and the checker in final mode already errors on an unfilled slot. Stage 1's init reminder then proposes the command without an author. Asked for on 2026-10-28 while stage 2 was running.
+
+## 0.2.2 (2026-10-29)
+
+- Memo mode (`03-manuscript.md`, "Memo mode"): after a dropped or parked decision at the stage 2 stop, the manuscript stage writes a null-finding manuscript once, covering every pilot folder, on the pilots' numbers: the same document in form, the supplementary note inside it, APA references and no target journal, one revision pass, no background report and no mock review, the Discussion in a paper's language with pilot, pre-registration, and pass rule banned. The helpers have a third render mode (`prov_set_mode(memo = TRUE)`, `memo_note()`, `pilot_path()`), the checker a `--memo` flag, the skeleton a `memo` parameter and the memo note chunk, and `STATUS.md` the states `parked`, `3, memo`, and `dropped (memo at ...)`. Decided 2026-10-29 while the first project's pilot was being re-scoped.
+- Supplementary figures and tables are numbered Figure S1, Table S1 by custom cross-reference kinds in the skeleton's YAML (`sfig-`, `stbl-`), written as fenced divs with the caption as the last paragraph; the chunk-label form does not resolve in Quarto 1.9, which the render test showed.
+
 ## 0.2.1 (2026-10-28)
 
 Lessons from the first run of stage 1, on the project pool-first-or-optimize-first (29 process-feedback items in its `log/01-idea-review.md`; the stage took about an hour and a half of agent time, most of it tool round trips).

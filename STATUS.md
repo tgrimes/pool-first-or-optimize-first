@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Workflow version | 0.2.1 (2026-10-28) |
+| Workflow version | 0.2.2 (2026-10-29) |
 | Project | Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data |
 | Package | micutoff |
-| Stage | 2, spec |
+| Stage | 2, pilot running |
 | Open stop | none: stage 2 in progress (re-pilot in `pilot-b/` after the re-scope of 2026-10-29, `proposal.md` section 12) |
 | Last update | 2026-10-29 |
 
@@ -14,8 +14,8 @@ The Stage row reads "stage number, state". The states a stage can be in:
 | Stage | States |
 |---|---|
 | 1. Idea review | `1, reviewing`; `1, proposal at stop 1`; `1, Zotero check`; `1, proposal final` |
-| 2. Pilot | `2, spec`; `2, pilot running`; `2, piloted-pass`; `2, piloted-fail`; `2, piloted-close-call`; `dropped (reason)` |
-| 3. Manuscript | `3, design stop`; `3, drafting`; `3, draft at stop`; `3, revision round N`; `3, settled`; `3, production run`; `3, final` |
+| 2. Pilot | `2, spec`; `2, pilot running`; `2, piloted-pass`; `2, piloted-fail`; `2, piloted-close-call`; `dropped (reason)`; `parked (reason)` |
+| 3. Manuscript | `3, design stop`; `3, drafting`; `3, draft at stop`; `3, revision round N`; `3, settled`; `3, production run`; `3, final`; after a dropped or parked pilot, `3, memo`, then `dropped (memo at manuscript/manuscript.html)` or `parked (memo at ...)` |
 | 4. Background report | `4, in progress`; `4, report at stop`; `4, done` |
 | 5. Mock review | `5, round N at stop`; `5, round N responses`; `5, complete after N rounds` |
 | 6. Slides, 7. Poster | `6, in progress`; `6, at stop`; `6, done`; the same for 7 |

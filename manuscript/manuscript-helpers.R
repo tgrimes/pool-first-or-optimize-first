@@ -5,12 +5,14 @@
 #   - every number in the text comes through prov(), which labels it with the run that
 #     produced it (pilot, quick, or production), read from results/run_info.rds;
 #   - in draft mode a pilot or quick number renders highlighted; in final mode anything
-#     but production is an error;
+#     but production is an error; in memo mode (the memo of a study not carried further)
+#     any label renders without a mark and markers are errors;
 #   - the draft banner, the gap table, and the marker table are apparatus, wrapped in a
 #     fenced div with class "apparatus", which the checker ignores and final mode drops.
 
 .ms <- new.env(parent = emptyenv())
 .ms$draft <- TRUE
+.ms$memo <- FALSE
 .ms$run_info <- NULL
 .ms$prov <- list()
 .ms$gap <- list()
@@ -28,11 +30,21 @@ project_root <- function(start = getwd()) {
   }
 }
 results_path <- function(...) file.path(project_root(), "results", ...)
+# A pilot's results, for memo mode: pilot_path("run_info.rds"), pilot_path("cells.rds", folder = "pilot-b").
+pilot_path <- function(..., folder = "pilot") file.path(project_root(), folder, "results", ...)
 
 # ---- modes and run information --------------------------------------------------------
 
-prov_set_mode <- function(draft = TRUE) { .ms$draft <- isTRUE(draft); invisible(.ms$draft) }
+# Three render modes: draft (marks and apparatus), final (production numbers only, no markers), and
+# memo (a pilot's numbers without marks, no markers, no apparatus).
+prov_set_mode <- function(draft = TRUE, memo = FALSE) {
+  .ms$memo <- isTRUE(memo)
+  .ms$draft <- isTRUE(draft) && !.ms$memo
+  invisible(prov_mode_name())
+}
 prov_mode <- function() .ms$draft
+prov_memo <- function() .ms$memo
+prov_mode_name <- function() if (.ms$memo) "memo" else if (.ms$draft) "draft" else "final"
 
 # results/run_info.rds is written by every analysis script:
 #   saveRDS(list(run = "quick", n_rep = 100, n_cells = 48, date = Sys.Date(),
@@ -97,11 +109,11 @@ prov <- function(x = NULL, digits = 3, run = NULL, text = NULL) {
   s <- if (!is.null(text)) text else if (is.character(x)) x else fmt(x, digits)
   .ms$prov[[length(.ms$prov) + 1]] <- list(run = run, value = s)
   if (!.ms$draft) {
-    if (run != "production") {
+    if (!.ms$memo && run != "production") {
       stop("final mode: a number labeled '", run, "' is in the text (", s, "). ",
            "Run the production study, or render in draft mode.")
     }
-    return(s)
+    return(s)   # final and memo modes: no mark
   }
   if (run == "production") return(s)
   sprintf("[%s]{.prov-%s}", s, run)
@@ -160,8 +172,16 @@ marker_scan <- function(qmd = "manuscript.qmd") {
 }
 check_no_markers <- function(qmd = "manuscript.qmd") {
   m <- marker_scan(qmd)
-  if (nrow(m)) stop("final mode: ", nrow(m), " marker(s) remain in ", qmd, " (", paste(unique(m$kind), collapse = ", "), ").")
+  if (nrow(m)) stop("final or memo mode: ", nrow(m), " marker(s) remain in ", qmd, " (", paste(unique(m$kind), collapse = ", "), ").")
   invisible(TRUE)
+}
+# Memo mode: the one-paragraph note that opens the memo, part of the document (not apparatus).
+memo_note <- function() {
+  ri <- run_info()
+  sprintf("This memo reports a study that was not carried further. Its numbers come from a simulation of %s replicates per cell over %s cells%s.",
+          if (is.null(ri$n_rep)) "an unstated number of" else format(ri$n_rep, big.mark = ","),
+          if (is.null(ri$n_cells)) "an unstated number of" else format(ri$n_cells, big.mark = ","),
+          if (is.null(ri$date)) "" else paste0(", run on ", format(ri$date)))
 }
 # The drafting log is the stage 3 log, log/03-manuscript.md at the project root.
 drafting_log <- function() file.path(project_root(), "log", "03-manuscript.md")

@@ -65,7 +65,7 @@ Write the project spec from the final proposal, then run the pre-registered pilo
 1. Write `2, piloted-pass`, `2, piloted-fail`, or `2, piloted-close-call` in `STATUS.md` with the date, and the stage record line naming `pilot/pilot-report.html`.
 2. Commit, with the rendered report ("Stage 2, step 8: pilot report, piloted-pass").
 
-**Stop.** Return the report, the verdict, the decisions log, and the spec. The user decides: pass, and stage 3 starts; fail, and the user revises the proposal (a dated revision section at its end) for a re-pilot in `pilot-b/`, or drops the idea (`STATUS.md` says `dropped (reason)`); or a re-scope, which is a revised proposal and a re-pilot.
+**Stop.** Return the report, the verdict, the decisions log, and the spec. The user decides: pass, and stage 3 starts; fail, and the user revises the proposal (a dated revision section at its end) for a re-pilot in `pilot-b/`; a re-scope, which is a revised proposal and a re-pilot; or dropped or parked (`STATUS.md` says `dropped (reason)` or `parked (reason)`), after which stage 3 writes the memo once, covering every pilot folder (`03-manuscript.md`, "Memo mode"). A memo is not written after each failed pilot of a re-pilot sequence, only after the dropped or parked decision that ends it.
 
 ## Outputs
 
