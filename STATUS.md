@@ -5,8 +5,8 @@
 | Workflow version | 0.2.0 (2026-10-28) |
 | Project | [FILL: short title, set by tools/init.R] |
 | Package | [FILL: package name, set by tools/init.R] |
-| Stage | 1, Zotero check |
-| Open stop | Stop 2: add the two missing items, fix the record faults listed in `log/01-idea-review.md` (step 9), then say the library is updated |
+| Stage | 1, proposal final |
+| Open stop | none: stage 1 is complete. Stage 2 starts when the user says the proposal is final (`workflow/02-pilot.md`) |
 | Last update | [FILL: date, set by tools/init.R] |
 
 The Stage row reads "stage number, state". The states a stage can be in:
@@ -29,3 +29,4 @@ One line per stage boundary, newest last: the date, the stage reached, the path 
 |---|---|---|---|
 | 2026-10-28 | 1, proposal at stop 1 | `proposal.md` (log: `log/01-idea-review.md`) | Stop 1: the user reviews the proposal, answers the open questions, and adds the Zotero items |
 | 2026-10-28 | 1, Zotero check | `manuscript/citations.csv` (faults and missing items: `log/01-idea-review.md`, step 9) | Stop 2: two items missing, record faults to fix |
+| 2026-10-28 | 1, proposal final | `proposal.md` | none: stage 1 complete; stage 2 starts on the user's word |

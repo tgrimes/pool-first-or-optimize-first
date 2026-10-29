@@ -417,3 +417,17 @@ Decisions: D30. The citations file grades 14 items core, 21 supporting, 3 defini
 Stop 2 reached; committed as "Stage 1, step 9: Zotero check, stop 2".
 
 Process feedback, added: 24. **Step 9.2, "by DOI and then by title".** The connector's general query matches the DOI field, so one DOI query per item works; eight records imported from Google Scholar had no DOI and needed the title. The stage file could say that a DOI miss usually means the record lacks the DOI, which is itself a fault to report. 25. **Step 9.3, passages.** One restricted full-text search per item (query = a phrase from the claim) is far cheaper than reading each PDF; the file could say so. A scanned PDF has no text layer and the connector returns only the scanner's notice; the file should say what to record then (done here: passage unreadable, usable kept). 26. **Record fields.** The connector's preview mode omits DOI, journal, volume, and pages; the complete mode is needed for the fault check, and the file could name it.
+
+### Step 9, second round (2026-10-28, 22:46 to 22:48): all sources present
+
+The user added the two missing items, entered the Wirth abstract and DOI, and added the R Journal record for ROCnReg (JWV7J36T, with PDF), leaving the preprint record in place; the DOI and formatting faults are deferred to the manuscript stage by the user's decision. Rechecked: van der Vaart, Asymptotic statistics (MFX4FI2X, book, no attachment, dated 2000 with the series number stored as volume 3, title and publisher lowercased, author stored as "Van der Vaart"); Fluss et al. 2009 (X5GYD67M, PDF, passage read); ROCnReg (JWV7J36T, PDF, passage read); Wirth (abstract now in the record). The Kim and Pollard scan is still without a text layer (deferred).
+
+- D33. The citation years follow the records: Leyrat 2019, Bantis 2019 (the 2018 online paper), Zhang 2020, Wirth 2024, van der Vaart 2000. The user sets the book's date to 1998 in Zotero if the first printing is wanted.
+- D34. Record faults stay listed above, unfixed, by the user's decision; `manuscript/build-bib.py` reports them again at the manuscript stage.
+- D35. Proposal rebuilt: section 10 carries the keys and Zotero items from `manuscript/citations.csv`; section 11 has the dated entry; the header reads final. STATUS `1, proposal final`. Committed as "Stage 1, step 9: proposal final".
+
+Stage 1 total agent time: 31 minutes to stop 1 (18:22 to 18:53), about 40 minutes across the six stop 1 rounds (19:38 to 21:58, in short turns), and 21 minutes for the Zotero check (22:27 to 22:48): about 1 hour 32 minutes.
+
+Process feedback, added: 27. **Step 9.4 and 9.5.** The stage file treats record faults as something the user fixes before the proposal is final; the user chose to defer them, which the manuscript stage's `build-bib.py` supports. The file could say that faults are reported here and may be deferred, and that only missing items and missing abstracts for abstract-only citations block the final. 28. **Step 9.6, "rebuild the proposal's citations from the checklist keys".** The proposal is markdown with author-date prose, so the rebuild meant aligning years to the records and adding the keys to section 10; the file could say exactly that. 29. **Stop 2 at most twice.** One round sufficed; the grouping by what the user must do worked.
+
+Still open at the end of stage 1: the author line for `tools/init.R` (not run); copying the abstract rule into the `research-workflow` template.
