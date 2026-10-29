@@ -19,6 +19,7 @@ A review report for one pilot: the idea, the model, the design, the results, the
 ## Steps
 
 1. Copy `pilot-report-template.qmd` into the pilot folder as `pilot-report.qmd`. The pilot folder holds `decisions.md` and the saved result files (in `results/`); `project-spec.md` is at the project root, one level up.
+   Copy `manuscript/.Rprofile` to the pilot folder as `.Rprofile` if it is not there, so that Quarto's R finds the project library. Write the sections that describe the idea, the data, and the design during the run if you like; write the Summary, the findings, and "Potential impact" after the verdict, because they state what the pilot decided.
 2. Fill the sections in order. Each section's requirements are below. Write the per-pilot figures in the qmd itself, reading the saved result files in the setup chunk.
 3. Render with `quarto render pilot-report.qmd`.
 4. Run `python3 -I ../templates/pilot-report/check-report.py pilot-report.qmd pilot-report.html`. Fix every ERROR and read every WARN.

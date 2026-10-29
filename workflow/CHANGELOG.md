@@ -2,9 +2,15 @@
 
 Dated lessons. Each line says what changed in which file and which project taught it.
 
-## Unreleased: changes to make after the stage 2 test run
+## 0.2.3 (2026-10-29)
 
-- The author line is not needed until the final draft. Today `tools/init.R` asks for `--author` at setup and stage 1 reminds the user of it in its first message, which held the first project's stage 2 on a question nobody needed answered yet. Change: `init.R` takes the package name and the title only and leaves the author slots as placeholders that pass `R CMD check` (the `Authors@R` person, the LICENSE holder, the README line, the manuscript YAML); a script `tools/authors.R` writes the author line into those four places; `03-manuscript.md`, step 6, runs it before the final render, and the checker in final mode already errors on an unfilled slot. Stage 1's init reminder then proposes the command without an author. Asked for on 2026-10-28 while stage 2 was running.
+Lessons from the first run of stage 2, on the project pool-first-or-optimize-first (three pilots, 32 process-feedback items in its `log/02-pilot.md`, about 3 h 45 min of wall time of which the runs were most), and the author-line change.
+
+- The author line is not needed until the final draft: `tools/init.R` takes the package name and the title only (the DESCRIPTION title in title case) and leaves placeholders that pass `R CMD check`; the new `tools/authors.R` writes the authors into DESCRIPTION, LICENSE, README.md, and the manuscript's YAML, refuses a one-word name, and takes repeated `--coauthor`; `03-manuscript.md` runs it at step 6 before the final render and in memo mode; stage 1's init reminder proposes the command without an author.
+- `templates/preregistration.md` is new: clauses with the quantity, the threshold, the cells, and the reading of a value within its Monte Carlo error; the combination rule; a size criterion beside every coverage criterion; no clause presuming another question's answer; readings of open cases; amendments before the run. Stage 1's pilot plan asks for the same.
+- `02-pilot.md`: the setup questions (init, download approval) in one message; `pilot/.Rprofile`; a data-description script when the pilot has no application part; variable codes from the codebook; `KnownAnswerChecks()` as one function the test asserts and the script saves; every cell timed at ten replicates with the workers loaded; subagents run no R while workers are up and tests are frozen before the pre-run check; a commit of the code before the run; the impact section after the verdict; the stop's branches for the user's reading, a revised proposal with its own stop unless waived, re-pilots with their log under their own heading, and the memo; a time box of two hours of agent time around the run.
+- `rules.md`: the code commit point and the lockfile; a template sync updates the version row; the user may extend the core cap for one run; tasks are cells or seeded blocks, `parLapplyLB(chunk.size = 1)`, the timing run loads every worker; a run is not stopped for running long; no subagent runs R while workers are up; an amendment before a run is allowed; "reading" in the vocabulary.
+- `templates/project-spec.md`: the Authors row points at DESCRIPTION; section 6 has the third label; the example question and the comparison line are domain-neutral. The report helper accepts both marker forms. The report README says what is written after the verdict.
 
 ## 0.2.2 (2026-10-29)
 

@@ -12,7 +12,7 @@ The files in `workflow/` and `templates/` are written for the agent that runs th
 - When a stop has been answered by a ruling, the agent applies the ruling. If the ruling's stated reason turns out to be wrong, the agent keeps the ruling, says so in the log with a dated note (and in `protocol.md` when the ruling concerns the design), and marks it in the deliverable.
 - The user may change at any stop. Every user is treated the same, and nothing in a deliverable or a log names the user; a header in `idea.md` that names its author or links a document is not copied into any deliverable or log.
 - While a stage is in progress, the Open stop row of `STATUS.md` reads `none: stage N in progress`; at a stop it names the stop and the deliverable.
-- The agent commits without being asked at these points, and nowhere else unless asked: when a pre-registration or `protocol.md` is written, before any run it governs; at every stop, with the deliverable and its rendered file; after every revision round; at the end of a production run; at the end of a stage. The commit message starts with the stage and the step ("Stage 2, step 2: pre-registration"). Nothing is pushed unless the user asks.
+- The agent commits without being asked at these points, and nowhere else unless asked: when a pre-registration or `protocol.md` is written, before any run it governs; when a pilot's code is complete and tested, before its run, with the lockfile if `DESCRIPTION` changed; at every stop, with the deliverable and its rendered file; after every revision round; at the end of a production run; at the end of a stage. A sync of the template into a project updates the version row of `STATUS.md` in the same commit. The commit message starts with the stage and the step ("Stage 2, step 2: pre-registration"). Nothing is pushed unless the user asks.
 - A rendered deliverable (the pilot report, the manuscript, the background report) is committed at its stop and after each revision round, so that a handover carries what the user read. It is not committed after every render.
 
 ## 2. Sources
@@ -48,9 +48,10 @@ The files in `workflow/` and `templates/` are written for the agent that runs th
 ## 5. Environment
 
 - R packages come from the project library (`renv::restore()`); Python from the project environment (`uv sync`). Nothing is installed outside them, and never through Homebrew, pyenv, or conda on the project's behalf. After a change to `DESCRIPTION` or `pyproject.toml`, snapshot and commit the lockfile.
-- Parallel code uses PSOCK workers with the BLAS pinned to one thread in each; at most three cores at once, counting the workers. A background run is stopped with the task tool, never with `pkill`. Before restarting anything that looks dead, check `uptime` and the run's own log.
+- Parallel code uses PSOCK workers with the BLAS pinned to one thread in each; at most three cores at once, counting the workers, unless the user extends the cap for one run, which the decisions log records and which ends with that run. The tasks are the cells, or seeded blocks within a cell when the cells are fewer than the workers; `parLapplyLB()` takes `chunk.size = 1`, since cells differ in cost; a timing run loads every worker as the run will, and its projection uses the run's own scheduling. A background run is stopped with the task tool, never with `pkill`, and not for running long unless its pre-registration says so. Before restarting anything that looks dead, check `uptime` and the run's own log.
+- While workers are up, no subagent runs R. The test files are frozen before the test and check runs that precede a run; a test edited afterwards means the suite runs again before the results are read.
 - Every R command runs from the project root or from `manuscript/`, where `.Rprofile` activates the library. The first R call in a fresh clone makes renv install itself into `renv/` (its bootstrap) and nothing else; that is expected and not an install outside the project library.
-- No simulation runs before `protocol.md` is written, except a pilot's own pre-registered run.
+- No simulation runs before `protocol.md` is written, except a pilot's own pre-registered run. A pre-registration or a protocol may be amended before any run it governs, as a dated entry committed before the run; after a run, a change is recorded, never applied to that run.
 
 ## 6. Logs and feedback
 
@@ -85,5 +86,6 @@ The words the stage files use, so that none is guessed at.
 - **Known-answer check:** a run of the simulation code on a case whose answer is known (a null cell, a closed form, a literal implementation), compared with that answer. It is a test in `tests/testthat/`, and the pilot report displays its outcome; it is never content of a manuscript.
 - **Coordinator, worker:** the agent in the conversation, and an agent it delegates a stage or a step to.
 - **Round:** one message of comments from the user on a draft, or one pass of the three mock reviewers.
+- **Reading:** how an open case of a pass rule is decided when the rule is applied (which estimator a clause meant, a value between two thresholds), listed in the pre-registration and the stop message; a reading is not a change to the rule.
 - **Memo:** the manuscript written once, in memo mode of stage 3, after a dropped or parked decision at the stage 2 stop: the same document in form, on the pilots' numbers, with APA references and no target journal, so that the review, the methods, the derivations, and the results are kept.
 - **Core, supporting, definitional:** the grades of a citation in `citations.csv`. Core carries the argument and needs the full text; supporting says only that something exists and may rest on the abstract; definitional names a method or a dataset.

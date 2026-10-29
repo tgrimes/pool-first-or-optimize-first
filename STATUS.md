@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Workflow version | 0.2.2 (2026-10-29; synced from the template during the re-pilot) |
+| Workflow version | 0.2.3 (2026-10-29) |
 | Project | Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data |
 | Package | micutoff |
 | Stage | 2, piloted-pass |

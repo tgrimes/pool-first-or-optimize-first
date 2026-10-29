@@ -15,7 +15,7 @@ read_md_part <- function(path, drop_title = TRUE, highlight_to_confirm = FALSE) 
   }
   txt <- paste(x, collapse = "\n")
   if (highlight_to_confirm) {
-    txt <- gsub("\\[TO CONFIRM: ([^]]*)\\]", "[**To confirm:** \\1]{.tc}", txt)
+    txt <- gsub("\\[TO CONFIRM: ([^]]*)\\](\\{\\.tc\\})?", "[**To confirm:** \\1]{.tc}", txt)   # either marker form, no doubled class
   }
   txt
 }

@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | Proposal | `proposal.md`, final [date] |
-| Authors | [names] |
+| Authors | as in `DESCRIPTION`, set by `tools/authors.R` before the final render |
 | Written | [date] |
 | Status | draft / final [date] |
 
@@ -29,7 +29,7 @@ The filled copy is `project-spec.md` at the project root, next to `protocol.md`.
 
 **Why it matters:** [What changes for a user of the procedure if the answer is yes. Two or three sentences.]
 
-> **What good looks like.** The question names a procedure people use and a condition they meet in real data, and it can be answered yes or no, or with a number. "Does the mean-shift artifact of the LIONESS edge carry over to SSN edges, and does within-group standardization remove it?" is a question. "Study the properties of sample-specific networks" is a topic. The "why it matters" sentence is about the user, not the field: what would they do differently on Monday?
+> **What good looks like.** The question names a procedure people use and a condition they meet in real data, and it can be answered yes or no, or with a number. "Does the pooled correlation estimate the within-group correlation when the groups differ in mean, and does within-group standardization remove the gap?" is a question. "Study the properties of pooled correlations" is a topic. The "why it matters" sentence is about the user, not the field: what would they do differently on Monday?
 
 ## 2. Mechanism we suspect
 
@@ -83,7 +83,7 @@ This becomes `protocol.md` at the design stop of stage 3. Bullets are enough her
 
 **Dataset:** [name, accession or path, and where it lives on disk]
 
-**Comparison:** [which groups, how many samples per group, which scale: counts, log-CPM, or intensities]
+**Comparison:** [which groups, how many samples per group, and the scale the measurements are on]
 
 **What to show:** [the one thing the application should demonstrate]
 
@@ -94,6 +94,8 @@ This becomes `protocol.md` at the design stop of stage 3. Bullets are enough her
 **Target journal:** [one journal]
 
 **Fallback:** [one journal]
+
+**The target's word limit and AI policy:** [copied from its profile, the worksheet's last line]
 
 > **What good looks like.** The target is chosen with the journal guide's worksheet (`workflow/journals/`), with a fallback that takes a sound version of the same paper with little rework. Name the journal's word limit and its AI policy, because the disclosure in the paper follows that policy.
 

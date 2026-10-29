@@ -44,7 +44,7 @@ A "no" on question 3 or 4 is stated plainly; it is the most common reason an ide
 **1. Inventory the idea.**
 
 1. Read `idea.md`. In the log, write what it states for each of: the question, the procedure in question, the setting, the mechanism, the estimand, any claimed theory, the aims, the literature it cites, the user's own prior work, the datasets it names, the journal, and constraints. For each, say whether it is stated, implied, or absent. Do not fill a gap yet.
-2. If `DESCRIPTION` still names `projecttemplate`, `tools/init.R` has not been run: the first message says so and proposes the command, with a package name derived from the idea's title and the author line asked for. The stage goes on without it.
+2. If `DESCRIPTION` still names `projecttemplate`, `tools/init.R` has not been run: the first message says so and proposes the command (`Rscript tools/init.R <name> --title "..."`, with a package name derived from the idea's title; no author line is needed, `tools/authors.R` sets the authors before the final render). The stage goes on without it.
 3. Set `STATUS.md` to `1, reviewing` and the Open stop row to `none: stage 1 in progress`.
 4. Send one message before any search: the question as read, in one sentence, and the paper type as read; when the idea carries a correction or a critique as a primary aim beside a new procedure, both readings, the pick, and a one-line reason. Do not wait for an answer; a misreading is caught at once, and the stage goes on. In a session that cannot deliver a message before its turn ends, write the same lines at the top of the log and go on.
 
@@ -71,7 +71,7 @@ A "no" on question 3 or 4 is stated plainly; it is the most common reason an ide
 **6. Feasibility and the pilot plan.**
 
 1. Write the first simulation: the design cells, the methods, the measures, the known-answer cells, and an estimate of runtime. The estimate may come from a timing run of at most ten replicates of one cell, labeled as a timing run and never reported as a result; otherwise from operation counts, labeled as such.
-2. Write the three pilot questions with pass criteria as numbers, decided before any run: does the effect exist; is it large enough to matter at realistic sizes; is there a fix or a diagnostic.
+2. Write the three pilot questions with pass criteria as numbers, decided before any run: does the effect exist; is it large enough to matter at realistic sizes; is there a fix or a diagnostic. Each clause names the quantity it refers to, the threshold, the cells, and how a value within its Monte Carlo standard error is read; no clause presumes the answer to another question; every coverage criterion has a size criterion beside it; and the plan says how the three answers combine into pass, fail, or close call (`templates/preregistration.md` is the form stage 2 fills from this).
 3. A design choice in the plan (a threshold, a replicate count, a bandwidth rule) carries a reason in the table; it is neither a claim that needs a source nor a decision that needs a marker.
 4. Say what code and data already exist. This is the draft pre-registration that stage 2 carries into `pilot/preregistration.md`.
 

@@ -11,11 +11,13 @@ A research project run with a fixed workflow: an idea is reviewed and verified i
 ## Starting a project
 
 1. Create a repository from this template on GitHub and clone it.
-2. Run the setup script from the project root. It names the package, sets the authors, removes the template's examples, and fills the headers:
+2. Run the setup script from the project root. It names the package, removes the template's examples, and fills the headers:
 
 ```bash
-Rscript tools/init.R <packagename> --title "Short title" --author "Name" [--coauthor "Name"] [--email ADDRESS] [--affiliation "..."] [--no-python]
+Rscript tools/init.R <packagename> --title "Short Title" [--no-python]
 ```
+
+The authors are not needed yet: `tools/authors.R` sets them in DESCRIPTION, LICENSE, this file, and the manuscript before the final render.
 
 3. Restore the environments. renv installs itself on the first start of R in the project root:
 
@@ -54,7 +56,7 @@ Every stage ends at a stop: one file for you to read, committed at the stop, and
 | `workflow/` | The instructions, `rules.md`, the journal guide, and the changelog |
 | `log/` | One log per stage: decisions, sources, process feedback; the manuscript's drafting log is `log/03-manuscript.md` |
 | `templates/` | The forms the stages fill |
-| `tools/` | `init.R`, `export.R`, and scripts shared by stages |
+| `tools/` | `init.R`, `authors.R`, `export.R`, and scripts shared by stages |
 | `R/`, `tests/testthat/` | Functions with roxygen comments, and their tests |
 | `pilot/` | The pilot: pre-registration, script, results, decisions, report |
 | `analysis/` | Numbered scripts that call the functions and write to `results/` |

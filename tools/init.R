@@ -1,18 +1,17 @@
 # tools/init.R
 # Sets up a project created from the research-workflow template, in place.
 #
-#   Rscript tools/init.R <packagename> --title "Short title" --author "Name"
-#          [--coauthor "Name"] [--email address] [--affiliation "Department, University"]
-#          [--no-python]
+#   Rscript tools/init.R <packagename> --title "Short Title" [--no-python]
 #
-# It names the R and Python packages, sets the authors in DESCRIPTION, LICENSE, README.md, and the
-# manuscript skeleton, removes the template's example function, test, script, help pages, and Python
-# example, writes placeholder tests so that R CMD check and pytest pass from the first commit, and
-# fills the headers of README.md and STATUS.md. Run it once, from the project root, before
-# renv::restore(). Anything not given stays a [FILL] slot.
+# It names the R and Python packages, removes the template's example function, test, script, help
+# pages, and Python example, writes placeholder tests so that R CMD check and pytest pass from the
+# first commit, and fills the headers of README.md and STATUS.md. The authors are not needed here:
+# DESCRIPTION, LICENSE, README.md, and the manuscript skeleton keep placeholders that pass R CMD
+# check, and tools/authors.R sets them before the final render (stage 3, step 6). Run it once, from
+# the project root, before renv::restore(). The DESCRIPTION title is put in title case.
 
 args <- commandArgs(trailingOnly = TRUE)
-usage <- "usage: Rscript tools/init.R <packagename> --title \"Short title\" --author \"Name\" [--coauthor \"Name\"] [--email ADDRESS] [--affiliation \"...\"] [--no-python]"
+usage <- "usage: Rscript tools/init.R <packagename> --title \"Short Title\" [--no-python]"
 if (length(args) < 1) stop(usage)
 pkg <- args[1]
 if (!grepl("^[A-Za-z][A-Za-z0-9]*$", pkg)) stop("package name must start with a letter and contain only letters and digits (the Python package shares it)")
@@ -22,10 +21,6 @@ opt <- function(flag, default = NULL) {
   args[i + 1]
 }
 title <- opt("--title", "[FILL: short title]")
-author <- opt("--author", "[FILL: first author]")
-coauthor <- opt("--coauthor", "[FILL: second author]")
-email <- opt("--email", "[FILL: email]")
-affiliation <- opt("--affiliation", "[FILL: affiliation]")
 no_python <- isTRUE(opt("--no-python", FALSE))
 root <- normalizePath(".")
 if (!file.exists(file.path(root, "DESCRIPTION")) || !dir.exists(file.path(root, "workflow"))) {
@@ -43,22 +38,18 @@ sub_file <- function(path, pattern, replacement, fixed = FALSE) {
   writeLines(x, path); invisible(TRUE)
 }
 is_fill <- function(s) grepl("^\\[FILL", s)
-split_name <- function(s) {
-  if (is_fill(s)) return(c("FILL", sub("^\\[FILL: (.*)\\]$", "\\1", s)))
-  p <- strsplit(s, " ")[[1]]; c(paste(head(p, -1), collapse = " "), tail(p, 1))
-}
 year <- format(Sys.Date(), "%Y")
 today <- format(Sys.Date())
 
 # ---- DESCRIPTION, LICENSE, tests/testthat.R ----------------------------------------------------
 d <- readLines("DESCRIPTION", warn = FALSE)
 d <- sub("^Package:.*$", paste0("Package: ", pkg), d)
-d <- sub("^Title:.*$", paste0("Title: ", gsub("[.?!]+$", "", title)), d)
+TitleCase <- function(s) { s <- tools::toTitleCase(gsub("[.?!]+$", "", s)); paste0(toupper(substr(s, 1, 1)), substr(s, 2, nchar(s))) }
+d <- sub("^Title:.*$", paste0("Title: ", if (is_fill(title)) title else TitleCase(title)), d)
+# The authors are placeholders until tools/authors.R sets them (R CMD check accepts these).
 a0 <- grep("^Authors@R:", d); nxt <- grep("^[A-Za-z@/]+:", d); a1 <- min(nxt[nxt > a0[1]]) - 1
-au <- split_name(author); co <- split_name(coauthor)
-d <- c(d[seq_len(a0[1] - 1)], "Authors@R: c(",
-       sprintf('    person("%s", "%s", , "%s", role = c("aut", "cre")),', au[1], au[2], if (is_fill(email)) "first.last@example.com" else email),
-       sprintf('    person("%s", "%s", role = "aut"))', co[1], co[2]),
+d <- c(d[seq_len(a0[1] - 1)], "Authors@R:",
+       '    person("Project", "Author", , "author@example.com", role = c("aut", "cre"))',
        d[seq(a1 + 1, length(d))])
 d0 <- grep("^Description:", d); nxt <- grep("^[A-Za-z@/]+:", d); d1 <- min(nxt[nxt > d0[1]]) - 1
 d <- c(d[seq_len(d0[1] - 1)], "Description: A research compendium: the functions, tests, analysis scripts, results,",
@@ -68,8 +59,7 @@ if (no_python) d <- d[!grepl("^\\s*reticulate,?\\s*$", d)]
 writeLines(d, "DESCRIPTION")
 sub_file("tests/testthat.R", "projecttemplate", pkg, fixed = TRUE)
 sub_file("LICENSE", "^YEAR:.*$", paste0("YEAR: ", year))
-holder <- if (is_fill(author)) paste(pkg, "authors") else if (is_fill(coauthor)) author else paste(author, "and", coauthor)
-sub_file("LICENSE", "projecttemplate authors", holder, fixed = TRUE)
+sub_file("LICENSE", "projecttemplate authors", paste(pkg, "authors"), fixed = TRUE)
 
 # ---- the Python package shares the name ---------------------------------------------------------
 if (no_python) {
@@ -98,17 +88,15 @@ if (!no_python) {
 
 # ---- headers: README, STATUS, the manuscript skeleton ------------------------------------------
 sub_file("README.md", "^# \\[Project title\\]$", paste0("# ", title))
-sub_file("README.md", "^Authors: \\[names\\]\\.", paste0("Authors: ", author, ", ", coauthor, "."))
+sub_file("README.md", "^Authors: \\[names\\]\\.", "Authors: set by `tools/authors.R` before the final render.")
 sub_file("STATUS.md", "[FILL: short title, set by tools/init.R]", title, fixed = TRUE)
 sub_file("STATUS.md", "[FILL: package name, set by tools/init.R]", pkg, fixed = TRUE)
 sub_file("STATUS.md", "[FILL: date, set by tools/init.R]", today, fixed = TRUE)
-for (pair in list(c("[FILL: first author]", author), c("[FILL: second author]", coauthor), c("[FILL: email]", email), c("[FILL: affiliation]", affiliation))) {
-  if (!is_fill(pair[2])) sub_file("manuscript/manuscript.qmd", pair[1], pair[2], fixed = TRUE)
-}
 if (!file.exists("log/03-manuscript.md")) {
   dir.create("log", showWarnings = FALSE)
   writeLines(c("# Drafting log (stage 3)", "", "Started by stage 3; see workflow/03-manuscript.md. The opening paragraph states the paper-test status in one line."), "log/03-manuscript.md")
 }
 
-cat("initialized:\n  package:", pkg, "\n  title:", title, "\n  authors:", author, "|", coauthor,
-    "\n  python:", if (no_python) "removed" else "kept", "\nnext: renv::restore() in R from the project root; uv sync; write idea.md\n")
+cat("initialized:\n  package:", pkg, "\n  title:", title,
+    "\n  python:", if (no_python) "removed" else "kept",
+    "\nnext: renv::restore() in R from the project root; uv sync; write idea.md; the authors are set later by tools/authors.R\n")
