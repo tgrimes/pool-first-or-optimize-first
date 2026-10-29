@@ -11,9 +11,9 @@
 /manuscript/*.docx
 
 # Large inputs are not committed. Record where to get them in README.md.
-# Uncomment to keep raw data out of git:
-# /data/raw/*
-# !/data/raw/.gitkeep
+# Raw data are kept out of git (stage 2): analysis/00_download.R recreates them.
+/data/raw/*
+!/data/raw/.gitkeep
 
 # Python environment and caches (uv manages .venv/; uv.lock is committed)
 /.venv/

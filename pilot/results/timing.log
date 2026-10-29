@@ -1,0 +1,45 @@
+2026-10-28 23:34:13 start, timing 
+2026-10-28 23:34:16 2026-10-28 23:34:16cell  cell7  1started
+ started
+2026-10-28 23:34:17 cell 1 done in 1 s
+2026-10-28 23:34:17 cell 2 started
+2026-10-28 23:34:18 cell 7 done in 2 s
+2026-10-28 23:34:18 cell 8 started
+2026-10-28 23:34:21 cell 8 done in 3 s
+2026-10-28 23:34:21 cell 9 started
+2026-10-28 23:34:21 cell 2 done in 4 s
+2026-10-28 23:34:21 cell 3 started
+2026-10-28 23:34:22 cell 3 done in 1 s
+2026-10-28 23:34:22 cell 4 started
+2026-10-28 23:34:24 cell 4 done in 1 s
+2026-10-28 23:34:24 cell 5 started
+2026-10-28 23:34:29 cell 5 done in 5 s
+2026-10-28 23:34:29 cell 6 started
+2026-10-28 23:34:33 cell 6 done in 4 s
+2026-10-28 23:34:33 cell 12 started
+2026-10-28 23:34:34 cell 9 done in 13 s
+2026-10-28 23:34:34 cell 10 started
+2026-10-28 23:34:39 cell 12 done in 6 s
+2026-10-28 23:34:39 cell 13 started
+2026-10-28 23:34:40 cell 13 done in 1 s
+2026-10-28 23:34:40 cell 14 started
+2026-10-28 23:34:44 cell 14 done in 4 s
+2026-10-28 23:34:44 cell 15 started
+2026-10-28 23:34:45 cell 15 done in 1 s
+2026-10-28 23:34:45 cell 16 started
+2026-10-28 23:34:46 cell 16 done in 1 s
+2026-10-28 23:34:46 cell 17 started
+2026-10-28 23:34:48 cell 10 done in 14 s
+2026-10-28 23:34:48 cell 11 started
+2026-10-28 23:34:48 cell 11 done in 0 s
+2026-10-28 23:34:50 cell 17 done in 4 s
+2026-10-28 23:34:50 cell 18 started
+2026-10-28 23:34:54 cell 18 done in 3 s
+2026-10-28 23:34:54 cell 19 started
+2026-10-28 23:34:55 cell 19 done in 2 s
+2026-10-28 23:34:55 cell 20 started
+2026-10-28 23:34:57 cell 20 done in 2 s
+2026-10-28 23:34:57 cell 21 started
+2026-10-28 23:35:06 cell 21 done in 9 s
+2026-10-28 23:35:06 cell 22 started
+2026-10-28 23:35:17 cell 22 done in 10 s

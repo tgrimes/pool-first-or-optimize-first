@@ -5,9 +5,9 @@
 | Workflow version | 0.2.1 (2026-10-28) |
 | Project | Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data |
 | Package | micutoff |
-| Stage | 1, proposal final |
-| Open stop | none: stage 1 complete, the proposal declared final on 2026-10-28. Stage 2 (`workflow/02-pilot.md`) starts in a new session on the user's word; `tools/init.R` has not been run (author line pending) |
-| Last update | 2026-10-28 |
+| Stage | 2, piloted-fail |
+| Open stop | Stop at the end of stage 2: the user reads `pilot/pilot-report.html` and decides on the failed pilot: a revised proposal and a re-pilot in `pilot-b/`, a re-scope (a revised proposal and a re-pilot), or a drop |
+| Last update | 2026-10-29 |
 
 The Stage row reads "stage number, state". The states a stage can be in:
 
@@ -30,3 +30,4 @@ One line per stage boundary, newest last: the date, the stage reached, the path 
 | 2026-10-28 | 1, proposal at stop 1 | `proposal.md` (log: `log/01-idea-review.md`) | Stop 1: the user reviews the proposal, answers the open questions, and adds the Zotero items |
 | 2026-10-28 | 1, Zotero check | `manuscript/citations.csv` (faults and missing items: `log/01-idea-review.md`, step 9) | Stop 2: two items missing, record faults to fix |
 | 2026-10-28 | 1, proposal final | `proposal.md` | none: the user declared the proposal final; stage 2 starts in a new session |
+| 2026-10-29 | 2, piloted-fail | `pilot/pilot-report.html` (verdict: `pilot/results/verdict.csv`; decisions: `pilot/decisions.md`; spec: `project-spec.md`; log: `log/02-pilot.md`) | The pilot stop: the user decides between a revised proposal with a re-pilot, a re-scope, and a drop |

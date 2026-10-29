@@ -1,0 +1,587 @@
+---
+title: "Pilot report: pooling accuracy curves or cutoffs across imputations"
+subtitle: "A review document: the pilot, its results, the draft spec, and the decisions log"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    theme: cosmo
+    fig-cap-location: bottom
+    code-fold: true
+    embed-resources: true
+    include-in-header:
+      - text: |
+          <style>
+            .tc { background: #fff3cd; border-left: 4px solid #e0a800; padding: 0 0.35em; }
+            .caption-small { font-size: 0.9em; color: #555; }
+          </style>
+execute:
+  echo: false
+  warning: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+source("../templates/pilot-report/report-helpers.R")
+
+# Every number below is computed from these files, written by pilot.R,
+# verdict.R, and nhanes.R in pilot/.
+s <- readRDS("results/cell_summaries.rds")
+v <- readRDS("results/verdict.rds")
+known <- readRDS("results/known_answers.rds")
+ri <- readRDS("results/run_info.rds")
+tm <- readRDS("results/timing.rds")
+nh <- readRDS("results/nhanes_summary.rds")
+pts <- readRDS("results/base_cell_points.rds")
+
+Cell <- function(shape = "sharp", miss = 0.4, n = 250, engine = "pmm",
+                 n_imp = 20, est = "empirical") {
+  r <- s[s$shape == shape & s$miss_rate == miss & s$n == n &
+           s$engine == engine & s$n_imp == n_imp & s$estimator == est, ]
+  stopifnot(nrow(r) == 1)
+  r
+}
+base <- Cell()
+base_k <- Cell(est = "kernel")
+sixty <- Cell(miss = 0.6)
+sixty_k <- Cell(miss = 0.6, est = "kernel")
+null_s <- Cell(miss = 0, engine = "none")
+crit <- v$criteria
+pm <- function(x, mcse, d = 4) paste0(fmt(x, d), " (MCSE ", fmt(mcse, d), ")")
+pct <- function(x, d = 1) paste0(fmt(100 * x, d), "%")
+status_word <- sub("piloted-", "", v$status)
+pmm_miss <- s[s$engine == "pmm" & s$miss_rate > 0, ]
+nn_miss <- s[s$engine == "nn", ]
+all_nh <- nh$by_cycle[nh$by_cycle$cycle == "All three", ]
+pmm_e <- pmm_miss[pmm_miss$estimator == "empirical", ]
+pmm_k <- pmm_miss[pmm_miss$estimator == "kernel", ]
+nn_e <- nn_miss[nn_miss$estimator == "empirical", ]
+q3a <- crit[crit$question == "Q3" & crit$clause == "a", ]
+bias_share <- 1 - abs(base$bias_j_ratio)
+l_cells <- s[s$shape == "sharp" & s$miss_rate == 0.4 & s$n == 250 &
+               s$engine == "pmm" & s$estimator == "empirical", ]
+l_cells <- l_cells[order(l_cells$n_imp), ]
+base_1000 <- Cell(n = 1000)
+base_1000_k <- Cell(n = 1000, est = "kernel")
+null_cov <- s[s$miss_rate == 0, c("cover_mid", "cover_lo", "cover_hi")]
+cov_pmm <- pmm_miss[, c("cover_mid", "cover_lo", "cover_hi")]
+cov_nn <- nn_miss[, c("cover_mid", "cover_lo", "cover_hi")]
+flat_e <- pmm_e[pmm_e$shape == "flat" & pmm_e$n_imp == 20, ]
+cap_scatter <- paste0("Base cell (sharp, 40% missing, 250 per group, PMM, ",
+                      "L = 20), all ", ri$n_rep, " replicates. Left: ",
+                      "empirical estimator, gap against the spread of the ",
+                      "20 per-dataset cutoffs. Right: kernel estimator, gap ",
+                      "against the predicted gap, identity line dashed. ",
+                      "From results/base_cell_points.rds.")
+```
+
+# Summary
+
+**Scope.** This document reports the pilot[^pilot] for the proposal `proposal.md` ("Pool first or optimize first? Cutoffs from multiply imputed biomarker data"): what the idea is, how the pilot was run, what it found, the full draft project spec, and the decisions made along the way. It was built from `project-spec.md`, `decisions.md`, the pre-registration `preregistration.md`, and the saved results in `pilot/results/`, and every number in the text and figures is computed from those files when the document renders. The pilot is a simulation; the NHANES data appear only as a description of the application to come.
+
+**Status.** In `STATUS.md` the pilot is marked `piloted-fail`[^pf], by the pre-registered rule. The effect exists, and the spread of the cutoffs predicts it. But pooling first removes `r pct(bias_share, 0)` of the index's upward bias in the base cell, where the rule required half, and no difference in the index reaches 0.005. A second reading, set out in the decisions log (D1), keeps the project with Aim 2 leading, because every part of the mechanism the pilot could test held and most of the index's bias turned out to be the ordinary optimism of a maximum.
+
+| Pilot question | Answer | Key evidence |
+|---------|-------------|---------------------------------------------|
+| 1. Does the effect exist? | yes | base cell gap `r pm(base$gap, base$gap_mcse)`; `r null_s$gap_n_nonzero` of `r null_s$n_rep` null replicates nonzero |
+| 2. Large enough at realistic n? | not in the index; yes in the cutoff's accuracy, favouring optimize first | largest gap `r fmt(v$largest_gap$gap, 4)` against 0.01; RMSE ratio of the cutoff, optimize first over pool first, `r pm(base$rmse_ratio, base$rmse_ratio_mcse, 2)` |
+| 3. Obvious fix or diagnostic? | a diagnostic, not a fix | correlation of the spread with the gap `r pm(base$cor_b_gap, base$cor_b_gap_mcse, 2)`; index bias `r fmt(base$bias_j_p1, 4)` pool first against `r fmt(base$bias_j_p2, 4)` optimize first |
+
+**What needs your decision** (details in [Action items and limitations](#action-items-and-limitations)): whether the failed pilot leads to a revised proposal and a re-pilot, a re-scope with Aim 2 leading, or a drop; the two yellow `[TO CONFIRM]` items in the spec (the production replicate count and the milestone dates); the five readings of the pass rule the pre-registration made; and two citations named in footnotes that are not in the Zotero library.
+
+# The idea
+
+## In plain language
+
+A blood test gives a number, and a clinic wants one threshold that splits people with a disease from people without it. The usual choice makes sensitivity plus specificity as large as possible (the Youden index[^youden]). Suppose the test value is missing for some people, so the analyst fills in the missing values several times over, each time with a different plausible guess, and gets 20 completed datasets (multiple imputation[^mi]). Now there are two ways to pick the threshold. One is to find the best threshold in each of the 20 datasets and average the 20 thresholds and the 20 best scores. The other is to average the 20 accuracy curves first and pick the best threshold of the average curve.
+
+The two orders give different scores. Take two datasets whose curves both peak at a score of 0.70, one at threshold 0.9 and the other at 1.1, and both score 0.69 at threshold 1.0, halfway between. Averaging the best scores reports 0.70. The average curve is highest at threshold 1.0, where it scores 0.69. The first order always reports at least as much as the second. What is not known is how large the difference is at the sample sizes and missing fractions of real studies, and whether the spread of the 20 thresholds predicts it. The pilot measures both.
+
+## Potential impact
+
+No published method gives an optimal cutoff, its index, and their uncertainty from multiply imputed data. The default analysis runs in each completed dataset and combines the results with Rubin's rules[^rubin], which average the estimates and add their spread to the variance, and for an optimal cutoff that default has no theory behind it. Rubin's rules assume each completed-data estimate is close to normally distributed (Leyrat et al. 2019), while the empirical optimal cutoff is the maximizer of a step function and converges at a slower, cube-root rate to a non-normal limit (Kim and Pollard 1990). The closest prior work, Long, Zhang, and Hsu (2011), imputed a missing depression score, averaged the true and false positive rates across imputations at each threshold, and read off the threshold that maximizes their sum; it reported no uncertainty for that threshold. Applied studies that impute and then report an optimal cutoff leave the order of the two steps unstated (Abdulrahman et al. 2022; Atlantis et al. 2016).
+
+The problem is a reporting error that more imputations do not cure. The averaged-maxima index is never smaller than the maximum of the averaged curve, and the excess is set by how far the per-dataset cutoffs scatter, which is a property of the missing data and not of the number of imputations. An analyst who reads the index off the averaged curve, and reports a band for the whole curve with a set of near-optimal thresholds in place of an interval for the cutoff, avoids it.
+
+The users are diagnostic-accuracy and prediction studies that impute a missing marker and publish an optimal cutoff, in laboratory medicine, epidemiology, and psychiatry. If the gap is large at realistic sizes, the indices those studies report overstate the accuracy of their cutoffs and the reporting changes. If it is small, the case for the proposed reporting rests on inference, which no current method supplies. The pilot puts the gap at `r fmt(base$gap, 4)` in the base cell (@fig-gap), below the pre-registered 0.01, so the impact lies on the inference side: the spread of the cutoffs is a diagnostic an analyst can compute (@fig-scatter), and the pointwise intervals that Rubin's rules give for the curve undercover once many values are missing (@fig-coverage).
+
+## Application: the study behind the data
+
+### The study
+
+The National Health and Nutrition Examination Survey[^nhanes] (NHANES) samples the noninstitutionalized United States population in two-year cycles, interviews each participant, and examines a subsample in a mobile examination center, where blood is drawn. Serum cotinine[^cotinine], the main metabolite of nicotine, was measured in examined participants aged 3 and over in the cycles 2013-2014, 2015-2016, and 2017-2018, with the same laboratory method (isotope-dilution liquid chromatography with tandem mass spectrometry) and the same lower limit of detection, 0.015 ng/mL; values below it are set to the limit divided by the square root of two (documentation files `COT_H`, `COT_I`, and `COT_J`, read 2026-10-28). Adults answer a smoking questionnaire (`SMQ`). The files are public at wwwn.cdc.gov/Nchs/Data/Nhanes/Public/, with no login.
+
+Two studies used these survey data to choose a cotinine cutoff for current smoking. Benowitz, Bernert, Caraballo, Holiday, and Wang (2009), *American Journal of Epidemiology* 169(2):236-48 (doi:10.1093/aje/kwn301), used the cycles 1999 to 2004 and found that optimal cutoffs differed by race/ethnicity, 5.92 ng/mL for non-Hispanic Black, 4.85 for non-Hispanic White, and 0.84 for Mexican American adults. Tompkins, Beltran, and Bedno (2019), *Biomarkers in Medicine* 13(12):1025-1033 (doi:10.2217/bmm-2019-0027), used the cycles 2009 to 2014 and found an adult cutoff of 3.63 ng/mL that differed by sex and race/ethnicity. In the three cycles used here, `r format(all_nh$adults, big.mark = ",")` adults answered the smoking question, `r format(all_nh$smokers, big.mark = ",")` of them current smokers[^smoker], and cotinine is missing for `r pct(all_nh$missing_share)` of them (@tbl-cohort).
+
+```{r}
+#| label: tbl-cohort
+#| tbl-cap: "Adults aged 18 and over with an answer to the smoking question, by NHANES cycle: current smokers, nonsmokers, participants not examined, participants with serum cotinine missing (of whom some were examined), values below the limit of detection, and the share missing. Computed from the downloaded NHANES files by pilot/nhanes.R (results/nhanes_summary.rds)."
+
+tab <- nh$by_cycle
+tab$missing_share <- pct(tab$missing_share)
+knitr::kable(tab, col.names = c("Cycle", "Adults", "Smokers", "Nonsmokers",
+                                "Not examined", "Cotinine missing",
+                                "Missing, examined", "Below detection",
+                                "Share missing"),
+             format.args = list(big.mark = ","), align = "lrrrrrrrr")
+```
+
+### Why the Youden index
+
+A cotinine cutoff classifies a participant as a smoker when the measured value exceeds it, and the Youden index of a cutoff, sensitivity plus specificity minus one, is the share of smokers called smokers minus the share of nonsmokers called smokers. Both cotinine studies chose the cutoff that maximizes it. The estimand is the maximizer of the population Youden curve and the curve's maximum; the question here is how to estimate both, with their uncertainty, when some cotinine values are missing and imputed. The proposed analysis imposes missingness at random on the adults with observed cotinine, so that the full-data cutoff is the benchmark, imputes, and compares the two pooling orders, overall and by race/ethnicity.
+
+### Did the original study compute it?
+
+Partly. Both studies estimated the optimal cutoff from receiver operating characteristic curves on participants with observed cotinine, and Benowitz et al. estimated it within race/ethnicity groups. Neither study imputed the missing cotinine values, and neither reported the uncertainty of its cutoff in the passages read for this project. The question here is new: how the cutoff, its index, and their uncertainty should be pooled once missing values are imputed, and whether the stratum-specific cutoff or the cutoff that is optimal for the population as a whole is the target within each race/ethnicity group.
+
+## In symbols
+
+Each group's marker distribution ($F_0$ for nonsmokers or the healthy group, $F_1$ for smokers or the diseased group), a threshold ($c$), the Youden curve ($J(c)$), its maximizer and maximum ($c^*$ and $J^*$), the curve of the $l$-th of $L$ completed datasets ($\hat J_l$) and its maximizer ($\hat c_l$), the averaged curve ($\bar J$), and the spread of the per-dataset cutoffs ($\hat B_c$) are related by
+
+$$
+\begin{aligned}
+J(c) &= F_0(c) - F_1(c), \qquad c^* = \arg\max_c J(c), \qquad J^* = J(c^*) \\
+\bar J(c) &= \frac{1}{L}\sum_{l=1}^{L} \hat J_l(c), \qquad \hat B_c = \frac{1}{L}\sum_{l=1}^{L} (\hat c_l - \bar c)^2 \\
+\text{P1 (pool first)} &: \ \hat c_{\mathrm{P1}} = \arg\max_c \bar J(c), \qquad \hat J_{\mathrm{P1}} = \max_c \bar J(c) \\
+\text{P2 (optimize then mean)} &: \ \hat c_{\mathrm{P2}} = \bar c, \qquad \hat J_{\mathrm{P2}} = \frac{1}{L}\sum_{l=1}^{L} \max_c \hat J_l(c) \\
+G &= \hat J_{\mathrm{P2}} - \hat J_{\mathrm{P1}} \ \ge\ 0.
+\end{aligned}
+$$
+
+| Symbol | Meaning |
+|----|----------------------------------------------|
+| $X$, $D$, $Z$ | the marker, the disease status (0 or 1), the auxiliary variable that predicts the marker |
+| $F_d$ | distribution function of $X$ in group $D = d$ |
+| $J(c)$, $c^*$, $J^*$ | the Youden curve, its maximizer, its maximum |
+| $\kappa$, $\tau$ | curvature $-J''(c^*)$ and third derivative $J'''(c^*)$ at the peak |
+| $L$, $\hat J_l$, $\hat c_l$ | number of imputations, curve and maximizer of completed dataset $l$ |
+| $\bar J$, $\bar c$, $\hat B_c$ | averaged curve, mean of the $\hat c_l$, their spread |
+| P1, P2, P3 | pool first; optimize then mean; optimize then median (the averaged curve read at the median of the $\hat c_l$) |
+| $G$ | the gap, P2's index minus P1's |
+
+The target is $c^*$ and $J^*$. What can be computed is one of the pooled pairs, P1 or P2, from the completed datasets. The inequality $G \ge 0$ holds in every dataset: each $\hat J_l(c)$ is at most its own maximum, so the average of the curves is at most the average of the maxima at every $c$. If every curve is a parabola near its peak with curvature $\kappa_l$, the gap is exactly $L^{-1}\sum_l (\kappa_l/2)(\hat c_l - \tilde c)^2$, with $\tilde c$ the curvature-weighted mean of the $\hat c_l$; with equal curvatures it is $\kappa \hat B_c / 2$. In words: the gap is half the sharpness of the peak times the spread of the cutoffs across imputations, and that spread does not shrink when more imputations are drawn. A third-order term moves the pooled cutoff from $\bar c$ by about $\tau \hat B_c / (2\kappa)$, zero for a symmetric peak.
+
+```{r}
+#| label: fig-idea
+#| fig-cap: "The idea, on made-up numbers (an illustration, not pilot output). Left: five completed-data Youden curves (grey), each a parabola with its own peak (dots), and their average (black), whose peak is the square. Right: the index each order reports. The mean of the five maxima (P2) exceeds the maximum of the averaged curve (P1) by half the curvature times the spread of the five peak locations."
+#| fig-width: 10
+#| fig-height: 4.2
+
+op <- par(mfrow = c(1, 2), mar = c(4.2, 4.2, 1.2, 1))
+toy_c <- c(0.70, 0.88, 1.00, 1.12, 1.30)
+toy_m <- c(0.69, 0.70, 0.68, 0.71, 0.69)
+toy_k <- 0.9
+grid_toy <- seq(0.2, 1.8, length.out = 401)
+curves_toy <- sapply(seq_along(toy_c), function(l) {
+  toy_m[l] - toy_k / 2 * (grid_toy - toy_c[l])^2
+})
+avg_toy <- rowMeans(curves_toy)
+matplot(grid_toy, curves_toy, type = "l", lty = 1, col = "grey65",
+        xlab = "Threshold c", ylab = "Youden index J(c)", ylim = c(0.45, 0.73))
+points(toy_c, toy_m, pch = 19, col = "grey40")
+lines(grid_toy, avg_toy, lwd = 2.5)
+points(grid_toy[which.max(avg_toy)], max(avg_toy), pch = 15, cex = 1.4)
+bar_vals <- c(P2 = mean(toy_m), P1 = max(avg_toy))
+b <- barplot(bar_vals, ylim = c(0.6, 0.72), xpd = FALSE, col = c("grey70", "grey30"),
+             ylab = "Reported index", names.arg = c("P2: mean of maxima", "P1: maximum of mean"))
+text(b, bar_vals + 0.004, fmt(bar_vals, 3))
+par(op)
+```
+
+```{r}
+#| label: fig-data
+#| fig-cap: "The real data: the full-data Youden curve of log serum cotinine among NHANES adults (2013 to 2018, participants with cotinine observed), current smokers against everyone else, on the scale used in the simulation (log cotinine standardized by the nonsmokers' mean and standard deviation). Black: the empirical curve; blue: the Gaussian-kernel curve. The solid vertical line is the maximizer of the kernel curve; the dashed line is the adult cutoff of 3.63 ng/mL of Tompkins, Beltran, and Bedno (2019). From results/nhanes_summary.rds."
+#| fig-width: 8
+#| fig-height: 4
+
+cv <- nh$curve
+op <- par(mar = c(4.2, 4.2, 1, 1))
+plot(cv$grid, cv$empirical, type = "s", ylim = c(0, 0.9),
+     xlab = "log10 cotinine, standardized by the nonsmokers",
+     ylab = "Youden index J(c)")
+lines(cv$grid, cv$kernel, col = "#2c7fb8", lwd = 2)
+abline(v = cv$c_star, lty = 1, col = "grey30")
+abline(v = (log10(cv$reference_cutoff_ng_ml) - cv$center) / cv$scale,
+       lty = 2, col = "grey30")
+par(op)
+```
+
+The full-data curve peaks at `r fmt(cv$cutoff_ng_ml, 2)` ng/mL with an index of `r fmt(cv$j_star_empirical, 3)` (empirical curve); at the published adult cutoff of 3.63 ng/mL the empirical index is `r fmt(cv$j_at_reference, 3)`, lower by `r fmt(cv$j_star_empirical - cv$j_at_reference, 3)` for a cutoff half as large. The curve is flat over that range, which is the situation in which per-dataset cutoffs scatter. On the standardized scale its curvature at the peak is `r fmt(cv$kappa, 3)`, between the flat (`r fmt(Cell(shape = "flat")$kappa, 3)`) and the sharp (`r fmt(base$kappa, 3)`) shapes of the simulation, and its maximum, `r fmt(cv$j_star, 3)`, is above both. The cutoff here is higher than the published ones; the definitions differ, since everyone who is not a current cigarette smoker, including users of other tobacco products, counts as a nonsmoker here.
+
+## Critiquing the model
+
+{{< include ../templates/pilot-report/parts/critique-intro.md >}}
+
+| Feature of the model | Why it may not be realistic | What should be done to check it |
+|-----------|----------------------------------------------|---------------------------------|
+| Binormal marker, $X \mid D = d$ normal with $\delta$ and $\sigma_1$ fixed | Real markers are skewed, bounded, or have a point mass (cotinine below the limit of detection), so $J$ need not be smooth near $c^*$ and $\kappa$, $\tau$ take other values | Simulate from the real cotinine distribution (resample the full-data cohort and impose missingness), and add a skewed shape |
+| The unknown parameters: $\delta$, $\sigma_1$, the auxiliary strength, the missingness coefficients | Two shapes and one auxiliary strength were chosen to bracket a sharp and a flat peak, not estimated from data; $\hat B_c$, and with it $G$, depends on all of them | Estimate them from the NHANES cohort and place the real data on each gradient; vary the auxiliary's correlation with $X$ |
+| One auxiliary $Z = X + e$ | With one auxiliary the nearest-neighbour method reduces to neighbours in $Z$, and predictive mean matching matches on one linear predictor; real imputation models carry several covariates and their misspecification | Add a design arm with several auxiliaries, one of them omitted from the imputation model |
+| Missing at random through $Z$ and $D$ | Cotinine may be missing for reasons tied to its value (missing not at random), which neither engine corrects | Out of scope for the paper; state the assumption and, in the application, compare participants with and without cotinine on observed covariates |
+| Equal group sizes $n_0 = n_1$ | Smokers are about one in five NHANES adults; $\hat B_c$ is driven by the smaller group | Add an unbalanced arm at fixed total size |
+| Pointwise within-imputation variance from the binomial formula, also for the kernel curve | Smoothing lowers the variance and adds a bias of order $h^2$, so the binomial formula is not the kernel estimator's variance and the interval is not centered at $J(c)$ | Compare the empirical variance of the kernel $\hat J(c)$ with the binomial formula in the full-data cells; measure the smoothing bias against $\Phi(c/\sqrt{1+h^2})$ |
+| Population curvature $\kappa$ in the predicted gap $\kappa \hat B_c / 2$ | An analyst does not know $\kappa$; the kernel curve's own curvature is flattened by smoothing | Report the gap against the curvature of the pooled curve, $\hat\kappa$, which an analyst can compute |
+| A unique, well-separated maximum | Flat plateaus, as in the cotinine curve, or two near-equal maxima make $\hat c_l$ jump between regions, outside the quadratic approximation | Add a two-maxima shape; measure the share of replicates with $\hat c_l$ in two regions |
+
+# Methods
+
+## Design
+
+The pilot simulates a binormal marker that is missing at random through one auxiliary, imputes it 20 times, estimates the Youden curve in each completed dataset with two estimators, and pools the results by the three rules. Part A is the main grid: two peak shapes, three missing fractions (0%, 40%, 60%), two sample sizes, and two imputation engines, predictive mean matching[^pmm] and the nearest-neighbour method of Long, Zhang, and Hsu (2011)[^mib], with the 0% cells needing no imputation. Part B varies the number of imputations $L$ (5, 20, 100) in the base cell. Each of the `r ri$n_cells` simulated settings (data cells) is analysed by both estimators on the same completed datasets, for `r nrow(s)` analysis cells and `r ri$n_rep` replicates per cell. The known-answer checks run the same code on cases with known answers.
+
+```{r}
+#| label: fig-design
+#| fig-cap: "The design at a glance. Each row is one part of the pilot, read from left to right: what is simulated, which factors are varied, what is estimated, what is measured, and how the result is shown. The input is the binormal marker model with one auxiliary. Part A's gap is shown in the gap figure (@fig-gap) and the verdict table (@tbl-verdict), its cutoff errors in @tbl-cutoff, and its coverage in @fig-coverage; Part B's gap by number of imputations in @fig-L; the base cell's replicates in @fig-scatter; the checks in @tbl-known-answer."
+#| fig-width: 11
+#| fig-height: 5
+
+design_diagram(
+  input = "Binormal marker X by group D\n\nAuxiliary Z = X + e\n\nX missing at random through Z and D",
+  lanes = list(
+    list(label = "Part A: main grid", fill = "#e8f0fa",
+         sim = "2 shapes x 3 missing fractions x 2 sizes x 2 engines",
+         vary = "Sharp or flat peak; 0, 40, 60% missing; 250 or 1,000 per group; PMM or nearest neighbours",
+         est = "Empirical and kernel curves in 20 completed datasets; pooled by P1, P2, P3",
+         meas = "Gap P2 - P1 against kappa B/2; cutoff bias and RMSE; regret; coverage of J(c)",
+         out = "Gap figure, verdict, cutoff and coverage tables"),
+    list(label = "Part B: number of imputations", fill = "#fdeceb",
+         sim = "Base cell: sharp, 40%, 250 per group, PMM",
+         vary = "L = 5, 20, 100",
+         est = "Same estimators and rules",
+         meas = "Gap and its prediction",
+         out = "Gap by L figure")),
+  harness = list(text = "Known-answer checks: closed forms of the binormal shape; gap and cutoff formulas on synthetic quadratic and cubic curves; gap never negative; gap exactly 0 with nothing missing; kernel expectation; stacking lemma; nearest-neighbour donors; missing fraction",
+                 out = "Known-answer table"))
+```
+
+Each figure and table in the Results traces back to one row of this diagram, and the row says what its points or entries represent.
+
+| Part | What is simulated | Main factors | Replicates |
+|----|--------------------------|--------------------------------|-------------|
+| A | $X \mid D{=}0 \sim N(0,1)$, $X \mid D{=}1 \sim N(\delta, \sigma_1^2)$; $Z = X + e$; $X$ missing with probability $\mathrm{expit}(\alpha_0 + Z + 0.5D)$ | shape, missing fraction, $n$ per group, engine; $L = 20$ | `r ri$n_rep` per cell, 20 data cells |
+| B | the base cell of part A | $L$ = 5, 100 (and 20 from part A) | `r ri$n_rep` per cell, 2 data cells |
+
+The sharp shape has $\delta = 2$ and $\sigma_1 = 1$: a symmetric peak at $c^* = `r fmt(base$c_star, 3)`$ with $J^* = `r fmt(base$j_star, 4)`$ and curvature $\kappa = `r fmt(base$kappa, 3)`$. The flat shape has $\delta = 1.5$ and $\sigma_1 = 2.5$: an asymmetric peak at $c^* = `r fmt(Cell(shape = "flat")$c_star, 3)`$ with $J^* = `r fmt(Cell(shape = "flat")$j_star, 4)`$, $\kappa = `r fmt(Cell(shape = "flat")$kappa, 3)`$, and $\tau = `r fmt(Cell(shape = "flat")$tau, 3)`$. The intercept $\alpha_0$ is solved so that the expected missing fraction is the target; missing values fall mostly at high $Z$, where the diseased group sits, so donors are sparse near and above $c^*$. Predictive mean matching uses 5 donors and the predictors $D$, $Z$, and $D \times Z$; the nearest-neighbour method uses 3 neighbours on two standardized scores with its bootstrap step, which with one auxiliary picks the 3 nearest observed subjects in $Z$ within the same group. The empirical curve's cutoff is the midpoint of the maximizing interval (the mean of the midpoints when intervals tie); the kernel curve uses Gaussian kernels with Silverman's bandwidth[^silverman] per group and per completed dataset. The pointwise interval for $J(c)$ combines the 20 completed-data estimates by Rubin's rules with the binomial within-imputation variance. The base cell is the sharp shape, 40% missing, 250 per group, predictive mean matching, $L = 20$, empirical estimator; its kernel twin is the same data analysed with the kernel estimator.
+
+## Known-answer checks
+
+{{< include ../templates/pilot-report/parts/known-answer-intro.md >}}
+
+```{r}
+#| label: tbl-known-answer
+#| tbl-cap: "Known-answer checks, from results/known_answers.rds (written by pilot.R before the run, the same checks the test suite asserts) and, for the last three rows, from results/cell_summaries.rds (the pilot's own null cells)."
+
+gave_tol <- function(k) {
+  if (k$type == "atleast") return(fmt(k$computed, 4))
+  if (k$truth == 0 || abs(k$computed - k$truth) < 1e-6) {
+    return(formatC(k$computed, digits = 6, format = "g"))
+  }
+  fmt(k$computed, 4)
+}
+rows <- lapply(seq_len(nrow(known)), function(i) {
+  k <- known[i, ]
+  reading <- switch(k$type,
+    tol = harness_reading_tol(k$computed, k$truth, k$tolerance),
+    mcse = harness_reading_mcse(k$computed, k$truth, k$tolerance, flag = 3,
+                                extra = "Judged at 3 MCSE, the pilot's rule."),
+    atleast = sprintf("The smallest gap is %s, not negative, so the check %s.",
+                      fmt(k$computed, 4), ifelse(k$pass, "passes", "fails: look for a bug")))
+  gave <- if (k$type == "mcse") sprintf("%.4f (MCSE %.4f)", k$computed, k$tolerance) else gave_tol(k)
+  harness_row(k$check, k$setting, k$known, gave, reading)
+})
+null_rows <- s[s$miss_rate == 0, ]
+sharp_full <- Cell(miss = 0, n = 1000, engine = "none")
+sharp_full_k <- Cell(miss = 0, n = 1000, engine = "none", est = "kernel")
+rows <- c(rows, list(
+  harness_row("Gap with nothing missing", "all 8 null analysis cells of the pilot",
+              "exactly 0 in every replicate",
+              sprintf("%d nonzero of %d", sum(null_rows$gap_n_nonzero), sum(null_rows$n_rep)),
+              ifelse(sum(null_rows$gap_n_nonzero) == 0,
+                     "No replicate has a nonzero gap, so the check passes.",
+                     "Nonzero gaps: look for a bug.")),
+  harness_row("Full-data cutoff", "sharp, 0%, 1,000 per group, empirical", "c* = 1 (symmetry)",
+              sprintf("%.4f (MCSE %.4f)", 1 + sharp_full$bias_c_p1, sharp_full$bias_c_p1_mcse),
+              harness_reading_mcse(1 + sharp_full$bias_c_p1, 1, sharp_full$bias_c_p1_mcse, flag = 3,
+                                   extra = "Judged at 3 MCSE, the pilot's rule.")),
+  harness_row("Full-data cutoff", "sharp, 0%, 1,000 per group, kernel", "c* = 1 (symmetry)",
+              sprintf("%.4f (MCSE %.4f)", 1 + sharp_full_k$bias_c_p1, sharp_full_k$bias_c_p1_mcse),
+              harness_reading_mcse(1 + sharp_full_k$bias_c_p1, 1, sharp_full_k$bias_c_p1_mcse, flag = 3,
+                                   extra = "Judged at 3 MCSE, the pilot's rule."))))
+harness_table(rows)
+```
+
+`r harness_flag_summary(c(abs(known$computed - known$truth)[known$type == "mcse"] / known$tolerance[known$type == "mcse"], abs(sharp_full$bias_c_p1) / sharp_full$bias_c_p1_mcse, abs(sharp_full_k$bias_c_p1) / sharp_full_k$bias_c_p1_mcse), flag = 3)` The rows without a standard error are exact identities or bounds, judged against a tolerance.
+
+# Results
+
+## How to read the outputs
+
+{{< include ../templates/pilot-report/parts/how-to-read-outputs.md >}}
+
+This pilot has no test, so level and power do not arise; it reports three further quantities. The gap is the index reported by optimizing in each completed dataset and averaging (P2) minus the maximum of the averaged curve (P1), averaged over replicates; it is never negative, and it is zero exactly when nothing is missing. The predicted gap is $\kappa \hat B_c / 2$, half the true curvature at the peak times the spread of the 20 per-dataset cutoffs in the same replicate; the ratio of the mean gap to the mean predicted gap is 1 when the quadratic formula holds. The coverage of an interval is the share of replicates in which it contains the true value, 0.95 for a correct 95% interval.
+
+## The gap between the two orders
+
+**Figure guide (part A, every cell with missing values).** If the mechanism holds, every mean gap is positive and the kernel estimator's gaps sit near their predicted values. One point is one analysis cell: the mean gap over `r ri$n_rep` replicates, with a bar of plus and minus two MCSE; filled points are predictive mean matching, open points nearest neighbours; a cross marks the mean predicted gap $\kappa \hat B_c / 2$. The dashed line is the pre-registered threshold of 0.01 and the dotted line 0.005. Look for: which cells, if any, reach the dashed line; whether the gap grows from 40% to 60% missing and shrinks from 250 to 1,000 per group; whether the crosses sit on the points for the kernel estimator and for the empirical one.
+
+```{r}
+#| label: fig-gap
+#| fig-cap: "Part A and B: the mean gap (P2 index minus P1 index) in every analysis cell with missing values, with plus and minus two MCSE, by estimator. Filled: predictive mean matching (PMM); open: nearest neighbours (NN); crosses: the mean predicted gap. Dashed and dotted lines: 0.01 and 0.005. From results/cell_summaries.rds."
+#| fig-width: 10
+#| fig-height: 6.4
+
+g <- s[s$miss_rate > 0, ]
+g$label <- sprintf("%s, %d%%, %d, %s, L=%d", g$shape, round(100 * g$miss_rate),
+                   g$n, toupper(g$engine), g$n_imp)
+g <- g[order(g$shape, g$engine, g$n, g$miss_rate, g$n_imp, decreasing = TRUE), ]
+op <- par(mfrow = c(1, 2), mar = c(4.2, 12.5, 2, 0.8))
+for (est in c("empirical", "kernel")) {
+  e <- g[g$estimator == est, ]
+  y <- seq_len(nrow(e))
+  xmax <- max(0.011, e$gap + 2 * e$gap_mcse, e$pred_gap)
+  plot(e$gap, y, xlim = c(0, xmax), yaxt = "n", ylab = "", xlab = "Mean gap",
+       pch = ifelse(e$engine == "pmm", 19, 1), main = est)
+  segments(e$gap - 2 * e$gap_mcse, y, e$gap + 2 * e$gap_mcse, y)
+  points(e$pred_gap, y, pch = 4, col = "#d95f02")
+  axis(2, at = y, labels = e$label, las = 1, cex.axis = 0.7)
+  abline(v = c(0.005, 0.01), lty = c(3, 2), col = "grey40")
+}
+par(op)
+```
+
+**Figure guide (base cell, replicate by replicate).** If the spread of the per-dataset cutoffs is the diagnostic the mechanism says, replicates with a larger spread have a larger gap. One point is one replicate of the base cell. Left: the empirical estimator's gap against the spread $\hat B_c$ of its 20 cutoffs. Right: the kernel estimator's gap against its predicted value $\kappa \hat B_c / 2$, with the identity line dashed. Look for: how tightly the points follow a line on the left; whether the right panel's points scatter around the dashed line or fall consistently above or below it.
+
+```{r}
+#| label: fig-scatter
+#| fig-cap: !expr cap_scatter
+#| fig-width: 10
+#| fig-height: 4.4
+
+op <- par(mfrow = c(1, 2), mar = c(4.2, 4.4, 2, 1))
+pe <- pts[pts$estimator == "empirical", ]
+pk <- pts[pts$estimator == "kernel", ]
+plot(pe$b_c, pe$gap, pch = 19, cex = 0.5, col = grDevices::adjustcolor("black", 0.4),
+     xlab = "Spread of the cutoffs across imputations", ylab = "Gap", main = "empirical")
+plot(pk$pred_gap, pk$gap, pch = 19, cex = 0.5, col = grDevices::adjustcolor("black", 0.4),
+     xlab = "Predicted gap, kappa B / 2", ylab = "Gap", main = "kernel")
+abline(0, 1, lty = 2, col = "#d95f02")
+par(op)
+```
+
+**Figure guide (part B, the number of imputations).** The mechanism says the gap does not shrink as $L$ grows, because the spread of the cutoffs is a property of the missing data. One point is the mean gap in the base cell at $L$ = 5, 20, or 100, with plus and minus two MCSE; crosses are the mean predicted gaps. Look for: whether the gap at $L = 100$ is smaller than at $L = 20$ by more than its bars; whether the two estimators move the same way.
+
+```{r}
+#| label: fig-L
+#| fig-cap: "Part B: the mean gap in the base cell (sharp, 40% missing, 250 per group, PMM) by the number of imputations L, with plus and minus two MCSE, for each estimator. Crosses: the mean predicted gap. From results/cell_summaries.rds."
+#| fig-width: 9
+#| fig-height: 3.8
+
+lb <- s[s$shape == "sharp" & s$miss_rate == 0.4 & s$n == 250 & s$engine == "pmm", ]
+op <- par(mfrow = c(1, 2), mar = c(4.2, 4.4, 2, 1))
+for (est in c("empirical", "kernel")) {
+  e <- lb[lb$estimator == est, ]
+  e <- e[order(e$n_imp), ]
+  x <- seq_len(nrow(e))
+  plot(x, e$gap, ylim = range(0, e$gap + 2 * e$gap_mcse, e$pred_gap), xaxt = "n",
+       xlab = "Number of imputations L", ylab = "Mean gap", pch = 19, main = est)
+  segments(x, e$gap - 2 * e$gap_mcse, x, e$gap + 2 * e$gap_mcse)
+  points(x, e$pred_gap, pch = 4, col = "#d95f02")
+  axis(1, at = x, labels = e$n_imp)
+}
+par(op)
+```
+
+## Coverage of the pointwise interval
+
+**Figure guide (part A, every cell).** A correct 95% interval for $J(c)$ at a fixed threshold covers in 95% of replicates. One point is one analysis cell's coverage at $c^*$ (black), at $c^* - 0.5$ (blue), or at $c^* + 0.5$ (orange); the grey band is 0.95 plus and minus two binomial standard errors at `r ri$n_rep` replicates; the dashed lines are the pre-registered limits 0.92 and 0.98. Look for: whether the null cells, where nothing is imputed, cover near 0.95 for each estimator; which threshold and which estimator fall below the band once values are missing.
+
+```{r}
+#| label: fig-coverage
+#| fig-cap: "Part A and B: coverage of the pointwise 95% Rubin's-rules interval for J(c) at c* (black), c* - 0.5 (blue), and c* + 0.5 (orange) in every analysis cell, by estimator. Grey band: 0.95 plus and minus two binomial standard errors; dashed lines: 0.92 and 0.98. From results/cell_summaries.rds."
+#| fig-width: 10
+#| fig-height: 7
+
+cg <- s
+cg$label <- sprintf("%s, %d%%, %d, %s, L=%d", cg$shape, round(100 * cg$miss_rate),
+                    cg$n, toupper(cg$engine), cg$n_imp)
+cg <- cg[order(cg$shape, cg$engine, cg$n, cg$miss_rate, cg$n_imp, decreasing = TRUE), ]
+band <- 2 * sqrt(0.95 * 0.05 / ri$n_rep)
+op <- par(mfrow = c(1, 2), mar = c(4.2, 12.5, 2, 0.8))
+for (est in c("empirical", "kernel")) {
+  e <- cg[cg$estimator == est, ]
+  y <- seq_len(nrow(e))
+  plot(e$cover_mid, y, xlim = range(0.7, 1, e$cover_lo, e$cover_hi, e$cover_mid),
+       yaxt = "n", ylab = "", xlab = "Coverage", pch = 19, main = est, type = "n")
+  rect(0.95 - band, 0, 0.95 + band, length(y) + 1, col = "grey90", border = NA)
+  abline(v = c(0.92, 0.98), lty = 2, col = "grey40")
+  points(e$cover_lo, y, pch = 17, col = "#2c7fb8")
+  points(e$cover_hi, y, pch = 15, col = "#d95f02")
+  points(e$cover_mid, y, pch = 19)
+  axis(2, at = y, labels = e$label, las = 1, cex.axis = 0.7)
+}
+par(op)
+```
+
+## Numbered findings
+
+Each finding is a claim followed by the output behind it. Read the claim, open the output, and check that you can see the claim there before accepting it. A claim that cannot be seen in the output is a question to raise with the user.
+
+1. **The gap exists in every cell with missing values and is exactly zero without them.** In the base cell the mean gap is `r pm(base$gap, base$gap_mcse)`, `r round(base$gap / base$gap_mcse)` MCSE above zero, and `r sum(s$gap_n_nonzero[s$miss_rate == 0])` of the `r format(sum(s$n_rep[s$miss_rate == 0]), big.mark = ",")` null replicates have a nonzero gap (@fig-gap; @tbl-verdict; @tbl-known-answer).
+2. **The gap is small at realistic sizes.** Across the predictive-mean-matching cells it runs from `r fmt_range(pmm_miss$gap, 4)`; the largest, `r fmt(v$largest_gap$gap, 4)`, is in the cell `r v$largest_gap$cell`, below the 0.01 and 0.02 thresholds and below the proposal's 0.005 line for a negative result. The kernel estimator's gaps are smaller, `r fmt_range(pmm_k$gap, 4)` (@fig-gap; @tbl-gap).
+3. **The spread of the cutoffs predicts the gap, and for the kernel curve with 40% missing the closed form holds once the pooled curve's own curvature is used.** The correlation of $\hat B_c$ with the gap runs from `r fmt_range(pmm_miss$cor_b_gap, 2)` across the predictive-mean-matching cells. For the kernel estimator the ratio of the mean gap to $\kappa \hat B_c / 2$ with the true curvature runs from `r fmt_range(pmm_k$gap_ratio, 2)`, because smoothing flattens the peak. With the pooled curve's own curvature the ratio runs from `r fmt_range(pmm_k$gap_ratio_hat[pmm_k$miss_rate == 0.4], 2)` with 40% missing and from `r fmt_range(pmm_k$gap_ratio_hat[pmm_k$miss_rate == 0.6], 2)` with 60%, where replicates with widely spread cutoffs fall below the prediction (@fig-scatter; @tbl-gap).
+4. **The gap does not shrink as the number of imputations grows.** In the base cell it is `r fmt(l_cells$gap[1], 4)`, `r fmt(l_cells$gap[2], 4)`, and `r fmt(l_cells$gap[3], 4)` at $L$ = 5, 20, and 100 (MCSE about `r fmt(max(l_cells$gap_mcse), 4)`), rising toward its limit as the spread of the cutoffs is estimated with less downward bias (@fig-L).
+5. **The gap shrinks with the sample size, at about the rates the theory gives.** From 250 to 1,000 per group the base cell's gap falls by a factor of `r fmt(base_1000$gap / base$gap, 2)` for the empirical estimator, against $4^{-2/3} = 0.40$ for a cube-root estimator, and by `r fmt(base_1000_k$gap / base_k$gap, 2)` for the kernel estimator, against $4^{-1} = 0.25$ for a regular one (@tbl-gap; a secondary measure, with no pass rule).
+6. **Pooling first removes a small share of the index's upward bias.** In the base cell the pool-first index exceeds $J^*$ by `r pm(base$bias_j_p1, base$bias_j_p1_mcse)` and the optimize-first index by `r pm(base$bias_j_p2, base$bias_j_p2_mcse)`, a ratio of `r pm(abs(base$bias_j_ratio), base$bias_j_ratio_mcse, 2)` against the required 0.5. With nothing missing the empirical maximum already exceeds $J^*$ by `r pm(null_s$bias_j_p1, null_s$bias_j_p1_mcse)`, so most of the bias is the optimism of a maximum, not the pooling order (@tbl-cutoff).
+7. **For the empirical curve the optimize-first cutoff is the more accurate one.** The ratio of root mean squared errors of the cutoff, optimize first over pool first, runs from `r fmt_range(pmm_e$rmse_ratio, 2)` across the predictive-mean-matching cells, and its regret is lower in `r sum(pmm_e$regret_p2 < pmm_e$regret_p1)` of these `r nrow(pmm_e)` cells (`r fmt(base$regret_p2, 4)` against `r fmt(base$regret_p1, 4)` in the base cell); for the kernel curve the ratio is `r fmt_range(pmm_k$rmse_ratio, 2)`, so the two orders give nearly the same cutoff (@tbl-cutoff).
+8. **The pointwise interval for $J(c)$ covers in the null cells and undercovers once missing values are many or the peak is flat.** Coverage runs from `r fmt_range(as.matrix(null_cov), 3)` in the null cells, from `r fmt_range(as.matrix(cov_pmm), 3)` in the predictive-mean-matching cells, lowest at $c^* + 0.5$ with 60% missing and the flat shape, and from `r fmt_range(as.matrix(cov_nn), 3)` in the nearest-neighbour cells. In the flat cells with 60% missing the empirical cutoff is biased by `r fmt_range(flat_e$bias_c_p1[flat_e$miss_rate == 0.6], 2)` under pool first: the imputations, not the pooling, are biased where donors are sparse (@fig-coverage; @tbl-cutoff).
+9. **The nearest-neighbour engine gives smaller gaps and worse coverage than predictive mean matching.** Its empirical gaps run from `r fmt_range(nn_e$gap, 4)` and its ratios to the prediction from `r fmt_range(nn_e$gap_ratio, 2)`; with one auxiliary its donors are the same 3 subjects in every imputation (decisions log, D5), so the imputations vary less than they should (@fig-gap; @tbl-gap; @fig-coverage).
+
+## Tables
+
+**Table guide (the verdict).** One row is one criterion of the pre-registered pass rule: the cell it is judged in, the measure, its estimate with its MCSE, the threshold, whether the threshold is met, and whether the estimate lies within three MCSE of the threshold (near). Question 2's clause (c) has one row per predictive-mean-matching cell with missing values. Which criteria decide each answer, and are any of the deciding ones near their thresholds?
+
+```{r}
+#| label: tbl-verdict
+#| tbl-cap: "The pass rule applied to the pilot (pilot/verdict.R, results/verdict.rds): every criterion of the pre-registration, its estimate and MCSE, its threshold, and whether it is met or near (within three MCSE of the threshold)."
+
+vt <- crit
+vt$estimate <- ifelse(is.na(vt$mcse), formatC(vt$estimate, format = "d"),
+                      fmt(vt$estimate, 4))
+vt$mcse <- ifelse(is.na(vt$mcse), "", fmt(vt$mcse, 4))
+vt$met <- ifelse(vt$met, "yes", "no")
+vt$near <- ifelse(vt$near, "near", "")
+knitr::kable(vt, col.names = c("Question", "Clause", "Cell", "Measure", "Estimate",
+                               "MCSE", "Threshold", "Met", "Near"),
+             row.names = FALSE, align = "llllrrlll")
+```
+
+**Table guide (the gap and its prediction, every cell).** One row is one analysis cell. The gap and the predicted gap should agree for the kernel estimator if the quadratic formula holds, so the ratio should be near 1 there; the version with the pooled curve's own curvature is what an analyst could compute. The correlation is between the spread of the cutoffs and the gap across replicates. The cutoff difference, P1 minus P2, should be near zero for the sharp (symmetric) shape and near its prediction for the flat one. Which cells have a ratio far from 1, and is it the empirical or the kernel estimator?
+
+```{r}
+#| label: tbl-gap
+#| tbl-cap: "The gap (P2 index minus P1 index) and its prediction in every analysis cell with missing values: mean gap (MCSE), mean predicted gap with the true curvature, their ratio (MCSE), the ratio with the pooled curve's curvature (kernel only), the correlation of the spread of the cutoffs with the gap (MCSE), and the mean cutoff difference P1 minus P2 (MCSE) against its prediction. From results/cell_summaries.rds."
+
+tg <- s[s$miss_rate > 0, ]
+tg <- tg[order(tg$estimator, tg$shape, tg$engine, tg$n, tg$miss_rate, tg$n_imp), ]
+knitr::kable(data.frame(
+  Estimator = tg$estimator, Shape = tg$shape, Missing = pct(tg$miss_rate, 0),
+  n = tg$n, Engine = toupper(tg$engine), L = tg$n_imp,
+  Gap = pm(tg$gap, tg$gap_mcse), Predicted = fmt(tg$pred_gap, 4),
+  Ratio = pm(tg$gap_ratio, tg$gap_ratio_mcse, 2),
+  `Ratio, own curvature` = ifelse(is.na(tg$gap_ratio_hat), "",
+                                  pm(tg$gap_ratio_hat, tg$gap_ratio_hat_mcse, 2)),
+  Correlation = pm(tg$cor_b_gap, tg$cor_b_gap_mcse, 2),
+  `Cutoff difference` = pm(tg$cdiff, tg$cdiff_mcse),
+  `Its prediction` = fmt(tg$pred_cdiff, 4), check.names = FALSE),
+  row.names = FALSE)
+```
+
+**Table guide (the cutoff and the index, every cell).** One row is one analysis cell. For the cutoff, smaller bias and root mean squared error (RMSE) are better, and a ratio of RMSEs (P2 over P1) away from 1 means the two orders differ in accuracy. For the reported index, the bias against $J^*$ is the overstatement of the accuracy the cutoff achieves; the regret is how much accuracy the chosen cutoff loses against the best one. Where is P2's index bias larger than P1's, and does the RMSE ratio move away from 1 anywhere?
+
+```{r}
+#| label: tbl-cutoff
+#| tbl-cap: "Cutoff and index under each pooling rule in every analysis cell: bias and RMSE of the cutoff for P1 and P2, the RMSE ratio P2 over P1 (MCSE), the bias of the reported index against J* for P1, P2, and P3, and the regret of P1 and P2, each with its MCSE in the full table file. From results/cell_summaries.rds."
+
+tc <- s[order(s$estimator, s$shape, s$engine, s$n, s$miss_rate, s$n_imp), ]
+knitr::kable(data.frame(
+  Estimator = tc$estimator, Shape = tc$shape, Missing = pct(tc$miss_rate, 0),
+  n = tc$n, Engine = toupper(tc$engine), L = tc$n_imp,
+  `Cutoff bias P1` = fmt(tc$bias_c_p1, 3), `Cutoff bias P2` = fmt(tc$bias_c_p2, 3),
+  `RMSE P1` = fmt(tc$rmse_c_p1, 3), `RMSE P2` = fmt(tc$rmse_c_p2, 3),
+  `RMSE ratio` = ifelse(is.na(tc$rmse_ratio), "", pm(tc$rmse_ratio, tc$rmse_ratio_mcse, 3)),
+  `Index bias P1` = pm(tc$bias_j_p1, tc$bias_j_p1_mcse),
+  `Index bias P2` = pm(tc$bias_j_p2, tc$bias_j_p2_mcse),
+  `Index bias P3` = fmt(tc$bias_j_p3, 4),
+  `Regret P1` = fmt(tc$regret_p1, 4), `Regret P2` = fmt(tc$regret_p2, 4),
+  check.names = FALSE), row.names = FALSE)
+```
+
+**Table guide (the numbers in the spec).** One row is one number that section 3 of the spec quotes, recomputed here from the result files. Does every number in the spec match its row?
+
+```{r}
+#| label: tbl-spec-numbers
+#| tbl-cap: "Every number quoted in section 3 of project-spec.md, recomputed from results/cell_summaries.rds and results/verdict.rds."
+
+q2c <- crit[crit$question == "Q2" & crit$clause == "c", ]
+far <- q2c[which.max(abs(q2c$estimate - 1)), ]
+spec_rows <- rbind(
+  crit[!(crit$question == "Q2" & crit$clause == "c"), ],
+  far)
+spec_rows$label <- paste0(spec_rows$question, spec_rows$clause)
+spec_rows$label[nrow(spec_rows)] <- "Q2c, the cell farthest from 1"
+knitr::kable(data.frame(
+  Item = spec_rows$label, Cell = spec_rows$cell, Measure = spec_rows$measure,
+  Value = ifelse(is.na(spec_rows$mcse), formatC(spec_rows$estimate, format = "d"),
+                 fmt(spec_rows$estimate, 4)),
+  MCSE = ifelse(is.na(spec_rows$mcse), "", fmt(spec_rows$mcse, 5))),
+  row.names = FALSE, align = "lllrr")
+```
+
+# The draft spec {#draft-spec}
+
+This is `project-spec.md`, read from the file when the document renders. Anything the agent[^agent] left for the user to decide is highlighted in yellow and starts with "To confirm".
+
+```{r}
+#| label: spec
+#| results: asis
+
+# The spec writes markers in the rules' form, [TO CONFIRM: ...]{.tc}; the
+# helper adds its own class, so the doubled one is removed.
+spec_md <- read_md_part("../project-spec.md", highlight_to_confirm = TRUE)
+cat(gsub("\\{\\.tc\\}\\{\\.tc\\}", "{.tc}", spec_md), "\n")
+```
+
+# Decisions log {#decisions-log}
+
+This is the agent's `decisions.md`, read from the file when the document renders.
+
+```{r}
+#| label: decisions
+#| results: asis
+
+cat(read_md_part("decisions.md"), "\n")
+```
+
+# Action items and limitations {#action-items-and-limitations}
+
+## Action items
+
+1. **Decide the status.** The rule gives `piloted-fail`: the pooling order changes the index by less than 0.005 everywhere and pooling first is not a fix for the index's bias. The decisions log (D1) states the reading that keeps the project, re-scoped with Aim 2 leading; a re-scope is a revised proposal and a re-pilot in `pilot-b/`, and a drop is recorded in `STATUS.md` as `dropped (reason)`.
+2. **Resolve the yellow `[TO CONFIRM]` items** in the spec: the production replicate count, and the milestone dates.
+3. **Verify the citations written from memory:** Rubin (1987), for Rubin's rules, and Silverman (1986), for the bandwidth rule, are named in footnotes, marked as not in the Zotero library, and need adding before any deliverable cites them. Every other source is in `manuscript/citations.csv` with its passage.
+4. **Check the five readings of the pass rule** the pre-registration made where the proposal left a case open (decisions log, D10), and the smoker definition used for the NHANES description (D12).
+5. **Look into the undercoverage with 60% missing**, which matters for Aim 2 whatever the status: it comes with a biased cutoff in the flat cells, which points at the imputations rather than at Rubin's rules.
+6. **Decide on the nearest-neighbour engine with one auxiliary**: its bootstrap step does not change the donors, so the imputations are not proper in the sense of Rubin's rules; a design with several auxiliaries would give the bootstrap a role.
+
+## Limitations
+
+- The pilot shows the mechanism on two binormal shapes with one auxiliary, equal group sizes, and missingness at random; it says nothing about skewed markers, several auxiliaries, or a misspecified imputation model.
+- The prediction of the gap uses the true curvature, which an analyst does not know; the analyst's version, with the pooled kernel curve's curvature, is a secondary measure.
+- The kernel interval uses the binomial variance, which is not the kernel estimator's variance; its coverage mixes that error with the smoothing bias and the imputation.
+- With `r ri$n_rep` replicates the MCSE of a coverage near 0.95 is about 0.01, so the base cell's kernel coverage, `r pm(base_k$cover_mid, base_k$cover_mid_mcse, 3)`, is near the 0.92 limit and its pass is not firm.
+- The application was described, not analysed: no missingness was imposed on the NHANES cohort, nothing was imputed, and the survey weights were not used.
+- The checks of the proposal that need more sizes or shapes (100 and 4,000 per group, two near-equal maxima, a discrete marker, the Box-Cox binormal estimator) and Aim 2's band, near-optimal set, and bootstrap variance methods were not run.
+
+
+{{< include ../templates/pilot-report/parts/standard-footnotes.md >}}
+
+[^youden]: The Youden index of a threshold is sensitivity plus specificity minus one: the share of diseased people the threshold flags minus the share of healthy people it flags. Its maximum over thresholds, and the threshold that attains it, are the usual "optimal cutoff".
+
+[^mi]: Multiple imputation fills each missing value several times with draws from a model of the missing value given what is observed, analyses each completed dataset, and combines the analyses.
+
+[^rubin]: Rubin's rules combine the completed-data estimates of one quantity: the estimate is their average, and its variance is the average within-dataset variance plus the between-dataset variance inflated by $1 + 1/L$. [CITE: Rubin 1987, Multiple Imputation for Nonresponse in Surveys; not in the Zotero library]{.cite}
+
+[^nhanes]: The National Health and Nutrition Examination Survey, run by the United States National Center for Health Statistics, combines interviews with physical examinations and laboratory tests on a sample of the population, released as public files every two years.
+
+[^cotinine]: Cotinine is the main product of nicotine in the body and stays in the blood for days, so its level in serum separates people who smoke from people who do not, and its low range measures exposure to other people's smoke.
+
+[^smoker]: Here a current smoker is an adult who has smoked at least 100 cigarettes in life and now smokes every day or some days; every other adult who answered is counted as a nonsmoker.
+
+[^pmm]: Predictive mean matching fits a regression of the marker on the other variables, and for each missing value takes the observed value of a randomly chosen donor among the few observed subjects whose predicted values are closest; here through the R package `mice`, with 5 donors.
+
+[^mib]: The nearest-neighbour method of Long, Zhang, and Hsu (2011) fits a regression for the marker and a model for being observed, and replaces each missing value by the value of one of the 3 observed subjects with the same disease status that are closest on the two fitted scores; both models are refitted on a bootstrap resample before each imputation.
+
+[^silverman]: Silverman's rule of thumb sets a kernel's bandwidth to $0.9 \min(s, \mathrm{IQR}/1.34)\, n^{-1/5}$, from the sample's standard deviation $s$ and interquartile range, as R's `bw.nrd0()` does. [CITE: Silverman 1986, Density Estimation for Statistics and Data Analysis; not in the Zotero library]{.cite}
