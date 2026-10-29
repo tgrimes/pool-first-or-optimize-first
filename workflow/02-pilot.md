@@ -22,7 +22,7 @@ Write the project spec from the final proposal, then run the pre-registered pilo
 **1. The spec.**
 
 1. Set `STATUS.md` to `2, spec`.
-2. Fill `templates/project-spec.md` as `project-spec.md` from the proposal: the question and why it matters, the mechanism, the pilot, the ADEMP skeleton, the application, the target journal, the milestones, what is out of scope, and the reading with its questions. A decision the proposal left to the user carries a `[TO CONFIRM: ...]` marker.
+2. Fill `templates/project-spec.md` as `project-spec.md` from the proposal: the question and why it matters, the mechanism, the pilot, the ADEMP skeleton, the application, the target journal (section 6 takes the last three lines of the journal worksheet in `log/01-idea-review.md`), the milestones, what is out of scope, and the reading with its questions. A decision the proposal left to the user carries a `[TO CONFIRM: ...]` marker.
 3. Section 3 (the pilot) is filled twice. Now it holds the plan: the code path the pilot will have, the three questions, and the pass rule, copied from the proposal. After step 5 it holds the three answers with their numbers and the path of the verdict file.
 4. If writing the spec changes the pilot's pass criteria, **stop** and say why before running anything; otherwise go on.
 

@@ -38,6 +38,7 @@ In plain terms, JCGS publishes new computational methods, algorithms, simulation
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | possible | Fits when the fix or diagnostic is a computational tool, as in the permutation-test papers found (Gómez et al. 2025). |
 | Simulation and diagnostic, no closed form | good | The journal publishes simulation design work (Elliott et al. 2025) and computational tests evaluated by simulation. |
+| Constructive method with theory, simulation, comparison, and application | possible | Fits when the new procedure is computational, like the new permutation and distance-correlation tests found (Gómez et al. 2025, Shen et al. 2021); a procedure whose novelty is statistical rather than computational is at the edge of the stated purpose [14]. |
 | Short methods note | good | Short Technical Notes are one of the journal's two article types [14], so a short computational note has its own format. |
 | Theory paper | possible | Theoretical articles are appropriate when "the results are relevant to computational statistics or data visualization" [14], though pure theory without that link is not. |
 | Applied analysis | poor | No applied-analysis papers were found; applications appear only as illustrations of methods. |
@@ -124,6 +125,7 @@ scope_5_words: computational and graphical statistical methods
 audience: methodologists
 fit_critique: possible
 fit_sim_diagnostic: good
+fit_constructive: possible
 fit_short_note: good
 fit_theory: possible
 fit_applied: poor

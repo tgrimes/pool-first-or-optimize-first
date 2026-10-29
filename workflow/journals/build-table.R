@@ -13,7 +13,8 @@ here <- dirname(normalizePath(sub("^--file=", "", args[grep("^--file=", args)]))
 files <- sort(list.files(file.path(here, "profiles"), pattern = "\\.md$", full.names = TRUE))
 
 keys <- c("scope_5_words", "audience", "fit_critique", "fit_sim_diagnostic",
-          "fit_short_note", "fit_theory", "fit_applied", "abstract_format",
+          "fit_constructive", "fit_short_note", "fit_theory", "fit_applied",
+          "abstract_format",
           "abstract_words", "length_limit", "apc", "oa_model",
           "ai_policy_3_words", "review_model", "guidelines_read")
 
@@ -48,8 +49,8 @@ tab$aud_rank <- match(tab$audience, ord)
 tab <- tab[order(tab$aud_rank, tolower(tab$journal)), ]
 cell <- function(v) gsub("\\|", "/", v)
 lines <- c(
-  "| Journal | Scope in five words | Audience | Critique | Simulation and diagnostic | Short note | Theory | Applied | Abstract | Length | Charge to publish | AI policy | Guidelines read |",
-  "|--------------|----------|-------|-----|-----|-----|-----|-----|--------------|-------------|----------|-------|-----|"
+  "| Journal | Scope in five words | Audience | Critique | Simulation and diagnostic | Constructive method | Short note | Theory | Applied | Abstract | Length | Charge to publish | AI policy | Guidelines read |",
+  "|--------------|----------|-------|-----|-----|-----|-----|-----|-----|--------------|-------------|----------|-------|-----|"
 )
 for (i in seq_len(nrow(tab))) {
   r <- tab[i, ]
@@ -57,7 +58,8 @@ for (i in seq_len(nrow(tab))) {
     paste0(r$abstract_format, "; words: ", r$abstract_words)
   lines <- c(lines, paste0(
     "| [", r$journal, "](", r$profile, ") | ", cell(r$scope_5_words), " | ", r$audience, " | ",
-    r$fit_critique, " | ", r$fit_sim_diagnostic, " | ", r$fit_short_note, " | ",
+    r$fit_critique, " | ", r$fit_sim_diagnostic, " | ", r$fit_constructive, " | ",
+    r$fit_short_note, " | ",
     r$fit_theory, " | ", r$fit_applied, " | ", cell(abs), " | ", cell(r$length_limit), " | ",
     cell(r$apc), " | ", cell(r$ai_policy_3_words), " | ", r$guidelines_read, " |"))
 }

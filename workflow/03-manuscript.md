@@ -44,7 +44,7 @@ Each step ends in a file someone can open. **Stop** marks a point where the step
 **2. References. Stop, up to twice.** Zotero is the only source of entries.
 
 1. *Inventory:* every source the draft will cite, from the proposal's Zotero list and `citations.csv` as stage 1 left it, the pilot's opened sources (D0, or the report's citations), the spec's reading list, and the seed `references.bib`, each with the claim and section that need it. Write it in the log as a table (key, grade core or supporting, section, why, origin). If the step was run before, the log points at the existing inventory and checklist rather than copying them.
-2. *Availability:* look each candidate up by DOI and then by title. Available means the item is there, the record is complete enough to cite, and a PDF with full text is attached; a pre-1980 record or a book counts without a PDF.
+2. *Availability:* look each candidate up by DOI and then by title. Available means the item is there, the record is complete enough to cite, and either a PDF with full text is attached or the citation is supporting and the abstract in the record states the claim (`rules.md`, section 2); a pre-1980 record or a book counts without a PDF.
 3. Return one message with three lists: (1) available, with the count; (2) missing, grouped as "add the item", "attach the PDF", "complete the metadata", or "correct a field", each row with the full citation as known, the identifier, and the claim it is needed for; (3) record faults, each with the item, the field, and the value to enter (a missing DOI, a lowercased journal, a title typo, an author list cut at ten, a date in the pages field). **Stop** until the library is updated, unless every candidate is available. If the connector is unavailable, return the single line "Zotero unavailable" and nothing else.
 4. *Build:* `python3 -I manuscript/build-bib.py manuscript/citations.csv manuscript/references.bib` exports each item from Zotero's local API, drops abstracts, file paths, access dates, keywords, and an article's publisher, remaps keys through the checklist, changes nothing else, and writes any remaining faults to `manuscript/zotero-fixes.md`.
 5. The checklist `manuscript/citations.csv` has one row per candidate: `key, zotero_item, grade, section, why, origin, identifier, identifier_source, pdf, usable, deviations_from_record, support_passage, read_date, verified_by, verified_date`.
@@ -66,7 +66,7 @@ Each step ends in a file someone can open. **Stop** marks a point where the step
    - When a result contradicts a claim in the spec, the Results state the fact, the Discussion interprets it with a guard, and a `[TO CONFIRM]` quotes the spec's sentence.
    - An exploratory probe that explains a result enters the paper only through a script that writes its numbers to `results/`; otherwise it stays in the log, and the interpretation it supports carries a marker.
    - The journal's CSL file is copied beside the qmd and named in the YAML from the start; the profile's placement of the AI-use statement and its required back-matter headings override the skeleton's.
-   - Every attributing citation is written with the PDF open (the connector's `get_content` or `search_fulltext` on the item), and its passage and date go in `citations.csv`; a citation that only names a method or a dataset is marked `definitional`. The passage reading may be delegated to other agents if each returns the quote, its location, and a verdict; the drafter spot-checks a sample against the PDFs and says so in the log.
+   - Every attributing citation is written with the full text open (the connector's `get_content` or `search_fulltext` on the item), or with the abstract for a supporting citation without a PDF, and its passage and date go in `citations.csv`; a citation that only names a method or a dataset is marked `definitional`. The passage reading may be delegated to other agents if each returns the quote, its location, and a verdict; the drafter spot-checks a sample against the PDFs and says so in the log.
 5. *Introduction revised* against the Results and Discussion; then the Abstract in the journal's headings.
 6. *Second Zotero batch.* If drafting turned up sources not in the inventory, run the availability check on them as one batch. **Stop** only if any is missing, with the same three lists as step 2.
 
@@ -91,6 +91,7 @@ Each step ends in a file someone can open. **Stop** marks a point where the step
    - a paragraph may be split, or sentences moved within a section, with the split logged.
 5. Record what changed and why in the log under `## Revision pass`: the changes by section, quoting the rendered page, with one reason per block of like changes rather than per sentence. Render again and run the checker.
 6. Make a second pass when the first changed more than three sentences in any section, and apply the same rule to the second; the third pass, when due, is the user's. The first pass lengthens a draft by splitting sentences, so the second pass also cuts what the splitting left redundant.
+7. For a deliverable written in markdown (the proposal, the spec, a review, a response): passes 1 and 2 over the whole document, with the labels a template carries exempt; no cross-checks and no render; the changes recorded in the stage's log as in 5.
 
 **5. Render and check. Stop.**
 
@@ -172,7 +173,7 @@ The rules every stage obeys, the word lists included, are in `rules.md`, section
 - Real LaTeX for all mathematics; multi-clause displays with one clause per line, separated by `\\`.
 - No workflow vocabulary in the paper: not "known-answer check", "harness check", "pilot", "card", "worker", "quick run", "spec", or "the report". Say plainly what was done.
 - Methods in past tense with no results; Results with no interpretation and no citations; Discussion with no new results.
-- Every citation that attributes a finding or a claim is written with the PDF open and its supporting passage recorded in the checklist; a citation that only names a method or a dataset is marked `definitional` there.
+- Every citation that attributes a finding or a claim is written with the full text open, or with the abstract for a supporting citation without a PDF, and its supporting passage recorded in the checklist; a citation that only names a method or a dataset is marked `definitional` there.
 - Table column widths in proportion to the text in each column (`kable_w()` takes `widths`).
 - Format: Quarto, `embed-resources: true`, `toc`, `theme: cosmo`, `fig-cap-location: bottom`, `code-fold: true`, `echo: false`, `warning: false`; the journal's CSL file copied beside the qmd and named in the YAML.
 

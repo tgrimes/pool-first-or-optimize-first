@@ -41,6 +41,7 @@ In plain terms, this is the section of the ASA's flagship journal ("the premier 
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | The section publishes articles that demonstrate statistical usage in applications [17], and recent JASA genomics papers pair a methods result with a substantive application (Su et al. 2024, Alzheimer's disease). |
 | Simulation and diagnostic, no closed form | possible | A diagnostic could fit if the real-data application carries the paper, but no simulation-only JASA paper was found. |
+| Constructive method with theory, simulation, comparison, and application | possible | The section is for papers that demonstrate statistical usage in applications [17], so a new method fits only when a substantive application carries it; otherwise it belongs in Theory and Methods. |
 | Short methods note | possible | The 25-page ACS Short Communication takes data infrastructure, pipelines, "comprehensive data analysis using familiar methodologies", and perspectives [17], so a short note framed as a perspective or an analysis could go there. |
 | Theory paper | poor | Theory without an application belongs in Theory and Methods, which publishes contributions to "foundations, theoretical development, and methodology" [17]. |
 | Applied analysis | good | The instructions say "careful analyses of data may be published in JASA even if there are no methodological innovations" [17]. |
@@ -130,6 +131,7 @@ scope_5_words: statistical usage in real applications
 audience: both
 fit_critique: good
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: possible
 fit_theory: poor
 fit_applied: good

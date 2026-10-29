@@ -37,6 +37,7 @@ The journal also runs Matters Arising, "a venue for research papers that directl
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | The aims consider negative results of clear value [5], and Matters Arising, at full research-article length, exists for papers that challenge a published iScience paper such as LIONESS [7]. |
 | Simulation and diagnostic, no closed form | possible | Simulation-backed limits on an estimation task appear (paper 3 below), but the journal asks for "significant contribution to a relevant field combined with robust results" [5]. |
+| Constructive method with theory, simulation, comparison, and application | possible | The out-of-scope list rules out machine-learning methods only when they lack benchmarks against similar methods [5], so new methods are considered, but few of its broad readers evaluate statistical procedures, and the paper must make a "significant contribution to a relevant field" [5]. |
 | Short methods note | poor | Research Articles and Matters Arising share one long format, and papers that "are technically accurate but do not report a significant contribution will not be considered" [7]. |
 | Theory paper | poor | No pure statistical theory found among published genomics papers, and the aims ask for robust results and methodology in an applied field [5]. |
 | Applied analysis | possible | Applied sample-specific network papers appear (paper 2 below), but single-dataset data mining without validation in an original or external cohort is out of scope [5], so a lupus reanalysis needs a second cohort. |
@@ -113,6 +114,7 @@ scope_5_words: broad interdisciplinary open access science
 audience: general science
 fit_critique: good
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: poor
 fit_theory: poor
 fit_applied: possible

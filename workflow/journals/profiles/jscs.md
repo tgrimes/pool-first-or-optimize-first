@@ -33,6 +33,7 @@ Two exclusions matter: "JSCS does not consider the analysis of specific data set
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | possible | Methods papers with simulation and a fix appear, though the papers found are less often genomics critiques. |
 | Simulation and diagnostic, no closed form | good | The journal covers contributions "involving Computation or Simulation" [11] and publishes simulation studies that settle questions about the error rates of standard tests (Consiglio 2026). |
+| Constructive method with theory, simulation, comparison, and application | good | New procedures evaluated by simulation are in scope [11], as with a new test for differential networks (Zhang et al. 2023), though the theory carries less weight than the computation. |
 | Short methods note | possible | Article is the only research type, with a typical maximum of 10,000 words and no short format [12], though some papers are short (Consiglio 2026, 12 pages). |
 | Theory paper | poor | The papers found are computational, not theoretical. |
 | Applied analysis | poor | The journal "does not consider the analysis of specific data sets, except as examples" [11]. |
@@ -114,6 +115,7 @@ scope_5_words: novel computation or simulation contributions
 audience: methodologists
 fit_critique: possible
 fit_sim_diagnostic: good
+fit_constructive: good
 fit_short_note: possible
 fit_theory: poor
 fit_applied: poor

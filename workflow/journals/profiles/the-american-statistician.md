@@ -36,6 +36,7 @@ The instructions list eight sections: Statistical Practice, General, Teacher's C
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | The Interdisciplinary section takes critical reviews of methods in common use outside the statistical core [14], and the journal publishes critiques of common procedures, including permutation tests (Christensen and Zabriskie 2021). |
 | Simulation and diagnostic, no closed form | good | Statistical Practice takes comparisons of methods focused on their usefulness in practice [14], and the journal publishes work on how simulation studies are run and reported (Pawel et al. 2025). |
+| Constructive method with theory, simulation, comparison, and application | poor | A new procedure for one estimand is a specialist contribution, while articles should address topics "important for a broad group of statisticians" and "ordinarily not be highly technical" [14]. |
 | Short methods note | good | Short cautionary papers appear (Hutson and Yu 2022, six pages), and a typical paper should be at most 25 pages [14]. |
 | Theory paper | poor | Articles should "ordinarily not be highly technical" [14]. |
 | Applied analysis | poor | A genomics analysis without a general statistical lesson does not address topics "important for a broad group of statisticians" [14]. |
@@ -119,6 +120,7 @@ scope_5_words: clear, general-interest articles for statisticians
 audience: methodologists
 fit_critique: good
 fit_sim_diagnostic: good
+fit_constructive: poor
 fit_short_note: good
 fit_theory: poor
 fit_applied: poor

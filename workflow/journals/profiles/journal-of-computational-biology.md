@@ -31,6 +31,7 @@ In plain terms, JCB is the RECOMB-affiliated methods journal for computational b
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | The journal publishes in-depth analysis of methods and their practical impact, and the fix supplies the new method it asks for. |
 | Simulation and diagnostic, no closed form | possible | Evaluation of methods is in scope, but the primary contribution is expected to be a new method. |
+| Constructive method with theory, simulation, comparison, and application | good | The primary contribution is expected to be "the development and application of new methods", statistical ones included [2], though the 3,000-word target pushes the theory into the supplement [1], [7]. |
 | Short methods note | possible | Research articles have a 3,000-word limit and software articles run 2 to 4 pages, both suited to short work. |
 | Theory paper | possible | Mathematical analysis of methods is named in the scope, though readers expect computational relevance. |
 | Applied analysis | poor | The primary contribution must be a new method, not a data analysis. |
@@ -109,6 +110,7 @@ scope_5_words: computational biology and bioinformatics methods
 audience: both
 fit_critique: good
 fit_sim_diagnostic: possible
+fit_constructive: good
 fit_short_note: possible
 fit_theory: possible
 fit_applied: poor

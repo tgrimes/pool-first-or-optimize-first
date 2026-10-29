@@ -25,6 +25,7 @@ Every page below was read on the date shown. Bracketed numbers in the text point
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good / possible / poor | [one sentence] |
 | Simulation and diagnostic, no closed form | good / possible / poor | [one sentence] |
+| Constructive method with theory, simulation, comparison, and application | good / possible / poor | [one sentence] |
 | Short methods note | good / possible / poor | [one sentence] |
 | Theory paper | good / possible / poor | [one sentence] |
 | Applied analysis | good / possible / poor | [one sentence] |
@@ -90,6 +91,7 @@ scope_5_words: [five words]
 audience: [genomics users | methodologists | both | general science]
 fit_critique: [good | possible | poor]
 fit_sim_diagnostic: [good | possible | poor]
+fit_constructive: [good | possible | poor]
 fit_short_note: [good | possible | poor]
 fit_theory: [good | possible | poor]
 fit_applied: [good | possible | poor]

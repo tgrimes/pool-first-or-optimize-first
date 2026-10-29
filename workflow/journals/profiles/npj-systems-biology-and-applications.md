@@ -33,6 +33,7 @@ In plain terms, this is a systems biology journal for computational and mathemat
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | Network biology is a named topic [1], and a head-to-head evaluation of SSN, LIONESS, SWEET, and others appeared here (paper 1). |
 | Simulation and diagnostic, no closed form | possible | In scope as a computational approach [1], but the novelty and significance criterion [6] favors papers with a clear systems biology payoff. |
+| Constructive method with theory, simulation, comparison, and application | possible | A new computational approach is in scope [1], but the novelty and significance criterion [6] favors a method with a clear systems biology payoff over one judged by its statistical properties. |
 | Short methods note | possible | Brief Communications cover concise studies that "do not fulfill the criteria of a full research article" [4]. |
 | Theory paper | possible | "Mathematical approaches to analysis and modeling" are explicitly in scope [1], though the journal's content leans toward modeling of specific systems. |
 | Applied analysis | possible | Applications to disease modeling and systems immunology are listed [1], and an applied LIONESS study of lung cancer appeared here (paper 2). |
@@ -110,6 +111,7 @@ scope_5_words: computational modeling of biological systems
 audience: both
 fit_critique: good
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: possible
 fit_theory: possible
 fit_applied: possible

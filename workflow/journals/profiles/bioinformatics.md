@@ -27,6 +27,7 @@ Bioinformatics is the ISCB's flagship methods journal. It publishes new algorith
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | An Original Paper offering a corrected method plus an R package, tested on real lupus data, matches the stated emphasis on new methods with real data. |
 | Simulation and diagnostic, no closed form | possible | Acceptable only if the diagnostic is a usable tool shown on real data, since simulated data alone is accepted only in well-justified cases. |
+| Constructive method with theory, simulation, comparison, and application | good | New methods shipped as software and shown on real data are the stated emphasis [1], though the seven-page limit pushes the theory into the supplement. |
 | Short methods note | possible | The Application Note (4 pages) fits only if the note is centered on freely available software. |
 | Theory paper | poor | The aims stress algorithms and databases, not mathematical results. |
 | Applied analysis | poor | The journal wants methodological advances, not biological findings from existing methods. |
@@ -102,6 +103,7 @@ scope_5_words: new computational biology methods software
 audience: genomics users
 fit_critique: good
 fit_sim_diagnostic: possible
+fit_constructive: good
 fit_short_note: possible
 fit_theory: poor
 fit_applied: poor

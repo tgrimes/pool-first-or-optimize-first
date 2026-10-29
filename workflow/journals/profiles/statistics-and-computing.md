@@ -26,6 +26,7 @@ Statistics and Computing publishes computational statistics: algorithms, Monte C
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | possible | The journal prints critiques of widely used computational procedures, but the genomics framing must give way to the algorithm. |
 | Simulation and diagnostic, no closed form | possible | Simulation-based evaluation of a computational method fits the scope if the diagnostic is new and general. |
+| Constructive method with theory, simulation, comparison, and application | possible | Fits when the new procedure is itself computational (an algorithm, or a resampling or Monte Carlo scheme); a new estimator for a genomics estimand is at the edge of a scope set at the intersection of statistics and computing [2]. |
 | Short methods note | poor | The guidelines list no short article type or length [1]. |
 | Theory paper | possible | Theory of computational procedures appears regularly; theory about a genomics estimand fits less well. |
 | Applied analysis | poor | The scope is methods at the statistics and computing interface [2]. |
@@ -95,6 +96,7 @@ scope_5_words: statistics and computing methods
 audience: methodologists
 fit_critique: possible
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: poor
 fit_theory: possible
 fit_applied: poor

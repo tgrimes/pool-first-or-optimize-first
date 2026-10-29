@@ -30,6 +30,7 @@ In plain terms, CSDA publishes statistical methods where computing matters: algo
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | Section III names comparison of statistical methodologies and simulation experiments with real applications. |
 | Simulation and diagnostic, no closed form | good | Simulation experiments and software or algorithm evaluation are named in the scope. |
+| Constructive method with theory, simulation, comparison, and application | good | Section II covers statistical methodology for data analysis, including statistical genetics and biostatistics [7], and new network methods with genomics applications appear (papers 2 and 3 below). |
 | Short methods note | possible | The journal publishes short communications as well as research papers, though no length limit is given [7]. |
 | Theory paper | poor | The journal centers computation and data analysis rather than theory without computation. |
 | Applied analysis | possible | "Advanced statistical analysis with real applications" is in scope, though the analysis needs a methodological angle. |
@@ -111,6 +112,7 @@ scope_5_words: computational statistics and data analysis
 audience: methodologists
 fit_critique: good
 fit_sim_diagnostic: good
+fit_constructive: good
 fit_short_note: possible
 fit_theory: poor
 fit_applied: possible

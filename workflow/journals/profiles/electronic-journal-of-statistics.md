@@ -28,6 +28,7 @@ EJS is an open-access general statistics journal from the IMS and the Bernoulli 
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | possible | Fits if the closed-form result is the center of the paper; the genomics application would be secondary for this readership. |
 | Simulation and diagnostic, no closed form | poor | Without a derivation the paper would be light for a journal held to IMS theory standards [1]. |
+| Constructive method with theory, simulation, comparison, and application | good | New estimators and tests with their properties are most of what the journal prints (papers 2 and 3 below), provided the properties are proved and not only simulated. |
 | Short methods note | good | "Short notes" are a stated article type [1], [4]. |
 | Theory paper | good | The journal publishes theoretical statistics and is open access [1], [4]. |
 | Applied analysis | poor | Applied statistics is in scope [1], but routine analyses are not what the journal prints. |
@@ -105,6 +106,7 @@ scope_5_words: theoretical, computational, applied statistics
 audience: methodologists
 fit_critique: possible
 fit_sim_diagnostic: poor
+fit_constructive: good
 fit_short_note: good
 fit_theory: good
 fit_applied: poor

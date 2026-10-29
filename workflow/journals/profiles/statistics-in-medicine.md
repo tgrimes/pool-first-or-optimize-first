@@ -34,6 +34,7 @@ In plain terms, this is the main methods journal for medical statisticians: new 
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | possible | The main criterion is that the methods suit "a particular medical problem" [10], which a critique with a fix and a lupus application can meet, but genomics is not the journal's core audience. |
 | Simulation and diagnostic, no closed form | possible | A diagnostic with a real medical example fits the aims, though the journal stresses methods over pure simulation evidence. |
+| Constructive method with theory, simulation, comparison, and application | good | The aims welcome "submissions that explain new methods" shown on real motivating examples [1], and new co-expression and distance-based methods for genomic data appear (papers 1 to 3 below), though "primarily mathematical content" is excluded [10]. |
 | Short methods note | poor | The author guidelines name research articles and Tutorials in Biostatistics but no short article type [7]. |
 | Theory paper | poor | "Papers with primarily mathematical content will be excluded" [10]. |
 | Applied analysis | poor | The journal publishes statistical methods, not substantive data analyses. |
@@ -110,6 +111,7 @@ scope_5_words: statistical methods for medical problems
 audience: methodologists
 fit_critique: possible
 fit_sim_diagnostic: possible
+fit_constructive: good
 fit_short_note: poor
 fit_theory: poor
 fit_applied: poor

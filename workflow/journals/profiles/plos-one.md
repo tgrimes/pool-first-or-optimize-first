@@ -31,6 +31,7 @@ In plain terms, PLOS ONE is a very broad journal that asks one question of a pap
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | The criteria reward a correct, well-documented analysis rather than novelty [2], and evaluations of widely used genomics methods appear in the journal (papers 1 and 2 below). |
 | Simulation and diagnostic, no closed form | good | Simulation-based method comparisons are published here (paper 1 below), and the bar is technical soundness [2]. |
+| Constructive method with theory, simulation, comparison, and application | possible | The soundness bar [2] accepts a new method with its comparison, but few of the general readers evaluate methods, and the papers found are evaluations rather than new procedures. |
 | Short methods note | possible | There is no separate short format, but there are no length limits [3], and short notes on a standard test appear as research articles (paper 3 below). |
 | Theory paper | possible | Statistics are named in criterion 3 [2], but a paper with no data or simulation would be unusual for a journal centered on original research. |
 | Applied analysis | good | Original research on any natural-science or medical question is in scope [1], judged only on soundness [2]. |
@@ -102,6 +103,7 @@ scope_5_words: soundness-only broad science journal
 audience: general science
 fit_critique: good
 fit_sim_diagnostic: good
+fit_constructive: possible
 fit_short_note: possible
 fit_theory: possible
 fit_applied: good

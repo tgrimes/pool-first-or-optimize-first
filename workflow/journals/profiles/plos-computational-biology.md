@@ -30,6 +30,7 @@ In plain terms, this journal wants computational work that teaches us something 
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | possible | Critiques of widely used metrics with theory and data appear here (paper 1 below), but the bar is "exceptional significance" for understanding living systems [1]. |
 | Simulation and diagnostic, no closed form | possible | The Benchmarking type takes comprehensive, transparent comparisons of public tools [2], and simulation-based critiques appear (paper 3 below). |
+| Constructive method with theory, simulation, comparison, and application | possible | A new adjustment method appeared here (paper 2 below), but Methods papers must describe "outstanding methods of exceptional importance" with "the promise of wide adoption by a broad community of users" [2]. |
 | Short methods note | poor | No short research format is listed; only Software articles have a length cap [2], and the significance bar is high [1]. |
 | Theory paper | poor | The journal's scope centers on biological insight from computation [1], not statistical theory for its own sake. |
 | Applied analysis | poor | An applied reanalysis would need to deliver exceptional new biological understanding [1]. |
@@ -106,6 +107,7 @@ scope_5_words: computation advancing understanding of biology
 audience: both
 fit_critique: possible
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: poor
 fit_theory: poor
 fit_applied: poor

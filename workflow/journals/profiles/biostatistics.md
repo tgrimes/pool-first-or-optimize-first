@@ -28,6 +28,7 @@ Biostatistics publishes new statistical methods motivated by health and biomedic
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | The journal publishes method papers that expose bias in widely used genomics pipelines and correct it (see the papers below). |
 | Simulation and diagnostic, no closed form | possible | Welcome if the diagnostic is framed as a new method; the guidelines ask for innovative methods, not comparisons alone. |
+| Constructive method with theory, simulation, comparison, and application | good | New methods with applications are what the guidelines ask for [1], and the readers are biostatisticians, many of them working on genomics. |
 | Short methods note | possible | Notes are short papers "on topics related to good biostatistical practice" [1], which suits a focused warning about a common procedure. |
 | Theory paper | poor | The guidelines ask papers to "focus on methods and applications" [1]. |
 | Applied analysis | poor | The journal publishes methods; an analysis with existing tools has no stated home. |
@@ -101,6 +102,7 @@ scope_5_words: statistical methods for human health
 audience: methodologists
 fit_critique: good
 fit_sim_diagnostic: possible
+fit_constructive: good
 fit_short_note: possible
 fit_theory: poor
 fit_applied: poor

@@ -14,7 +14,7 @@ Write the detailed companion to the final manuscript: the literature its Introdu
 ## Preconditions
 
 - `STATUS.md` says `3, final`. If the user asks for the report before the production run, it is written on the settled draft, its numbers carry the quick label, and it is rendered again after stage 3, step 6.
-- Zotero is serving; every cited item has its full text attached (the Zotero check of stage 1 and the references step of stage 3 guarantee it; confirm with a ping).
+- Zotero is serving; every core citation has its full text attached, and a supporting citation may be abstract-only (`rules.md`, section 2; the Zotero check of stage 1 and the references step of stage 3 guarantee it; confirm with a ping).
 - The log is `log/04-background-report.md`.
 
 ## Procedure
@@ -31,7 +31,7 @@ Write the detailed companion to the final manuscript: the literature its Introdu
 1. The full citation.
 2. What the paper did: its question, data, method, and main finding, in the report's words.
 3. What it did not do, as it bears on the manuscript.
-4. The passage the manuscript's claim rests on, quoted briefly from the full text with its location. Reading is from the full text in Zotero, not from the recorded passage alone; a passage that does not say what the manuscript says it says is an issue.
+4. The passage the manuscript's claim rests on, quoted briefly from the full text with its location. Reading is from the full text in Zotero, not from the recorded passage alone, or from the abstract for a supporting citation without a PDF, and the block says so; a passage that does not say what the manuscript says it says is an issue.
 5. How the manuscript uses it.
 6. For each paragraph of the Introduction, a closing note: what the paragraph's claim rests on across its sources, and whether any source carries more or less weight than the manuscript gives it.
 

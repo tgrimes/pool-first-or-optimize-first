@@ -28,6 +28,7 @@ Briefings in Bioinformatics describes itself as a review journal: its manuscript
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | possible | As an evaluation of existing tools (LIONESS, SSN, SWEET) it fits a protocol or review frame, but the stated ban on pure original research makes the new fix a risk. |
 | Simulation and diagnostic, no closed form | possible | A systematic benchmark of established methods suits a review or Problem Solving Protocol. |
+| Constructive method with theory, simulation, comparison, and application | poor | The manuscript-preparation page excludes "work on new methods that have not yet been described elsewhere" [2], although the About page lists new methods [3] and SWEET appeared here (paper 1 below). |
 | Short methods note | poor | The short types are opinion articles, letters critiquing a BIB paper, and software reviews by non-originators, each 500 to 1,000 words [2]. |
 | Theory paper | poor | The aims address experimental practitioners, not theory. |
 | Applied analysis | poor | Case studies must be "applied to clinical practice" and the journal does not take pure original research [2]. |
@@ -105,6 +106,7 @@ scope_5_words: reviews and protocols for practitioners
 audience: genomics users
 fit_critique: possible
 fit_sim_diagnostic: possible
+fit_constructive: poor
 fit_short_note: poor
 fit_theory: poor
 fit_applied: poor

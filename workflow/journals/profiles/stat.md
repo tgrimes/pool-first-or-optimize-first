@@ -34,6 +34,7 @@ In plain terms, Stat is a fast, short-paper journal run by the ISI with Wiley, o
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | possible | The topic fits the broad scope, but the 10-page limit forces a much shorter version of the full critique, even with proofs moved to Supporting Information [8]. |
 | Simulation and diagnostic, no closed form | possible | A short diagnostic fits, though long simulation tables would strain the page limit. |
+| Constructive method with theory, simulation, comparison, and application | possible | New methodological research is in scope [2], but the theory, simulation, comparison, and application must fit in 10 pages, with proofs moved to Supporting Information [8]. |
 | Short methods note | good | Rapid, short research communications are the journal's stated purpose. |
 | Theory paper | good | The aims name new theoretical research, and a short closed-form result suits the format. |
 | Applied analysis | possible | The aims include applied research, but the readership is statisticians rather than genomics users. |
@@ -112,6 +113,7 @@ scope_5_words: rapid short papers, all statistics
 audience: methodologists
 fit_critique: possible
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: good
 fit_theory: good
 fit_applied: possible

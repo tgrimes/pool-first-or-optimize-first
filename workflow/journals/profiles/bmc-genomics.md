@@ -31,6 +31,7 @@ In plain terms, this journal publishes genome-scale biology across many organism
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | Research articles may report "new experimental or computational methods" [4], there is a Transcriptomic Methods section [1], and a cell-composition critique of blood expression studies appeared here (paper 1 below). |
 | Simulation and diagnostic, no closed form | possible | In scope as a computational method [4], but the readership is applied, so the paper needs a clear genomics use case. |
+| Constructive method with theory, simulation, comparison, and application | possible | New computational methods are in scope [4], but the readers mostly use methods rather than evaluate them, so the theory carries little weight and the paper needs a clear genomics use case. |
 | Short methods note | possible | No length limits are stated, so a short research article is allowed [3], [4], but there is no dedicated short methods format. |
 | Theory paper | poor | The aims list biological domains and methods for them [1]; nothing suggests pure statistical theory is considered. |
 | Applied analysis | good | Original primary genomics research is the journal's core content [1], [4]. |
@@ -107,6 +108,7 @@ scope_5_words: genetics, genomics, transcriptomics, proteomics research
 audience: genomics users
 fit_critique: good
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: possible
 fit_theory: poor
 fit_applied: good

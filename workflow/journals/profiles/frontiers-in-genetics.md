@@ -32,6 +32,7 @@ In plain terms, this is a large open access genetics journal split into 21 speci
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | The Statistical Genetics and Methodology section publishes statistical method work for transcriptomics [2], and co-expression method comparisons appear (paper 1 below). |
 | Simulation and diagnostic, no closed form | good | Simulation studies of how a common analysis fails when its assumptions break appear in the journal (paper 2 below), and the section wants a strong methodological component [2]. |
+| Constructive method with theory, simulation, comparison, and application | good | The Statistical Genetics and Methodology section "is dedicated to publishing research focused on novel data analysis methods" [2], and Methods is a listed article type [4]. |
 | Short methods note | good | Brief Research Report is a listed type at up to 4,000 words and 4 figures or tables [4]. |
 | Theory paper | possible | Hypothesis and Theory is a listed type [4], and the Statistical Genetics section is methods-focused [2], but pure theory with no data is uncommon. |
 | Applied analysis | possible | Analyses of public data need independent validation or high innovation [1], so a lupus reanalysis would need a second cohort. |
@@ -111,6 +112,7 @@ scope_5_words: genetics and genomics, sectioned
 audience: both
 fit_critique: good
 fit_sim_diagnostic: good
+fit_constructive: good
 fit_short_note: good
 fit_theory: possible
 fit_applied: possible

@@ -33,6 +33,7 @@ In plain terms, Cell Reports Methods prints methods papers and method evaluation
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | The Resources type exists for data-driven re-evaluations of existing methods [6], and published papers expose biases in standard genomics pipelines and propose fixes (papers 1 and 2 below). |
 | Simulation and diagnostic, no closed form | good | A diagnostic that re-evaluates a current approach without a new method is what the Resources type describes [6]. |
+| Constructive method with theory, simulation, comparison, and application | possible | An Article presents a method, compares it with related methods, and validates it [6], which is this paper's shape, but the readers adopt methods rather than evaluate them, and the bar is a method that changes how research is done [4, 5]. |
 | Short methods note | possible | Reports (under 4,000 words, at most four figures or tables) give a short format [6], but the journal's main criterion is a robust, reproducible method [4]. |
 | Theory paper | poor | The aims center on methods, platforms, and analytical frameworks that change how research is done [5], not on statistical theory. |
 | Applied analysis | poor | A methods journal; a disease reanalysis without a methodological contribution does not match its aims [4, 5]. |
@@ -114,6 +115,7 @@ scope_5_words: methods that advance biological research
 audience: both
 fit_critique: good
 fit_sim_diagnostic: good
+fit_constructive: possible
 fit_short_note: possible
 fit_theory: poor
 fit_applied: poor

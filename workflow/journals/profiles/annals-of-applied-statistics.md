@@ -32,6 +32,7 @@ The "range" is the span of statistical research "from direct subject-matter coll
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | AoAS publishes critiques of genomics procedures with a fix and a real application (see the papers below), and it asks for "comparative analyses and substantive findings" [4]. |
 | Simulation and diagnostic, no closed form | possible | Fits if the diagnostic answers a real applied question; new methodology "without a clear application" is not suitable [7]. |
+| Constructive method with theory, simulation, comparison, and application | possible | New tests appear when a real genomics problem drives them (papers 2 and 3 below), but papers "developing new methodology without a clear application" are not suitable [7], so the application must yield substantive findings. |
 | Short methods note | poor | The submission page names no short article type [4]. |
 | Theory paper | poor | The journal is "aimed at papers in the applied half" of statistical research [1], and methodology without a clear application is not suitable [7]. |
 | Applied analysis | possible | Papers should have "substantive applied origins" [4], but they must also be "of interest beyond the specific application" [4], so an analysis with off-the-shelf methods may be judged too thin. |
@@ -112,6 +113,7 @@ scope_5_words: applied problems driving statistical methods
 audience: methodologists
 fit_critique: good
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: poor
 fit_theory: poor
 fit_applied: possible

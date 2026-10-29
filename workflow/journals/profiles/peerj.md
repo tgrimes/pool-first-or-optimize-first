@@ -27,6 +27,7 @@ In plain terms, PeerJ is a broad open access journal across biology, medicine, e
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | Soundness-only review [1] and a stated critique-submission route [3] suit a paper showing a popular method's target differs from what users assume. |
 | Simulation and diagnostic, no closed form | good | Method Papers must compare with existing approaches and quantify improvements [3], and simulation-based method evaluations appear (paper 1 below). |
+| Constructive method with theory, simulation, comparison, and application | possible | Method Papers must compare with existing approaches and quantify the improvement [3], which this paper does, but the readers mostly use methods rather than evaluate them. |
 | Short methods note | possible | There is no short format, but no word limit either; short R-package method papers appear (paper 3 below), and Bioinformatics Software Tools are a listed type [1]. |
 | Theory paper | poor | Hypothesis papers are not published [1], and the review criteria center on experimental design and data [1]. |
 | Applied analysis | possible | Research Articles are the main type [1], but an analysis of public data needs validation in at least two independent sources [3]. |
@@ -103,6 +104,7 @@ scope_5_words: soundness-only life and environment
 audience: general science
 fit_critique: good
 fit_sim_diagnostic: good
+fit_constructive: possible
 fit_short_note: possible
 fit_theory: poor
 fit_applied: possible

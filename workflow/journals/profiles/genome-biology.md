@@ -33,6 +33,7 @@ In plain terms, this is a selective, high-profile genomics journal with in-house
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | The journal publishes high-impact critiques of widely used genomics methods (papers 1 and 2), but only when the problem affects many users. |
 | Simulation and diagnostic, no closed form | possible | A diagnostic could be a Methodology article if it beats existing practice on simulated ground truth and real data [5]; the bar for "wide audience" is high. |
+| Constructive method with theory, simulation, comparison, and application | possible | A Methodology article must show a clear advance over the state of the art, benchmarked on known ground truth and on real data [5], which matches the shape, but the theory carries little weight and the advance must interest a wide genomics audience [4]. |
 | Short methods note | possible | Brief Reports take a new method or a new version of one, shown in at most two figures or tables [6]. |
 | Theory paper | poor | Methodology articles require benchmarking and real-data utility [5]; nothing suggests pure theory is considered. |
 | Applied analysis | poor | Research articles must be "a substantial advance over previous studies" of wide interest [4]; a reanalysis of public lupus data is unlikely to meet that bar. |
@@ -111,6 +112,7 @@ scope_5_words: biology from a genomic perspective
 audience: both
 fit_critique: good
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: possible
 fit_theory: poor
 fit_applied: poor

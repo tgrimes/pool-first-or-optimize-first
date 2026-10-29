@@ -31,6 +31,7 @@ In plain terms, SMMR publishes medical statistics methods papers written for a b
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | The journal wants accounts of how methods are and could be used, with a motivating example, which a critique with a fix supplies. |
 | Simulation and diagnostic, no closed form | possible | A diagnostic with a motivating example fits, though the journal frames papers around methods and reviews. |
+| Constructive method with theory, simulation, comparison, and application | good | The aims name "accounts of innovative methodological developments" [1], and new tests and distance-based methods with simulation and an application appear (papers 1 to 3 below), with technical material in an appendix [1]. |
 | Short methods note | poor | The only short type is a 1,500-word letter to the editor; research papers are expected to run about 8,000 words. |
 | Theory paper | poor | Very technical material is to be moved to an appendix, and papers must be accessible to a broad audience. |
 | Applied analysis | poor | The journal publishes methods and reviews, not substantive analyses. |
@@ -111,6 +112,7 @@ scope_5_words: medical statistics methods and reviews
 audience: methodologists
 fit_critique: good
 fit_sim_diagnostic: possible
+fit_constructive: good
 fit_short_note: poor
 fit_theory: poor
 fit_applied: poor

@@ -32,6 +32,7 @@ In plain terms, Biometrical Journal is a European biostatistics methods journal 
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | The journal publishes statistical methods with life-science applications and has recently published critiques of widely used genomics practice. |
 | Simulation and diagnostic, no closed form | good | It publishes work on how simulation studies and method comparisons can mislead, and the guidelines send "extensive simulation work" to online supporting information [7]. |
+| Constructive method with theory, simulation, comparison, and application | good | Statistical methods with life-science applications are the stated scope [1], and the journal asks for the code and data "used to illustrate new methods" [1], so a new procedure with simulation and an application is its core content. |
 | Short methods note | good | The journal has a Short Communication type with a recommended length of 2,000 words [7]. |
 | Theory paper | poor | Articles "containing only extensive mathematical theory" are not suitable [7]. |
 | Applied analysis | possible | Novel case studies are welcome, but single-dataset analyses without a methodological advance generally are not [7]. |
@@ -112,6 +113,7 @@ scope_5_words: biostatistical methods for life sciences
 audience: methodologists
 fit_critique: good
 fit_sim_diagnostic: good
+fit_constructive: good
 fit_short_note: good
 fit_theory: poor
 fit_applied: possible

@@ -2,9 +2,16 @@
 
 Dated lessons. Each line says what changed in which file and which project taught it.
 
-## Unreleased
+## 0.2.1 (2026-10-28)
 
-- 2026-10-28, project pool-first-or-optimize-first, stage 1: `rules.md`, section 2, and `01-idea-review.md`, step 9, now let a supporting citation (one that says only that an approach, a result, or a dataset exists) be cited from its abstract without a PDF; a core citation still needs the full text. Taught by three papers at stop 1 whose PDFs the user could not obtain and whose abstracts stated all the proposal used them for.
+Lessons from the first run of stage 1, on the project pool-first-or-optimize-first (29 process-feedback items in its `log/01-idea-review.md`; the stage took about an hour and a half of agent time, most of it tool round trips).
+
+- `rules.md`, section 2: a supporting citation, one that says only that an approach, a result, or a dataset exists, is cited from its abstract without a PDF; a core citation needs the full text. Taught by three papers at stop 1 whose PDFs the user could not obtain and whose abstracts stated all the proposal used them for. Stages 3 and 4 amended to match; the grades are in section 9.
+- `rules.md`: the Open stop row reads `none: stage N in progress` while a stage runs; the `idea.md` header is not copied into a deliverable or a log; a template's labels are exempt from the bold lead-in rule; the first R call in a fresh clone bootstraps renv; the markdown form of the revision pass (`03-manuscript.md`, step 4.7) applies to the proposal, the spec, reviews, and responses.
+- `01-idea-review.md`: the search tools named as the session sees them, a budget per source with identifier lookups outside it, applied papers logged by count, a page summary as a partial reading, Zotero searched first, a threshold for delegating the search, sketches the agent adds labeled as its own, one dataset per candidate and a web search after a failed fetch, a timing run of at most ten replicates, reasons rather than sources for design choices, the journal worksheet in this stage's log, the init reminder in the first message, both paper-type readings when a correction is a primary aim, the Zotero check's DOI query and complete record mode and one full-text search per passage and scanned PDFs and deferred faults and the meaning of the rebuild, the workflow matters on a separate line of the stop message, and a time box of two hours.
+- `02-pilot.md`: section 6 of the spec takes the last three lines of the worksheet from the stage 1 log.
+- `templates/proposal.md`: markers in the `{.tc}` form; three labels reworded without "would".
+- `workflow/journals/`: a sixth paper type, the constructive method, rated for every profile and added to the summary table, the choosing procedure, and the worksheet; the worksheet is filled at stage 1 and kept in its log.
 
 ## 0.2.0 (2026-10-28)
 

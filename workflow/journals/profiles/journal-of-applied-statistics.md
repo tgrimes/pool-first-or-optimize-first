@@ -33,6 +33,7 @@ The listed disciplines include "genetics and genomics" and "biological and biome
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | The Research Article structure (data challenge, methodology, application with simulation) matches it [11], and the journal published a paper on the bias of a common genomics practice and its correction (Wang et al. 2026). |
 | Simulation and diagnostic, no closed form | possible | Comparison and review papers driven by simulation appear, but most papers found pair a method with real data. |
+| Constructive method with theory, simulation, comparison, and application | good | The aims name "innovations of statistical methodology motivated by current and important real-world examples" [12], and the Research Article structure (data challenge, methodology, application with simulation) fits a new method [11]. |
 | Short methods note | good | The Application Note, at most 15 pages, is a short format in which simulation studies are expected [11]. |
 | Theory paper | poor | "Purely theoretical papers are avoided" [12]. |
 | Applied analysis | possible | "Routine applications of standard statistical methods to some data are not suitable as an Application Note", and a Research Article needs a Methodology section [11], so an analysis needs a methods angle. |
@@ -113,6 +114,7 @@ scope_5_words: statistics motivated by real-world examples
 audience: both
 fit_critique: good
 fit_sim_diagnostic: possible
+fit_constructive: good
 fit_short_note: good
 fit_theory: poor
 fit_applied: possible

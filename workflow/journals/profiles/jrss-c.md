@@ -28,6 +28,7 @@ Series C is the Royal Statistical Society's applied journal, read by statisticia
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | possible | Fits if the real-data problem drives the paper and the fix is presented as new methodology [1, 2]. |
 | Simulation and diagnostic, no closed form | possible | A new diagnostic motivated by a real application qualifies; a simulation comparison alone does not [2]. |
+| Constructive method with theory, simulation, comparison, and application | possible | Developing new statistical methodology is what the journal asks for [2], but only when the application is central and motivates the work [1]. |
 | Short methods note | possible | The guidelines say "Short communications may also be appropriate" but give no length or format [1]. |
 | Theory paper | poor | Applications must be central and motivate the work [1]. |
 | Applied analysis | poor | "Papers that use well-established statistical methods to analyze data are not suitable" [2]. |
@@ -98,6 +99,7 @@ scope_5_words: applied problems motivating new methods
 audience: methodologists
 fit_critique: possible
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: possible
 fit_theory: poor
 fit_applied: poor

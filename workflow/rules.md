@@ -10,7 +10,8 @@ The files in `workflow/` and `templates/` are written for the agent that runs th
 - `STATUS.md` names the stage and the open stop. The agent updates it when it reaches a stop and when a stop is answered. On any message, the agent reads `STATUS.md` first, then the stage file it names, then the stage's log.
 - Within a stage, the stops the stage file marks are real stops: the agent returns what the stop asks for and waits. If the user has switched the stops off for a run, the agent decides at each one, records the decision and its reason in the stage's log under "Decisions made in place of a stop", and marks in the deliverable what the user should look at.
 - When a stop has been answered by a ruling, the agent applies the ruling. If the ruling's stated reason turns out to be wrong, the agent keeps the ruling, says so in the log with a dated note (and in `protocol.md` when the ruling concerns the design), and marks it in the deliverable.
-- The user may change at any stop. Every user is treated the same, and nothing in a deliverable or a log names the user.
+- The user may change at any stop. Every user is treated the same, and nothing in a deliverable or a log names the user; a header in `idea.md` that names its author or links a document is not copied into any deliverable or log.
+- While a stage is in progress, the Open stop row of `STATUS.md` reads `none: stage N in progress`; at a stop it names the stop and the deliverable.
 - The agent commits without being asked at these points, and nowhere else unless asked: when a pre-registration or `protocol.md` is written, before any run it governs; at every stop, with the deliverable and its rendered file; after every revision round; at the end of a production run; at the end of a stage. The commit message starts with the stage and the step ("Stage 2, step 2: pre-registration"). Nothing is pushed unless the user asks.
 - A rendered deliverable (the pilot report, the manuscript, the background report) is committed at its stop and after each revision round, so that a handover carries what the user read. It is not committed after every render.
 
@@ -37,18 +38,18 @@ The files in `workflow/` and `templates/` are written for the agent that runs th
 - One idea per sentence, in a simple structure. The reader's time is balanced against the reader's burden: a simple topic takes one sentence, a complex one up to three simple sentences that build on each other, never one sentence that packs them together and never a long preamble.
 - Why before what. A sentence that leaves the reader asking why, followed by a description, loses the reader.
 - Keep the paragraph's subject rather than introducing another to carry a fact about it ("these methods were developed to", not "their authors' aim was to").
-- No claim without a source, the first sentence included. No em or en dashes. The Oxford comma. No bold lead-ins outside an abstract with required headings. No footnotes in a manuscript (a report may use them to define a term). "We", never "I".
+- No claim without a source, the first sentence included. No em or en dashes. The Oxford comma. No bold lead-ins outside an abstract with required headings and the labels a template carries (a proposal's "Question:" line). No footnotes in a manuscript (a report may use them to define a term). "We", never "I".
 - Keep estimand, estimator, statistic, and limit distinct. Say what "trustworthy", "safe", or "valid" refers to. No workflow vocabulary in a deliverable meant for readers outside the project (harness, pilot, card, worker, quick run, spec, the report, too small to matter).
 - The word lists below are the only copies; the manuscript checker carries the same lists, and a change is made in both places. Delete on sight: considerably, dramatically, enormously, exceptionally, extremely, highly, quite, remarkably, substantially, very, actually, basically, clearly, essentially, in fact, indeed, just, kind of, of course, really, simply, sort of, certainly, obviously, undoubtedly, important, interesting, notable, remarkable, considerable, major, minor, substantial. Justify or replace: apparently, arguably, can, conceivably, could, maybe, may, might, perhaps, potentially, possibly, presumably, probably, likely, seemingly, would, commonly, frequently, generally, largely, mostly, often, rarely, typically, usually.
 - A table of notation is never included. A design table with a reason column is welcome; its caption defines every label it uses and its cells read on their own.
 - An abstract gives numeric results with their uncertainty for every claim.
-- Every deliverable goes through at least one revision pass for clarity (`03-manuscript.md`, step 4) before the user reads it.
+- Every deliverable goes through at least one revision pass for clarity before the user reads it: `03-manuscript.md`, step 4, for a rendered document, and its step 4.7 for a deliverable written in markdown (the proposal, the spec, a review, a response).
 
 ## 5. Environment
 
 - R packages come from the project library (`renv::restore()`); Python from the project environment (`uv sync`). Nothing is installed outside them, and never through Homebrew, pyenv, or conda on the project's behalf. After a change to `DESCRIPTION` or `pyproject.toml`, snapshot and commit the lockfile.
 - Parallel code uses PSOCK workers with the BLAS pinned to one thread in each; at most three cores at once, counting the workers. A background run is stopped with the task tool, never with `pkill`. Before restarting anything that looks dead, check `uptime` and the run's own log.
-- Every R command runs from the project root or from `manuscript/`, where `.Rprofile` activates the library.
+- Every R command runs from the project root or from `manuscript/`, where `.Rprofile` activates the library. The first R call in a fresh clone makes renv install itself into `renv/` (its bootstrap) and nothing else; that is expected and not an install outside the project library.
 - No simulation runs before `protocol.md` is written, except a pilot's own pre-registered run.
 
 ## 6. Logs and feedback
@@ -84,3 +85,4 @@ The words the stage files use, so that none is guessed at.
 - **Known-answer check:** a run of the simulation code on a case whose answer is known (a null cell, a closed form, a literal implementation), compared with that answer. It is a test in `tests/testthat/`, and the pilot report displays its outcome; it is never content of a manuscript.
 - **Coordinator, worker:** the agent in the conversation, and an agent it delegates a stage or a step to.
 - **Round:** one message of comments from the user on a draft, or one pass of the three mock reviewers.
+- **Core, supporting, definitional:** the grades of a citation in `citations.csv`. Core carries the argument and needs the full text; supporting says only that something exists and may rest on the abstract; definitional names a method or a dataset.

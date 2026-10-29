@@ -31,6 +31,7 @@ GigaScience publishes large-scale life-science data work and judges papers on "r
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | possible | A Technical Note on an open-source corrected method compared with existing tools fits, but the closed-form derivation is not what the journal emphasizes. |
 | Simulation and diagnostic, no closed form | possible | A diagnostic tool shipped as open software, tested against existing tools, can be a Technical Note [3]. |
+| Constructive method with theory, simulation, comparison, and application | possible | A Technical Note takes a method "tested and compared with existing tools" [3], but the journal judges reproducibility, usability, and utility [1], not a method's theoretical properties. |
 | Short methods note | possible | Brief Communications take concise observations in 1,500 words and up to 2 figures [4]. |
 | Theory paper | poor | The scope is big-data research, judged on reproducibility and usability. |
 | Applied analysis | possible | Research articles "present work utilising large scale data that provide some scientific insight and conclusions" [2]; a lupus RNA-seq reanalysis would need to be large scale. |
@@ -105,6 +106,7 @@ scope_5_words: open, reproducible big-data life science
 audience: genomics users
 fit_critique: possible
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: possible
 fit_theory: poor
 fit_applied: possible

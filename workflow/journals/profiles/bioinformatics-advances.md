@@ -21,12 +21,13 @@ Every page below was read on the date shown. Bracketed numbers in the text point
 
 > "Bioinformatics Advances is an interdisciplinary journal on bioinformatics and computational biology. The journal covers bioinformatics methods, such as algorithms, statistics, databases and software" [1]
 
-Bioinformatics Advances is the ISCB's fully open access companion to Bioinformatics, launched in 2021 [3]. It takes methods papers (statistics is named in the scope), software and data notes, and short "Discovery Notes" that report biological findings made with computational methods [1]. Its bar is broader than Bioinformatics', it sends papers to fewer reviewers, and it states firm page and reference limits. All five of our paper types have a plausible slot except pure theory.
+Bioinformatics Advances is the ISCB's fully open access companion to Bioinformatics, launched in 2021 [3]. It takes methods papers (statistics is named in the scope), software and data notes, and short "Discovery Notes" that report biological findings made with computational methods [1]. Its bar is broader than Bioinformatics', it sends papers to fewer reviewers, and it states firm page and reference limits. All six of our paper types have a plausible slot except pure theory.
 
 | Paper type | Fit | Why |
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | An Original Article on a statistical method with software fits the stated scope, though the 8-page and 50-reference caps force a tight paper. |
 | Simulation and diagnostic, no closed form | good | Methods evaluations fit the scope, and no rule against simulation-only work is stated. |
+| Constructive method with theory, simulation, comparison, and application | good | Statistics is named among the methods in scope [1], and an Original Article on a new method with software fits, though the 8-page and 50-reference caps push the theory into the supplement. |
 | Short methods note | possible | The Application Note (4 pages) is the short format, but it is framed around software or data resources. |
 | Theory paper | poor | The scope is applied methods and software; nothing suggests appetite for theory alone. |
 | Applied analysis | possible | Discovery Notes take "novel biomedical insights for whose discovery bioinformatics techniques are essential" [1]. |
@@ -102,6 +103,7 @@ scope_5_words: open access computational biology methods
 audience: both
 fit_critique: good
 fit_sim_diagnostic: good
+fit_constructive: good
 fit_short_note: possible
 fit_theory: poor
 fit_applied: possible

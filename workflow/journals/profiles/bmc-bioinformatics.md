@@ -32,6 +32,7 @@ In plain terms, this is a home for computational and statistical methods aimed a
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | Statistical methods, network analysis, and transcriptome analysis are named areas, and the soundness-only criterion rewards a careful critique [1]. |
 | Simulation and diagnostic, no closed form | good | Research articles may present a new computational "test or procedure" [4], and benchmark-style evaluations of single-sample methods appear in the journal (paper 2 below). |
+| Constructive method with theory, simulation, comparison, and application | good | Novel statistical methods for biological data are the stated scope [1], and a new regression method for cell-type-specific expression, checked in simulation, appeared here (paper 3 below). |
 | Short methods note | possible | There is no short research format; Matters Arising is limited to comments on papers published in this journal [6], so a short note would go in as a brief research article. |
 | Theory paper | possible | Statistical methods are in scope [1], but a paper with no computational tool or data analysis would sit at the edge of what the journal publishes. |
 | Applied analysis | possible | Research articles may report original primary research [4], but the aims center on methods and tools [1]. |
@@ -109,6 +110,7 @@ scope_5_words: computational methods for biological data
 audience: both
 fit_critique: good
 fit_sim_diagnostic: good
+fit_constructive: good
 fit_short_note: possible
 fit_theory: possible
 fit_applied: possible

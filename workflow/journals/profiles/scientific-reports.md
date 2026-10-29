@@ -32,6 +32,7 @@ In plain terms, this is a very large, broad, open access journal that accepts an
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | possible | Sound methods papers are accepted [4], and a PERMANOVA-based evaluation with simulated and real data appeared here (paper 2 below), but the audience is general. |
 | Simulation and diagnostic, no closed form | possible | Validity, not novelty, is the criterion [4], so a well-designed simulation study qualifies; it may get less attention from specialists. |
+| Constructive method with theory, simulation, comparison, and application | possible | Validity, not novelty, is the criterion [4], so a sound new method can be published, but statistics is not a listed subject area [1] and the readers are general scientists. |
 | Short methods note | good | Word limits are recommendations, and the journal suggests at most 4 display items for articles of 2,000 words or less [5], so short articles are normal. |
 | Theory paper | poor | Mathematics and statistics are not among the listed subject areas [1]. |
 | Applied analysis | good | Original research in biology and health sciences is the journal's core content [1], [3]. |
@@ -106,6 +107,7 @@ scope_5_words: sound research across all sciences
 audience: general science
 fit_critique: possible
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: good
 fit_theory: poor
 fit_applied: good

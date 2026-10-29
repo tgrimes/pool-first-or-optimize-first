@@ -27,6 +27,7 @@ Statistics in Biosciences is a smaller journal, published three times a year, th
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | Case Studies and Practice explicitly takes "evaluation of existing methods" [2], and the fix can go to Original Articles. |
 | Simulation and diagnostic, no closed form | good | An evaluation of an existing method with a new diagnostic fits Case Studies and Practice [2]. |
+| Constructive method with theory, simulation, comparison, and application | good | Original Articles are the section for new methods, and the journal wants substantive science "motivating and demonstrating the methodological development" [2]. |
 | Short methods note | possible | Commentaries cover "reactions to an article published in the journal, and scholarly essays" [2]; no length is stated. |
 | Theory paper | poor | The journal requires substantive science to motivate the work [2]. |
 | Applied analysis | possible | Case studies and "innovative applications of existing methods that further understanding of subject-matter science" fit [2]; a routine analysis would not. |
@@ -98,6 +99,7 @@ scope_5_words: statistical methods and practice, biosciences
 audience: both
 fit_critique: good
 fit_sim_diagnostic: good
+fit_constructive: good
 fit_short_note: possible
 fit_theory: poor
 fit_applied: possible

@@ -30,6 +30,7 @@ Biometrics is the International Biometric Society's general methods journal for 
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | Biometric Practice explicitly takes re-examinations of widely used practices, and Biometric Methodology takes the fix. |
 | Simulation and diagnostic, no closed form | possible | Fits Biometric Practice only if it offers new insight; routine simulation comparisons are "generally not suitable" [1]. |
+| Constructive method with theory, simulation, comparison, and application | good | Biometric Methodology is the section for new methods, and it takes proofs provided the derivations go to an appendix [1]. |
 | Short methods note | possible | Reader Reaction (12 pages) fits only if it responds to a Biometrics article from about the last three years [1]. |
 | Theory paper | possible | Methodology papers may carry proofs, but derivations should go to an appendix and an accessible introduction is required [1]. |
 | Applied analysis | poor | Practice papers need "substantial new insight"; a plain analysis with existing tools has no stated home [1]. |
@@ -99,6 +100,7 @@ scope_5_words: statistical methods for biosciences
 audience: methodologists
 fit_critique: good
 fit_sim_diagnostic: possible
+fit_constructive: good
 fit_short_note: possible
 fit_theory: possible
 fit_applied: poor

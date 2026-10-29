@@ -29,6 +29,7 @@ In plain terms, SAGMB is a statistical genomics journal: methods for omics data,
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | Omics methods are the core scope, and the journal has published critiques of widely used genomics procedures. |
 | Simulation and diagnostic, no closed form | good | Rigorous evaluation of existing methods on high-dimensional biological data is in scope. |
+| Constructive method with theory, simulation, comparison, and application | good | Advancing statistical methodologies for the molecular biosciences is the stated aim [1, 2], and the readers are statisticians who work on genomics. |
 | Short methods note | possible | Software Application Notes (at most 4 typeset pages) exist, but no short methods-note type is listed. |
 | Theory paper | possible | Theoretical innovations are named among the journal's benefits, provided the theory concerns biological data. |
 | Applied analysis | possible | The aims welcome "insightful applications" of existing approaches to molecular biology. |
@@ -105,6 +106,7 @@ scope_5_words: statistical methods for omics data
 audience: both
 fit_critique: good
 fit_sim_diagnostic: good
+fit_constructive: good
 fit_short_note: possible
 fit_theory: possible
 fit_applied: possible

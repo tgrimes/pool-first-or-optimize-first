@@ -28,6 +28,7 @@ NAR Genomics and Bioinformatics is the open access sibling of Nucleic Acids Rese
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | A Standard or Methods paper that establishes "a novel result" with open-source code and explicit benchmarks matches the stated criteria [2]. |
 | Simulation and diagnostic, no closed form | possible | Benchmark work fits, but Methods and Benchmark Surveys expect "an exhaustive combination of benchmarks" and a strong author track record [2]. |
+| Constructive method with theory, simulation, comparison, and application | possible | A Methods paper fits if the method is open source and benchmarked "against an adequate number of relevant alternative state of the art technologies" [2], but the readers are practitioners, so the theory carries little weight. |
 | Short methods note | good | Application Notes are brief communications on "a single result or method," at most 3,000 words [2]. |
 | Theory paper | poor | The journal focuses on large-scale data analysis, not theory. |
 | Applied analysis | possible | Standard papers can report a novel genomic result from large-scale data analysis [2]. |
@@ -102,6 +103,7 @@ scope_5_words: large-scale genomics data analysis methods
 audience: genomics users
 fit_critique: good
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: good
 fit_theory: poor
 fit_applied: possible

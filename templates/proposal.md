@@ -7,7 +7,7 @@
 | Status | draft / final [date] |
 
 <!-- Filled by stage 1 (workflow/01-idea-review.md). Written in the proposal's own words, not by copying
-idea.md. Every claim carries a source in Zotero or a [TO CONFIRM: ...] marker. Delete the comments. -->
+idea.md. Every claim carries a source in Zotero or a [TO CONFIRM: ...]{.tc} marker. Delete the comments. -->
 
 ## 1. Summary and verdict
 
@@ -27,13 +27,13 @@ idea.md. Every claim carries a source in Zotero or a [TO CONFIRM: ...] marker. D
 | 2. A setting it was not built for | | |
 | 3. The estimand, as a functional | | |
 | 4. The target and the bias term | | |
-| 5. A simulation that would confirm it | | |
+| 5. A simulation that confirms it | | |
 | 6. A correction or a diagnostic | | |
 | 7. The application | | |
 
 ## 4. Mechanism and theory
 
-[The mechanism in words, then the first-order sketch with its assumptions, labeled as a sketch. For each result the idea claims: the restatement, the first step that does not hold or is not justified, and the numerical check that would catch an error.]
+[The mechanism in words, then the first-order sketch with its assumptions, labeled as a sketch. For each result the idea claims: the restatement, the first step that does not hold or is not justified, and the numerical check that catches an error.]
 
 ## 5. Prior work and novelty
 
@@ -51,7 +51,7 @@ Searches are logged in `log/01-idea-review.md`.
 |---|---|---|---|---|
 | | | | verified / verify / unavailable | [date] |
 
-**Recommended:** [dataset], with [fallback]. **What the application would show:** [one sentence].
+**Recommended:** [dataset], with [fallback]. **What the application shows:** [one sentence].
 
 ## 7. Pilot plan and pass criteria
 
@@ -73,7 +73,7 @@ Searches are logged in `log/01-idea-review.md`.
 
 ## 9. Open questions for the user
 
-- [TO CONFIRM: ...]
+- [TO CONFIRM: ...]{.tc}
 
 ## 10. Items to add to Zotero
 

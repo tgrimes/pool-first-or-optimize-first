@@ -41,6 +41,7 @@ In plain terms, this is the ASA's flagship journal, which the ASA calls "the pre
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | good | Original contributions to statistical methodology are the section's stated aim [17], and recent JASA papers derive what a common practice actually does (Rizzelli et al. 2026) and give inference for widely used genomics estimates (Cai et al. 2024). |
 | Simulation and diagnostic, no closed form | poor | The section asks for original contributions to theory and methodology and warns that narrowly focused contributions may be inappropriate [17]; every recent JASA paper in this area found carries new theory or a new method. |
+| Constructive method with theory, simulation, comparison, and application | good | New methodology and its theory are the section's stated aim [17], and a permutation test analyzed in theory and applied to single-cell genomics appeared in JASA (Miao et al. 2024). |
 | Short methods note | poor | JASA's only short research format, the 25-page Short Communication, belongs to the Applications and Case Studies section [17]. |
 | Theory paper | good | Foundations and theoretical development of statistics and probability are the section's stated aim [17]. |
 | Applied analysis | poor | Applied work belongs in the Applications and Case Studies section, and a paper may be submitted to only one section at a time [17]. |
@@ -128,6 +129,7 @@ scope_5_words: statistical foundations, theory, and methodology
 audience: methodologists
 fit_critique: good
 fit_sim_diagnostic: poor
+fit_constructive: good
 fit_short_note: poor
 fit_theory: good
 fit_applied: poor

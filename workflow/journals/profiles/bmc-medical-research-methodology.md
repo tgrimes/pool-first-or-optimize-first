@@ -31,6 +31,7 @@ In plain terms, this is a statistics and research-design journal for health rese
 |--------------------------------------------|----------|------------------------------------------------|
 | Critique with a closed-form bias, simulation, fix, and application | possible | Data analysis and statistics are in scope [1], and a review of individual-specific networks appeared here (paper 3 below), but co-expression networks are far from the journal's clinical core. |
 | Simulation and diagnostic, no closed form | possible | Neutral simulation studies of common practice are typical here (papers 1 and 2 below); the genomics setting is the stretch. |
+| Constructive method with theory, simulation, comparison, and application | possible | New data-analysis methods for health research are in scope if "well tested" [4], but genomics is far from the journal's clinical core, and the home page's line against "scientific methods or techniques" [2] calls for a research-methodology framing. |
 | Short methods note | possible | No length limit is stated for research articles [4], but there is no short methods format. |
 | Theory paper | poor | The aims stress applied methodology for healthcare research, and research articles describing technical advances must be "well tested" [4]. |
 | Applied analysis | poor | The journal does not publish substantive applied studies; descriptive single-institution results are restricted [4]. |
@@ -107,6 +108,7 @@ scope_5_words: statistical methodology for healthcare research
 audience: methodologists
 fit_critique: possible
 fit_sim_diagnostic: possible
+fit_constructive: possible
 fit_short_note: possible
 fit_theory: poor
 fit_applied: poor
