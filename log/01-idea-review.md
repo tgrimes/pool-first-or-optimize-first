@@ -431,3 +431,9 @@ Stage 1 total agent time: 31 minutes to stop 1 (18:22 to 18:53), about 40 minute
 Process feedback, added: 27. **Step 9.4 and 9.5.** The stage file treats record faults as something the user fixes before the proposal is final; the user chose to defer them, which the manuscript stage's `build-bib.py` supports. The file could say that faults are reported here and may be deferred, and that only missing items and missing abstracts for abstract-only citations block the final. 28. **Step 9.6, "rebuild the proposal's citations from the checklist keys".** The proposal is markdown with author-date prose, so the rebuild meant aligning years to the records and adding the keys to section 10; the file could say exactly that. 29. **Stop 2 at most twice.** One round sufficed; the grouping by what the user must do worked.
 
 Still open at the end of stage 1: the author line for `tools/init.R` (not run); copying the abstract rule into the `research-workflow` template.
+
+## End of stage 1 (2026-10-28, 22:53)
+
+- D36. The user declared the proposal final and asked that stage 2 not start in this session; it starts in a new session with the same words. STATUS left at `1, proposal final` with the note.
+- Left for the next session: `tools/init.R` (package `micutoff`, author line not given); the `idea.md` edit the user made before stage 1 is still uncommitted (not committed here because this session was told to commit only files it changed); the abstract rule is not yet in the `research-workflow` template; record faults deferred to the manuscript stage (step 9 above); the Kim and Pollard PDF has no text layer.
+- Hand-over note for the session family: `stage1-handover.md` in the shared notes folder.
