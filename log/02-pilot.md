@@ -145,4 +145,29 @@ The run (`pilot-b/results/run_info.rds`) finished in 9.1 minutes against a proje
 
 | Step | Started | Ended | Agent time | Notes |
 |---|---|---|---|---|
-| 0. Decision recorded; proposal section 13 | 01:22 | 01:26 | 4 min | |
+| 0. Decision recorded; proposal section 13 | 01:22 | 01:24 | 2 min | |
+| 1. The spec, section 3 and small changes to 2 and 4 | 01:24 | 01:25 | 1 min | revision round committed, d4d4b95 |
+| 2. Pre-registration, commit | 01:24 | 01:25 | 1 min | 93f61eb at 01:25:29 |
+| 3. Code, known answers, timing | 01:26 | 01:29 | 3 min | all seven known-answer checks passed first time; timing on seven workers, 01:28 to 01:29: 2,000 replicates projected at 88 minutes, so 1,300 (decisions D2); per-replicate time about 2.5 times the single-core time with seven workers busy |
+| 3b. Tests and check | 01:28 | 01:38 | 10 min | unit tests by a Sonnet subagent during the timing run (one R process, within the eight cores the user allowed; 820 expectations); full suite 2,597 expectations, 0 failures; check 0/0/0 at 01:38 |
+| 4. Run | 01:38 | 02:41 | 62.3 min of compute | seven PSOCK workers, blocks of 100 replicates; the report's static sections written before the run |
+| 5. Verdict | 02:41 | 02:42 | 1 min | `piloted-close-call` |
+| 6. Decisions log, spec section 3 | 02:42 | 02:44 | 2 min | |
+| 7. Report: fill, render, check, look, revise | 02:44 | 02:48 | 4 min | three renders, checker clean each time |
+| 8. STATUS, log, commit | 02:48 | 02:50 | 2 min | |
+| Total, pilot-c | 01:22 | 02:50 | about 1 h 28 min | of which 62 min the run |
+
+The run (`pilot-c/results/run_info.rds`) took 62.3 minutes against a projection of 57. Under full load a block of 100 replicates took up to about 600 seconds, against about 410 in the timing run, which had five tasks for seven workers; the later blocks ran faster as the load fell. The run was not stopped: the pre-registration sets the replicate count before the run and says nothing of stopping one, and the overrun was small. `uptime` during the run showed a load of about 13, of which seven processes were the workers; nothing else used real CPU.
+
+The verdict: questions 1 and 2 pass; question 3 passes clause (a) and the comparison-based sets for both constructions, and fails each construction's band coverage in the base cell, within three MCSE of 0.93, so the status is a close call (`pilot-c/decisions.md`, D1). The 60% predictive-mean-matching cell's optimism differs from the re-pilot's by about three combined MCSE (D5).
+
+### Revision pass (pilot-c report)
+
+- Finding 6 printed "1.000 to 1.000" for a constant; now "every replicate of every cell", computed. Its "often" was a justify-or-replace word; replaced by what was observed.
+- Finding 8 claimed the two constructions' coverage differs by less than its MCSE in every cell, which the 60% predictive-mean-matching cell contradicts; now the computed largest difference and where it is.
+- Finding 9 asserted why Rubin's rules undercover with predictive mean matching; the pilot cannot separate too little between-imputation spread from bias, and the finding now says so.
+- No section changed by more than three sentences after the first pass, so no second pass.
+29. **The core cap and a timing projection on mixed cores.** With seven workers busy, a replicate took about 2.5 times its single-core time; the machine's eight cores are probably not all alike (the system reports eight, with other work on it). The one-hour box then lowered pilot-c's replicates from 2,000 to 1,300 by the pre-registered rule. The stage file could say to time with as many workers as the run will use, which was done here, and that the single-core time is not a guide.
+30. **Cells fewer than workers.** Pilot-c has five cells and seven workers, so cells were split into seeded blocks of 100 replicates (seed $20261030 + 1000k + b$); the per-cell seed of the earlier pilots would have left two workers idle. The stage file's "each cell its own seed" could allow seeded blocks within a cell.
+31. **A timing run with fewer tasks than workers.** Pilot-c's timing ran one task per cell, five tasks on seven workers, so it measured the per-replicate time under less load than the run had; the run took 62 minutes against 57 projected. The timing run should load every worker, for example by timing blocks.
+32. **Time.** Pilot-c took about 1 h 28 min from the user's answer to the commit, 62 minutes of it the run; the stage, three pilots, about 3 h 45 min of wall time.

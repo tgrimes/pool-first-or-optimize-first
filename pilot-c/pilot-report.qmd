@@ -1,0 +1,547 @@
+---
+title: "Pilot-c report: a narrower near-optimal set, a matched correction, and the band's calibration"
+subtitle: "A review document: the third pilot of the re-scoped proposal, its results, the draft spec, and the decisions log"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    theme: cosmo
+    fig-cap-location: bottom
+    code-fold: true
+    embed-resources: true
+    include-in-header:
+      - text: |
+          <style>
+            .tc { background: #fff3cd; border-left: 4px solid #e0a800; padding: 0 0.35em; }
+            .caption-small { font-size: 0.9em; color: #555; }
+          </style>
+execute:
+  echo: false
+  warning: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+source("../templates/pilot-report/report-helpers.R")
+
+# Every number below is computed from these files: pilot-c's, written by
+# pilot.R and verdict.R in pilot-c/, the re-pilot's cell summaries, and the
+# first pilot's NHANES description, read-only from ../pilot-b/results/ and
+# ../pilot/results/.
+s <- readRDS("results/cell_summaries.rds")
+v <- readRDS("results/verdict.rds")
+known <- readRDS("results/known_answers.rds")
+ri <- readRDS("results/run_info.rds")
+tm <- readRDS("results/timing.rds")
+pts <- readRDS("results/base_cell_points.rds")
+nh <- readRDS("../pilot/results/nhanes_summary.rds")
+prev <- readRDS("../pilot-b/results/cell_summaries.rds")
+
+Cell <- function(miss = 0.4, engine = "pmm") {
+  r <- s[s$miss_rate == miss & s$engine == engine, ]
+  stopifnot(nrow(r) == 1)
+  r
+}
+base <- Cell()
+twin <- Cell(engine = "norm")
+sixty <- Cell(miss = 0.6)
+sixty_n <- Cell(miss = 0.6, engine = "norm")
+null_s <- Cell(miss = 0, engine = "none")
+prev_base <- prev[prev$shape == "sharp" & prev$miss_rate == 0.4 &
+                    prev$engine == "pmm", ]
+prev_twin <- prev[prev$shape == "sharp" & prev$miss_rate == 0.4 &
+                    prev$engine == "norm", ]
+crit <- v$criteria
+pm <- function(x, mcse, d = 4) paste0(fmt(x, d), " (MCSE ", fmt(mcse, d), ")")
+pct <- function(x, d = 1) paste0(fmt(100 * x, d), "%")
+all_nh <- nh$by_cycle[nh$by_cycle$cycle == "All three", ]
+s$label <- sprintf("%d%%, %s", round(100 * s$miss_rate),
+                   ifelse(s$engine == "none", "no imputation",
+                          ifelse(s$engine == "pmm", "PMM", "normal")))
+TrackCor <- function(k, col) {
+  p <- pts[pts$cell == k, ]
+  stats::cor(p$apparent - p$j_at_c_hat, p[[col]])
+}
+track_pmm <- TrackCor(2, "optimism_20")
+track_norm <- TrackCor(3, "optimism_20")
+below <- function(x, mcse) (0.93 - x) / mcse
+prev_sixty <- prev[prev$shape == "sharp" & prev$miss_rate == 0.6 &
+                     prev$engine == "pmm", ]
+imp <- s[s$miss_rate > 0, ]
+cap_scatter <- paste0("Base cell (40% missing, predictive mean matching, ",
+                      "left) and its normal twin (right), all ", ri$n_rep,
+                      " replicates each: the reported index's optimism ",
+                      "against the 20-imputation correction, identity line ",
+                      "dashed. From results/base_cell_points.rds.")
+```
+
+# Summary
+
+**Scope.** This document reports the third pilot[^pilot] of the re-scoped proposal (`proposal.md`, sections 12 and 13, "Pool first or optimize first? Cutoffs from multiply imputed biomarker data"), run after the re-pilot's close call to test five revisions: a near-optimal set built from comparisons between thresholds, an optimism correction whose resamples are imputed as often as the analysis, a better-calibrated band, a grid built from completed values, and a narrower design. It was built from `project-spec.md`, `decisions.md`, the pre-registration `preregistration.md`, and the saved results in `pilot-c/results/`; the re-pilot's cell summaries and the first pilot's NHANES description are read, read-only, from `pilot-b/results/` and `pilot/results/`. Every number in the text and figures is computed from those files when the document renders.
+
+**Status.** In `STATUS.md` pilot-c is marked `piloted-close-call`[^pf], by the pre-registered rule, for a spec that applies to the re-scoped proposal (a conditional draft[^cond]). The comparison-based set, the matched correction, and the grid did what they were meant to. The one failed criterion is the band's coverage in the base cell, `r pm(base$cover_boot, base$cover_boot_mcse, 3)` for the bootstrap construction and `r pm(base$cover_hybrid, base$cover_hybrid_mcse, 3)` for the hybrid one, `r fmt(below(base$cover_boot, base$cover_boot_mcse), 1)` and `r fmt(below(base$cover_hybrid, base$cover_hybrid_mcse), 1)` MCSE below the 0.93 limit. The reading that passes: the band covers inside the limits without imputation and with the normal engine. The reading that fails: the band is slightly liberal in every cell, more so with predictive mean matching, and the cause lies in the covariance, which more resamples did not fix (decisions log, D1).
+
+| Pilot question | Answer | Key evidence |
+|---------|-------------|---------------------------------------------|
+| 1. Does the problem exist? | yes | optimism of the reported index `r pm(base$optimism, base$optimism_mcse)`; pointwise intervals cover the whole curve in `r fmt(base$cover_pointwise, 3)` of replicates |
+| 2. Large enough at realistic n? | yes | optimism `r fmt(base$optimism, 4)` at 40% and `r fmt(sixty$optimism, 4)` at 60% missing, against 0.01 |
+| 3. Obvious fix? | nearly; a close call | corrected bias `r pm(base$corrected_bias_20, base$corrected_bias_20_mcse)`; comparison-based set holds the best threshold in `r fmt(base$compset_boot, 3)` at `r fmt(base$length_ratio_boot, 2)` of the band-based length; band coverage `r fmt(base$cover_boot, 3)` (bootstrap) and `r fmt(base$cover_hybrid, 3)` (hybrid) against 0.93 to 0.97 |
+
+**What needs your decision** (details in [Action items and limitations](#action-items-and-limitations)): the close call, read both ways in the decisions log (D1); whether the band's slight liberality is a design question for the protocol or a reason for another pilot; the pilot-c pass rule, pre-registered without a separate stop; the two yellow `[TO CONFIRM]` items in the spec; and the citations not in the Zotero library.
+
+# The idea
+
+## In plain language
+
+A clinic that picks a cutoff for a blood test from its own data reports how well the cutoff works, as sensitivity plus specificity minus one (the Youden index[^youden]). That number is optimistic, because the cutoff was chosen where the data happened to favour it, and the study reports no margin of error, because no method gives one when missing test values were filled in by multiple imputation[^mi]. The earlier pilots showed both problems at 250 patients per group and tested three repairs: a margin of error for the whole accuracy curve (a simultaneous band), the range of cutoffs that cannot be told apart from the best one (a near-optimal set), and a corrected index from a bootstrap[^boot].
+
+Two of the repairs fell short for reasons of construction. The range of cutoffs was so wide, about two-thirds of the thresholds considered, that it said little: it was built by asking whether a cutoff's best case reaches the best cutoff's worst case, which counts the uncertainty twice. This pilot builds it the other way, by asking for each pair of cutoffs whether one is clearly better than the other, for example "1.06 is better than 0.2, but not clearly better than 0.8". The corrected index was too large where many values were missing, plausibly because each bootstrap copy was filled in twice while the analysis fills in twenty times; this pilot fills each copy in twenty times.
+
+## Potential impact
+
+No published method gives a band for the accuracy curve, a set of near-optimal thresholds, or an optimism-corrected index when the marker has been multiply imputed. Complete-data methods exist for intervals of the index and the cutoff (Bantis, Nakas, and Reiser 2019) and for the joint uncertainty of sensitivity and specificity at an estimated cutoff (Bantis, Nakas, and Reiser 2014). For imputed data, Long, Zhang, and Hsu (2011) pooled the curves and reported a threshold with no uncertainty, and the general results on combining the bootstrap with imputation (Bartlett and Hughes 2020; von Hippel and Bartlett 2021) have not been applied to a curve or its maximum. The cutoff itself is a cube-root estimator for which the standard bootstrap is inconsistent (Cattaneo, Jansson, and Nagasawa 2020).
+
+The problem is a reporting gap. Studies that impute a missing marker and publish an optimal cutoff report an index that overstates the cutoff's accuracy and no measure of how well the cutoff is determined, and many authors do not report the precision of their cutpoints even with complete data (Thiele and Hirschfeld 2023).
+
+If the repairs work, an analyst reports the pooled curve with a calibrated band, a range of cutoffs as good as the best that is narrow enough to act on, and an index that estimates the accuracy the chosen cutoff will deliver, in place of one number. That changes how diagnostic-accuracy and prediction studies with imputed markers present a cutoff, in laboratory medicine and epidemiology in particular, where the cotinine application below sits. This pilot shows how far the repairs have come: the reported index overstates the chosen cutoff's accuracy by `r fmt(base$optimism, 3)` in the base cell and the 20-imputation correction leaves `r fmt(base$corrected_bias_20, 3)` of it (@fig-optimism); the near-optimal set is `r pct(1 - base$length_ratio_boot, 0)` shorter than the earlier construction without losing coverage (@fig-sets); and the band is within a point or two of its nominal coverage (@fig-coverage).
+
+## Application: the study behind the data
+
+### The study
+
+The National Health and Nutrition Examination Survey[^nhanes] (NHANES) samples the noninstitutionalized United States population in two-year cycles, interviews each participant, and examines a subsample in a mobile examination center, where blood is drawn. Serum cotinine[^cotinine], the main metabolite of nicotine, was measured in examined participants aged 3 and over in the cycles 2013-2014, 2015-2016, and 2017-2018, with the same laboratory method (isotope-dilution liquid chromatography with tandem mass spectrometry) and the same lower limit of detection, 0.015 ng/mL; values below it are set to the limit divided by the square root of two (documentation files `COT_H`, `COT_I`, and `COT_J`, read 2026-10-28). Adults answer a smoking questionnaire (`SMQ`). The files are public at wwwn.cdc.gov/Nchs/Data/Nhanes/Public/, with no login.
+
+Two studies used these survey data to choose a cotinine cutoff for current smoking. Benowitz, Bernert, Caraballo, Holiday, and Wang (2009), *American Journal of Epidemiology* 169(2):236-48 (doi:10.1093/aje/kwn301), used the cycles 1999 to 2004 and found that optimal cutoffs differed by race/ethnicity, 5.92 ng/mL for non-Hispanic Black, 4.85 for non-Hispanic White, and 0.84 for Mexican American adults. Tompkins, Beltran, and Bedno (2019), *Biomarkers in Medicine* 13(12):1025-1033 (doi:10.2217/bmm-2019-0027), used the cycles 2009 to 2014 and found an adult cutoff of 3.63 ng/mL that differed by sex and race/ethnicity. In the three cycles used here, `r format(all_nh$adults, big.mark = ",")` adults answered the smoking question, `r format(all_nh$smokers, big.mark = ",")` of them current smokers[^smoker], and cotinine is missing for `r pct(all_nh$missing_share)` of them (@tbl-cohort).
+
+```{r}
+#| label: tbl-cohort
+#| tbl-cap: "Adults aged 18 and over with an answer to the smoking question, by NHANES cycle: current smokers, nonsmokers, participants not examined, participants with serum cotinine missing (of whom some were examined), values below the limit of detection, and the share missing. Computed from the downloaded NHANES files by pilot/nhanes.R (../pilot/results/nhanes_summary.rds, read-only)."
+
+tab <- nh$by_cycle
+tab$missing_share <- pct(tab$missing_share)
+knitr::kable(tab, col.names = c("Cycle", "Adults", "Smokers", "Nonsmokers",
+                                "Not examined", "Cotinine missing",
+                                "Missing, examined", "Below detection",
+                                "Share missing"),
+             format.args = list(big.mark = ","), align = "lrrrrrrrr")
+```
+
+### Why the Youden index
+
+A cotinine cutoff classifies a participant as a smoker when the measured value exceeds it, and the Youden index of a cutoff, sensitivity plus specificity minus one, is the share of smokers called smokers minus the share of nonsmokers called smokers. Both cotinine studies chose the cutoff that maximizes it. The estimand is the maximizer of the population Youden curve and the curve's maximum; the question here is how to estimate both, with their uncertainty, when some cotinine values are missing and imputed. The proposed analysis imposes missingness at random on the adults with observed cotinine, so that the full-data cutoff is the benchmark, imputes, and compares the two pooling orders, overall and by race/ethnicity.
+
+### Did the original study compute it?
+
+Partly. Both studies estimated the optimal cutoff from receiver operating characteristic curves on participants with observed cotinine, and Benowitz et al. estimated it within race/ethnicity groups. Neither study imputed the missing cotinine values, and neither reported the uncertainty of its cutoff in the passages read for this project. The question here is new: how the cutoff, its index, and their uncertainty should be pooled once missing values are imputed, and whether the stratum-specific cutoff or the cutoff that is optimal for the population as a whole is the target within each race/ethnicity group.
+
+## In symbols
+
+Each group's marker distribution ($F_0$, $F_1$), the Youden curve ($J(c)$), its maximizer and maximum ($c^*$, $J^*$), the pooled curve of $L$ completed datasets ($\bar J$) on a grid of thresholds ($c_1, \dots, c_K$), its covariance ($\Sigma$), the chosen cutoff ($\hat c$), the reported index ($A$), a band with limits $\ell$ and $u$, the band-based set ($S_B$), and the comparison-based set ($S_C$) are related by
+
+$$
+\begin{aligned}
+J(c) &= F_0(c) - F_1(c), \qquad \hat c = \arg\max_c \bar J(c), \qquad A = \max_c \bar J(c) \\
+\text{optimism} &= A - J(\hat c) \\
+\text{band} &: \ \bar J(c_k) \pm q\,\sqrt{\Sigma_{kk}} \\
+S_B &= \{c_k : u(c_k) \ge \max_j \ell(c_j)\} \\
+S_C &= \{c_k : \bar J(c_j) - \bar J(c_k) \le q_D\,\mathrm{SE}_{jk} \ \text{for every } j \ne k\}, \qquad \mathrm{SE}_{jk}^2 = \Sigma_{jj} + \Sigma_{kk} - 2\Sigma_{jk}.
+\end{aligned}
+$$
+
+| Symbol | Meaning |
+|----|----------------------------------------------|
+| $X$, $D$, $Z$ | the marker, the disease status (0 or 1), the auxiliary variable that predicts the marker |
+| $J(c)$, $c^*$, $J^*$ | the Youden curve, its maximizer, its maximum |
+| $\bar J$, $\hat c$, $A$ | the pooled curve of $L = 20$ completed datasets, its maximizer, its maximum |
+| $c_1, \dots, c_K$ | 41 thresholds between the 10% and 90% quantiles of the completed values |
+| $\Sigma$ | covariance of $\bar J$ on the grid, from bootstrap-then-impute with the imputation part rescaled to $L$ |
+| $q$, $q_D$ | critical values of the band and of the comparisons |
+| $S_B$, $S_C$ | the band-based and the comparison-based near-optimal sets |
+
+The target of a set is the grid threshold with the largest true $J$. Both sets contain it when their critical values hold. For $S_C$: if every comparison of the best threshold $c_{k^*}$ with another is within its bound, then $\bar J(c_j) - \bar J(c_{k^*}) \le J(c_j) - J(c_{k^*}) + q_D\,\mathrm{SE}_{jk^*} \le q_D\,\mathrm{SE}_{jk^*}$. The difference between nearby thresholds varies much less than the curve, because their errors move together, so $\mathrm{SE}_{jk}$ is small where $c_j$ is near $c_k$ and $S_C$ is narrower than $S_B$. The two constructions compared differ only in their critical values: the bootstrap construction reads them from the resamples, the hybrid construction from the normal law with covariance $\Sigma$.
+
+```{r}
+#| label: fig-idea
+#| fig-cap: "The idea, on made-up numbers (an illustration, not pilot output). A true Youden curve (grey), an estimated curve (black), and a band (shaded). The band-based set (upper bar) keeps every threshold whose upper limit reaches the band's highest lower limit; the comparison-based set (lower bar) keeps every threshold that no other threshold beats by more than the uncertainty of their difference, which is small for nearby thresholds."
+#| fig-width: 8
+#| fig-height: 4
+
+op <- par(mar = c(4.2, 4.2, 1, 1))
+g <- seq(-0.5, 2.5, length.out = 121)
+truth_toy <- pnorm(g) - pnorm(g - 2)
+est_toy <- truth_toy + 0.02 * sin(4 * g) + 0.015
+half <- 0.05
+plot(g, truth_toy, type = "n", ylim = c(0.15, 0.8), xlab = "Threshold c",
+     ylab = "Youden index J(c)")
+polygon(c(g, rev(g)), c(est_toy - half, rev(est_toy + half)),
+        col = "grey88", border = NA)
+lines(g, truth_toy, col = "grey55", lwd = 2)
+lines(g, est_toy, lwd = 2)
+k_max <- which.max(est_toy)
+points(g[k_max], est_toy[k_max], pch = 19)
+in_band <- g[est_toy + half >= max(est_toy - half)]
+segments(min(in_band), 0.24, max(in_band), 0.24, lwd = 6, col = "grey50")
+# Toy comparison set: the difference to the best has a standard error that
+# grows with the distance between thresholds.
+se_diff <- 0.06 * sqrt(abs(g - g[k_max]))
+in_comp <- g[est_toy[k_max] - est_toy <= 2 * se_diff]
+segments(min(in_comp), 0.18, max(in_comp), 0.18, lwd = 6)
+par(op)
+```
+
+```{r}
+#| label: fig-data
+#| fig-cap: "The real data: the full-data Youden curve of log serum cotinine among NHANES adults (2013 to 2018, participants with cotinine observed), current smokers against everyone else, on the scale used in the simulation (log cotinine standardized by the nonsmokers' mean and standard deviation). Black: the empirical curve; blue: the Gaussian-kernel curve. The solid vertical line is the maximizer of the kernel curve; the dashed line is the adult cutoff of 3.63 ng/mL of Tompkins, Beltran, and Bedno (2019). From ../pilot/results/nhanes_summary.rds, read-only."
+#| fig-width: 8
+#| fig-height: 4
+
+cv <- nh$curve
+op <- par(mar = c(4.2, 4.2, 1, 1))
+plot(cv$grid, cv$empirical, type = "s", ylim = c(0, 0.9),
+     xlab = "log10 cotinine, standardized by the nonsmokers",
+     ylab = "Youden index J(c)")
+lines(cv$grid, cv$kernel, col = "#2c7fb8", lwd = 2)
+abline(v = cv$c_star, lty = 1, col = "grey30")
+abline(v = (log10(cv$reference_cutoff_ng_ml) - cv$center) / cv$scale,
+       lty = 2, col = "grey30")
+par(op)
+```
+
+The full-data curve peaks at `r fmt(cv$cutoff_ng_ml, 2)` ng/mL with an index of `r fmt(cv$j_star_empirical, 3)` (empirical curve); at the published adult cutoff of 3.63 ng/mL the empirical index is `r fmt(cv$j_at_reference, 3)`, lower by `r fmt(cv$j_star_empirical - cv$j_at_reference, 3)` for a cutoff half as large. The curve is flat over that range, which is the situation in which a near-optimal set is wide and a single cutoff says little. On the standardized scale its curvature at the peak is `r fmt(cv$kappa, 3)`, between the flat (`r fmt(prev$kappa[prev$shape == "flat"][1], 3)`) and the sharp (`r fmt(prev$kappa[prev$shape == "sharp"][1], 3)`) shapes of the earlier pilots of the simulation, and its maximum, `r fmt(cv$j_star, 3)`, is above both. The cutoff here is higher than the published ones; the definitions differ, since everyone who is not a current cigarette smoker, including users of other tobacco products, counts as a nonsmoker here.
+
+## Critiquing the model
+
+{{< include ../templates/pilot-report/parts/critique-intro.md >}}
+
+| Feature of the model | Why it may not be realistic | What should be done to check it |
+|-----------|----------------------------------------------|---------------------------------|
+| Binormal marker with a sharp symmetric peak | Real markers are skewed or have a point mass (cotinine below the limit of detection), and a flat peak, as in the cotinine data, widens every near-optimal set | Simulate from the real cotinine distribution; restore the flat shape in the full design |
+| The unknown parameters: $\delta$, $\sigma_1$, the auxiliary strength, the missingness coefficients | One shape and one auxiliary strength were chosen; the band's width, the sets' length, and the optimism depend on all of them | Estimate them from the NHANES cohort and place the real data on each gradient |
+| One auxiliary and a correctly specified normal imputation model | Real imputation models carry several covariates and are misspecified; the normal engine is correct here only because $X$ and $Z$ are jointly normal within groups | Add an arm with several auxiliaries and one omitted from the imputation model |
+| Missing at random, concentrated at high $Z$ | Missingness tied to the marker's own value is not corrected by either engine | State the assumption; compare participants with and without cotinine on observed covariates |
+| The covariance $\Sigma$ from bootstrap-then-impute, rescaled from 2 to 20 imputations | The rescaling assumes the imputation part of the variance falls as $1/L$; with few resamples the estimated $\Sigma$ is noisy, and its eigenvalues were clipped at zero | Vary the resamples and the imputations per resample; compare $\Sigma$ with the Monte Carlo covariance of $\bar J$ |
+| The normal law of the hybrid construction | The sup-t and comparison critical values assume $\bar J$ is jointly normal on the grid; the empirical curve is a step function and its differences between nearby thresholds are counts of few subjects | Compare the hybrid and bootstrap constructions across sizes, down to 100 per group |
+| The comparison-based set's guarantee at the grid's best threshold | The guarantee is for the best grid point, not for $c^*$; a coarse grid or a flat peak makes the two differ | Report the set's coverage of $c^*$ by interpolation as well; vary the grid |
+| The bootstrap optimism correction for a cube-root estimator | The standard bootstrap does not reproduce a cube-root estimator's distribution (Cattaneo, Jansson, and Nagasawa 2020), so the resamples' optimism need not match the original's | Compare the correction across sizes; try a subsampling version |
+
+# Methods
+
+## Design
+
+The pilot simulates the earlier pilots' binormal marker with the sharp peak, missing at random through one auxiliary, at 250 per group, and applies the empirical estimator to 20 completed datasets. Every replicate builds the pointwise, Rubin's-rules, bootstrap, and hybrid bands on a 41-point grid from the completed values; the band-based and comparison-based sets of the bootstrap and hybrid constructions; and the optimism correction with 20 and with 2 imputations per resample. The `r ri$n_cells` cells are no missing values, and 40% and 60% missing imputed by predictive mean matching[^pmm] or by Bayesian normal linear regression[^norm], for `r format(ri$n_rep, big.mark = ",")` replicates per cell, run in seeded blocks of 100 on `r ri$n_workers` workers. The known-answer checks run the same code on cases with known answers.
+
+```{r}
+#| label: fig-design
+#| fig-cap: "The design at a glance. Each row is one part of the pilot, read from left to right; all parts use the same simulated datasets. The bands' coverage is in @fig-coverage, the sets' coverage and length in @fig-sets, the optimism and its corrections in @fig-optimism and @fig-scatter, every cell in @tbl-cells, and the verdict in @tbl-verdict; the checks are in @tbl-known-answer."
+#| fig-width: 11
+#| fig-height: 5.4
+
+design_diagram(
+  input = "Binormal marker X by group D, sharp peak\n\nAuxiliary Z = X + e\n\nX missing at random through Z and D\n\n250 per group",
+  lanes = list(
+    list(label = "Part A: the curve", fill = "#e8f0fa",
+         sim = "No imputation, or 40% and 60% missing x 2 engines",
+         vary = "0, 40, 60% missing; PMM or normal imputation",
+         est = "Pooled curve on 41 thresholds; bootstrap and hybrid bands from 1,000 resamples",
+         meas = "Simultaneous coverage and half-width",
+         out = "Coverage figure, cell table, verdict"),
+    list(label = "Part B: the cutoff", fill = "#eaf5ea",
+         sim = "The same datasets",
+         vary = "As in part A",
+         est = "Band-based and comparison-based sets of each construction",
+         meas = "Set holds the best threshold; set length",
+         out = "Set figure, cell table, verdict"),
+    list(label = "Part C: the index", fill = "#fdeceb",
+         sim = "The same datasets",
+         vary = "As in part A",
+         est = "Optimism correction, 100 resamples x 20 imputations, and 200 x 2",
+         meas = "Optimism; corrected bias against the chosen cutoff's true accuracy",
+         out = "Optimism figures, cell table, verdict")),
+  harness = list(text = "Known-answer checks: comparison critical value for two independent points; hybrid critical value for 41; the covariance split; a set built on the true curve; zero optimism for a reproducing bootstrap; the true near-optimal region; gap exactly 0 with nothing missing",
+                 out = "Known-answer table"))
+```
+
+Each figure and table in the Results traces back to one row of this diagram, and the row says what its points or entries represent.
+
+| Part | What is simulated | Main factors | Replicates |
+|----|--------------------------|--------------------------------|-------------|
+| A | $X \mid D{=}0 \sim N(0,1)$, $X \mid D{=}1 \sim N(2, 1)$; $Z = X + e$; $X$ missing with probability $\mathrm{expit}(\alpha_0 + Z + 0.5D)$; 20 imputations; 1,000 resamples within groups, each imputed twice | missing fraction, engine | `r format(ri$n_rep, big.mark = ",")` per cell, 5 cells |
+| B | the same resamples | as part A | the same |
+| C | 100 further resamples, each imputed 20 times; the first 200 of part A's resamples | as part A | the same |
+
+The base cell has 40% missing imputed by predictive mean matching; its normal twin uses normal imputation; the null cell has nothing missing. The covariance of the pooled curve comes from part A's resamples, with the imputation part estimated from the two imputations of each resample and rescaled to 20. The bootstrap construction reads its critical values from the resamples; the hybrid construction from 5,000 draws of the normal law with that covariance. The true optimal cutoff is $c^* = `r fmt(base$c_star, 3)`$ and $J^* = `r fmt(base$j_star, 4)`$; the true thresholds within 0.01 of $J^*$ span `r fmt(base$true_region_length, 2)` units.
+
+## Known-answer checks
+
+{{< include ../templates/pilot-report/parts/known-answer-intro.md >}}
+
+```{r}
+#| label: tbl-known-answer
+#| tbl-cap: "Known-answer checks, from results/known_answers.rds (written by pilot.R before the run, the same checks the test suite asserts) and, for the last row, from results/cell_summaries.rds (the null cell, where nothing is imputed)."
+
+rows <- lapply(seq_len(nrow(known)), function(i) {
+  k <- known[i, ]
+  harness_row(k$check, k$setting, k$known, formatC(k$computed, digits = 6, format = "g"),
+              harness_reading_tol(k$computed, k$truth, k$tolerance))
+})
+rows <- c(rows, list(
+  harness_row("Pooling-order gap with nothing missing", "the null cell",
+              "exactly 0 in every replicate",
+              sprintf("%d nonzero of %s", null_s$gap_n_nonzero,
+                      format(null_s$n_rep, big.mark = ",")),
+              ifelse(null_s$gap_n_nonzero == 0,
+                     "No replicate has a nonzero gap, so the check passes.",
+                     "Nonzero gaps: look for a bug."))))
+harness_table(rows)
+```
+
+Every row is an exact identity or an approximation judged against a tolerance. The bands' coverage in the null cell is not a known-answer check, because the 95% level holds only approximately at 250 per group; it is part of the pass rule and reported with the results.
+
+# Results
+
+## How to read the outputs
+
+{{< include ../templates/pilot-report/parts/how-to-read-outputs.md >}}
+
+This pilot has no test, so level and power do not arise; it reports four further quantities. A band's simultaneous coverage is the share of replicates in which it contains the true curve at all 41 thresholds at once, 95% for a correct band; the pointwise intervals read as a band cover less often, because each of 41 intervals has its own 5% chance to miss. A set's coverage is the share of replicates in which it contains the grid threshold with the largest true $J$, and its length is the range of thresholds it spans. The optimism is the reported index minus the true accuracy of the cutoff it picked, averaged over replicates; a corrected index's bias is the same difference after the correction.
+
+## The bands
+
+**Figure guide (part A, every cell).** A correct band covers the true curve in 95% of replicates, the solid line; the dashed lines are the pre-registered limits 0.93 and 0.97. One point is one cell's coverage over `r format(ri$n_rep, big.mark = ",")` replicates, with plus and minus two MCSE for the two candidate bands: bootstrap (black circles), hybrid (blue triangles), Rubin's rules (open squares), and the pointwise intervals (orange crosses). Look for: whether either candidate sits inside the limits in the null cell, the base cell, and the normal twin; how far the Rubin's-rules band moves with predictive mean matching.
+
+```{r}
+#| label: fig-coverage
+#| fig-cap: "Part A: simultaneous coverage over the 41-threshold grid in every cell: bootstrap band (black, plus and minus two MCSE), hybrid band (blue, plus and minus two MCSE), Rubin's-rules band (open squares), pointwise intervals read as a band (orange). Solid line 0.95; dashed lines 0.93 and 0.97. From results/cell_summaries.rds."
+#| fig-width: 9
+#| fig-height: 4.2
+
+op <- par(mar = c(4.2, 9, 1, 1))
+y <- seq_len(nrow(s))
+plot(s$cover_boot, y - 0.12, xlim = c(min(0.3, s$cover_pointwise), 1),
+     ylim = c(0.5, nrow(s) + 0.5), yaxt = "n", ylab = "",
+     xlab = "Simultaneous coverage over the grid", pch = 19)
+segments(s$cover_boot - 2 * s$cover_boot_mcse, y - 0.12,
+         s$cover_boot + 2 * s$cover_boot_mcse, y - 0.12)
+points(s$cover_hybrid, y + 0.12, pch = 17, col = "#2c7fb8")
+segments(s$cover_hybrid - 2 * s$cover_hybrid_mcse, y + 0.12,
+         s$cover_hybrid + 2 * s$cover_hybrid_mcse, y + 0.12, col = "#2c7fb8")
+points(s$cover_rubin, y, pch = 0)
+points(s$cover_pointwise, y, pch = 4, col = "#d95f02")
+abline(v = 0.95, col = "grey40")
+abline(v = c(0.93, 0.97), lty = 2, col = "grey40")
+axis(2, at = y, labels = s$label, las = 1, cex.axis = 0.8)
+par(op)
+```
+
+## The near-optimal sets
+
+**Figure guide (part B, every cell).** Left: the share of replicates in which a set contains the best grid threshold, with the 0.93 threshold dashed; right: the sets' mean length, with the true range of thresholds within 0.01 of $J^*$ dotted. One point is one cell: comparison-based sets (filled) and band-based sets (open), bootstrap (black) and hybrid (blue). Look for: whether the comparison-based sets keep their coverage while their length falls; how far both sets stay from the true range.
+
+```{r}
+#| label: fig-sets
+#| fig-cap: "Part B: the near-optimal sets in every cell. Left: share of replicates in which the set contains the best grid threshold (comparison-based filled, band-based open; bootstrap black, hybrid blue), 0.93 dashed. Right: mean length, with the length of the true range of thresholds within 0.01 of J* dotted. From results/cell_summaries.rds."
+#| fig-width: 10
+#| fig-height: 4.2
+
+op <- par(mfrow = c(1, 2), mar = c(4.2, 9, 1, 1))
+plot(s$compset_boot, y - 0.12, xlim = c(min(0.85, s$compset_boot, s$compset_hybrid), 1),
+     ylim = c(0.5, nrow(s) + 0.5), yaxt = "n", ylab = "",
+     xlab = "Set contains the best threshold", pch = 19)
+points(s$compset_hybrid, y + 0.12, pch = 17, col = "#2c7fb8")
+points(s$bandset_boot, y - 0.12, pch = 1)
+points(s$bandset_hybrid, y + 0.12, pch = 2, col = "#2c7fb8")
+abline(v = 0.93, lty = 2, col = "grey40")
+axis(2, at = y, labels = s$label, las = 1, cex.axis = 0.8)
+plot(s$compset_boot_length, y - 0.12,
+     xlim = c(0, max(s$bandset_boot_length, s$bandset_hybrid_length)),
+     ylim = c(0.5, nrow(s) + 0.5), yaxt = "n", ylab = "", xlab = "Mean length",
+     pch = 19)
+points(s$compset_hybrid_length, y + 0.12, pch = 17, col = "#2c7fb8")
+points(s$bandset_boot_length, y - 0.12, pch = 1)
+points(s$bandset_hybrid_length, y + 0.12, pch = 2, col = "#2c7fb8")
+abline(v = s$true_region_length[1], lty = 3)
+axis(2, at = y, labels = s$label, las = 1, cex.axis = 0.8)
+par(op)
+```
+
+## The optimism and its correction
+
+**Figure guide (part C, every cell).** An unbiased index sits on the zero line. One row is one cell: the mean optimism of the reported index (open circles), the bias of the 20-imputation corrected index (filled black), and of the 2-imputation one (grey triangles), all against the true accuracy of the chosen cutoff, with plus and minus two MCSE for the first two. Look for: whether the 20-imputation correction stays near zero as the missing fraction grows, where the 2-imputation one moves away.
+
+```{r}
+#| label: fig-optimism
+#| fig-cap: "Part C: mean optimism of the reported index (open), bias of the 20-imputation corrected index (filled, plus and minus two MCSE), and bias of the 2-imputation corrected index (grey triangles), all against the true accuracy of the chosen cutoff, in every cell. Solid line 0; dashed line 0.01. From results/cell_summaries.rds."
+#| fig-width: 9
+#| fig-height: 4.2
+
+op <- par(mar = c(4.2, 9, 1, 1))
+rng <- range(0, s$optimism + 2 * s$optimism_mcse, s$corrected_bias_2,
+             s$corrected_bias_20 - 2 * s$corrected_bias_20_mcse)
+plot(s$optimism, y, xlim = rng, ylim = c(0.5, nrow(s) + 0.5), yaxt = "n",
+     ylab = "", xlab = "Index minus the true accuracy of the chosen cutoff", pch = 1)
+segments(s$optimism - 2 * s$optimism_mcse, y, s$optimism + 2 * s$optimism_mcse, y)
+points(s$corrected_bias_20, y + 0.2, pch = 19)
+segments(s$corrected_bias_20 - 2 * s$corrected_bias_20_mcse, y + 0.2,
+         s$corrected_bias_20 + 2 * s$corrected_bias_20_mcse, y + 0.2)
+points(s$corrected_bias_2, y - 0.2, pch = 17, col = "grey50")
+abline(v = 0, col = "grey40")
+abline(v = 0.01, lty = 2, col = "grey40")
+axis(2, at = y, labels = s$label, las = 1, cex.axis = 0.8)
+par(op)
+```
+
+**Figure guide (base cell and its normal twin, replicate by replicate).** If the correction measured each study's own optimism, the points would rise along the dashed identity line. One point is one replicate: its optimism against the 20-imputation correction. Look for: whether the points rise with the optimism or form a flat band; where most of them sit.
+
+```{r}
+#| label: fig-scatter
+#| fig-cap: !expr cap_scatter
+#| fig-width: 10
+#| fig-height: 4.4
+
+op <- par(mfrow = c(1, 2), mar = c(4.2, 4.4, 2, 1))
+for (k in c(2, 3)) {
+  p <- pts[pts$cell == k, ]
+  plot(p$apparent - p$j_at_c_hat, p$optimism_20, pch = 19, cex = 0.4,
+       col = grDevices::adjustcolor("black", 0.35),
+       xlab = "Optimism of the reported index", ylab = "20-imputation correction",
+       main = ifelse(k == 2, "PMM", "normal"))
+  abline(0, 1, lty = 2, col = "#d95f02")
+}
+par(op)
+```
+
+## Numbered findings
+
+Each finding is a claim followed by the output behind it. Read the claim, open the output, and check that you can see the claim there before accepting it. A claim that cannot be seen in the output is a question to raise with the user.
+
+1. **The problem reproduces.** The optimism of the reported index is `r pm(base$optimism, base$optimism_mcse)` in the base cell, `r pm(null_s$optimism, null_s$optimism_mcse)` with nothing missing, and `r fmt(sixty$optimism, 4)` at 60% missing with predictive mean matching; the pointwise intervals cover the whole curve in `r fmt_range(s$cover_pointwise, 2)` of replicates across cells (@fig-optimism; @fig-coverage).
+2. **The comparison-based set keeps its coverage and is about half as long.** It contains the best grid threshold in `r fmt_range(c(s$compset_boot, s$compset_hybrid), 3)` of replicates in every cell, and its length is `r fmt_range(c(s$length_ratio_boot, s$length_ratio_hybrid), 2)` of the band-based set's (@fig-sets; @tbl-cells).
+3. **The set is still wider than the true range of good thresholds.** Its mean length runs from `r fmt_range(c(s$compset_boot_length, s$compset_hybrid_length), 2)`, against `r fmt(base$true_region_length, 2)` for the thresholds whose true index is within 0.01 of $J^*$; its coverage, above 0.99, says the critical value is conservative (@fig-sets).
+4. **The 20-imputation correction removes most of the optimism and no longer overshoots with normal imputation.** Its bias is `r pm(base$corrected_bias_20, base$corrected_bias_20_mcse)` in the base cell and `r pm(twin$corrected_bias_20, twin$corrected_bias_20_mcse)` in the normal twin. At 60% with normal imputation it is `r pm(sixty_n$corrected_bias_20, sixty_n$corrected_bias_20_mcse)`, where the 2-imputation correction overshoots to `r fmt(sixty_n$corrected_bias_2, 4)`; with predictive mean matching at 60% both corrections fall short, `r fmt(sixty$corrected_bias_20, 4)` and `r fmt(sixty$corrected_bias_2, 4)` (@fig-optimism; @tbl-cells).
+5. **The correction does not track a study's own optimism.** Across replicates the correlation between the optimism and the 20-imputation correction is `r fmt(track_pmm, 2)` in the base cell and `r fmt(track_norm, 2)` in the normal twin (@fig-scatter).
+6. **The grid from the completed values holds the optimal cutoff.** The grid contains $c^*$ in `r if (all(s$c_star_in_grid == 1)) "every replicate of every cell" else paste(fmt_range(s$c_star_in_grid, 3), "of replicates across cells")`, where the re-pilot's grid from observed values missed the flat shape's $c^*$ at both missing fractions (@tbl-cells; the re-pilot's report).
+7. **The bootstrap and hybrid bands cover slightly below 95% in every cell.** Their coverage runs from `r fmt_range(c(s$cover_boot, s$cover_hybrid), 3)`: inside the 0.93 to 0.97 limits without imputation and with normal imputation, just below at 40% with predictive mean matching, and `r fmt(sixty$cover_boot, 3)` and `r fmt(sixty$cover_hybrid, 3)` at 60% with it. The base cell's bootstrap coverage was `r fmt(prev_base$cover_boot, 3)` in the re-pilot with 200 resamples (@fig-coverage; @tbl-verdict).
+8. **The two constructions nearly agree, so the shortfall is mostly in the covariance they share.** Their mean critical values are `r fmt(base$q_boot, 2)` and `r fmt(base$q_hybrid, 2)` in the base cell and `r fmt_range(s$q_boot - s$q_hybrid, 2)` apart across cells. Their coverage differs by at most `r fmt(max(abs(s$cover_boot - s$cover_hybrid)), 3)`, the largest difference at 60% with predictive mean matching, where the hybrid band is the lower (@tbl-cells).
+9. **Rubin's rules undercover with predictive mean matching.** The Rubin's-rules band covers `r fmt_range(s$cover_rubin[s$engine == "norm"], 3)` with normal imputation and `r fmt_range(s$cover_rubin[s$engine == "pmm"], 3)` with predictive mean matching, against `r fmt(null_s$cover_rubin, 3)` without imputation. Rubin's rules take the between-imputation spread at face value, so this fits predictive mean matching's imputations varying less between datasets than the uncertainty they carry, or being biased where donors are sparse, as the first pilot's cutoffs were at 60% missing; the pilot does not separate the two (@fig-coverage).
+10. **One cell differs from the re-pilot.** The 60% predictive-mean-matching cell's optimism is `r pm(sixty$optimism, sixty$optimism_mcse)` here and was `r pm(prev_sixty$optimism, prev_sixty$optimism_mcse)` in the re-pilot, `r fmt(abs(sixty$optimism - prev_sixty$optimism) / sqrt(sixty$optimism_mcse^2 + prev_sixty$optimism_mcse^2), 1)` combined MCSE apart; the other cells agree (decisions log, D5).
+
+## Tables
+
+**Table guide (the verdict).** One row is one criterion of the pre-registered pass rule: the cell, the measure, its estimate with its MCSE, the threshold, whether it is met, and whether it lies within three MCSE of the threshold (near). Clause (b) has a block of rows for each construction; question 3 needs (a) and one whole block. Which construction, if either, meets every row of its block?
+
+```{r}
+#| label: tbl-verdict
+#| tbl-cap: "Pilot-c's pass rule applied (pilot-c/verdict.R, results/verdict.rds): every criterion of the pre-registration, its estimate and MCSE, its threshold, and whether it is met or near (within three MCSE of the threshold)."
+
+vt <- crit
+vt$estimate <- fmt(vt$estimate, 4)
+vt$mcse <- fmt(vt$mcse, 4)
+vt$met <- ifelse(vt$met, "yes", "no")
+vt$near <- ifelse(vt$near, "near", "")
+knitr::kable(vt, col.names = c("Question", "Clause", "Cell", "Measure", "Estimate",
+                               "MCSE", "Threshold", "Met", "Near"),
+             row.names = FALSE, align = "llllrrlll")
+```
+
+**Table guide (every cell).** One row is one cell. The first block is the index: the optimism and the two corrected indices' bias, all against the true accuracy of the chosen cutoff. The second is the curve: the coverage of the four bands. The third is the cutoff: the coverage and mean length of the comparison-based sets, and the ratio of their length to the band-based sets'. The last two columns are the pooling-order note. Where does the 2-imputation correction drift from the 20-imputation one, and where is the hybrid band wider or narrower than the bootstrap band?
+
+```{r}
+#| label: tbl-cells
+#| tbl-cap: "Every cell of pilot-c: optimism of the reported index and bias of the 20- and 2-imputation corrected indices (MCSE); simultaneous coverage (MCSE) of the pointwise, Rubin's-rules, bootstrap, and hybrid bands; coverage of the best threshold, mean length, and length ratio to the band-based set of the bootstrap and hybrid comparison-based sets; the pooling-order gap and the cutoff's RMSE ratio, optimize first over pool first. From results/cell_summaries.rds."
+
+knitr::kable(data.frame(
+  Cell = s$label,
+  Optimism = pm(s$optimism, s$optimism_mcse),
+  `Corrected, 20` = pm(s$corrected_bias_20, s$corrected_bias_20_mcse),
+  `Corrected, 2` = pm(s$corrected_bias_2, s$corrected_bias_2_mcse),
+  Pointwise = fmt(s$cover_pointwise, 3),
+  Rubin = pm(s$cover_rubin, s$cover_rubin_mcse, 3),
+  Bootstrap = pm(s$cover_boot, s$cover_boot_mcse, 3),
+  Hybrid = pm(s$cover_hybrid, s$cover_hybrid_mcse, 3),
+  `Set, bootstrap` = paste0(fmt(s$compset_boot, 3), "; ", fmt(s$compset_boot_length, 2),
+                            "; ", fmt(s$length_ratio_boot, 2)),
+  `Set, hybrid` = paste0(fmt(s$compset_hybrid, 3), "; ", fmt(s$compset_hybrid_length, 2),
+                         "; ", fmt(s$length_ratio_hybrid, 2)),
+  Gap = fmt(s$gap, 4), `RMSE ratio` = fmt(s$rmse_ratio, 2), check.names = FALSE),
+  row.names = FALSE)
+```
+
+**Table guide (the numbers in the spec).** One row is one number that section 3 of the spec quotes, recomputed here from the result files. Does every number in the spec match its row?
+
+```{r}
+#| label: tbl-spec-numbers
+#| tbl-cap: "Every number quoted in section 3 of project-spec.md, recomputed from results/verdict.rds."
+
+knitr::kable(data.frame(
+  Item = paste0(crit$question, crit$clause), Cell = crit$cell, Measure = crit$measure,
+  Value = fmt(crit$estimate, 4), MCSE = fmt(crit$mcse, 5)),
+  row.names = FALSE, align = "lllrr")
+```
+
+# The draft spec {#draft-spec}
+
+This is `project-spec.md`, read from the file when the document renders. It is the spec of the re-scoped proposal, a conditional draft[^cond]. Anything the agent[^agent] left for the user to decide is highlighted in yellow and starts with "To confirm".
+
+```{r}
+#| label: spec
+#| results: asis
+
+# The spec writes markers in the rules' form, [TO CONFIRM: ...]{.tc}; the
+# helper adds its own class, so the doubled one is removed.
+spec_md <- read_md_part("../project-spec.md", highlight_to_confirm = TRUE)
+cat(gsub("\\{\\.tc\\}\\{\\.tc\\}", "{.tc}", spec_md), "\n")
+```
+
+# Decisions log {#decisions-log}
+
+This is the agent's `decisions.md` for pilot-c, read from the file when the document renders.
+
+```{r}
+#| label: decisions
+#| results: asis
+
+cat(read_md_part("decisions.md"), "\n")
+```
+
+# Action items and limitations {#action-items-and-limitations}
+
+## Action items
+
+1. **Decide the status.** The rule gives `piloted-close-call`. Read as a pass, stage 3 starts, with the band's calibration under predictive mean matching as a design question for the protocol; read as a fail, another revision targets the covariance. Both readings are in the decisions log (D1).
+2. **Review the pilot-c pass rule** (`proposal.md`, section 13; `preregistration.md`, section 5), pre-registered without a separate stop at your instruction.
+3. **Check the 60% predictive-mean-matching cell** that differs from the re-pilot (D5), by a rerun with a third seed, before any production run.
+4. **Resolve the yellow `[TO CONFIRM]` items** in the spec: the production replicate count, and the milestone dates.
+5. **Verify the citations written from memory:** Rubin (1987), a source for the bootstrap optimism correction, and a source for multiple comparisons with the best, all marked as not in the Zotero library.
+6. **Decide whether the core allowance changes the rule.** Pilot-c used seven workers under your allowance of eight cores; `rules.md` still says three.
+
+## Limitations
+
+- Pilot-c covers the sharp peak at 250 per group, one auxiliary, missingness at random, and the empirical estimator; the flat peak, other sizes, and misspecified imputation models were not run.
+- With `r format(ri$n_rep, big.mark = ",")` replicates the MCSE of a coverage near 0.95 is about 0.006, so coverage near the 0.93 limit cannot be told apart from it.
+- The sets' target is the grid's best threshold, not $c^*$ itself; with a 41-point grid the two are at most half a grid step apart.
+- The correction was judged against the true accuracy of the chosen cutoff; it targets the average optimism and does not estimate a single study's.
+- The application was not analysed; its description is the first pilot's.
+
+{{< include ../templates/pilot-report/parts/standard-footnotes.md >}}
+
+
+[^youden]: The Youden index of a threshold is sensitivity plus specificity minus one: the share of diseased people the threshold flags minus the share of healthy people it flags. Its maximum over thresholds, and the threshold that attains it, are the usual "optimal cutoff".
+
+[^mi]: Multiple imputation fills each missing value several times with draws from a model of the missing value given what is observed, analyses each completed dataset, and combines the analyses.
+
+[^boot]: The bootstrap redraws the study's subjects with replacement to make new datasets of the same size, reruns the whole analysis on each, and uses the spread of the results to measure the uncertainty of the original one. Here each redrawn dataset is also re-imputed, the order Bartlett and Hughes (2020) found valid when the imputation model and the analysis do not match.
+
+[^nhanes]: The National Health and Nutrition Examination Survey, run by the United States National Center for Health Statistics, combines interviews with physical examinations and laboratory tests on a sample of the population, released as public files every two years.
+
+[^cotinine]: Cotinine is the main product of nicotine in the body and stays in the blood for days, so its level in serum separates people who smoke from people who do not, and its low range measures exposure to other people's smoke.
+
+[^smoker]: Here a current smoker is an adult who has smoked at least 100 cigarettes in life and now smokes every day or some days; every other adult who answered is counted as a nonsmoker.
+
+[^pmm]: Predictive mean matching fits a regression of the marker on the other variables, and for each missing value takes the observed value of a randomly chosen donor among the few observed subjects whose predicted values are closest; here through the R package `mice`, with 5 donors.
+
+[^norm]: Bayesian normal linear regression imputation draws the regression's coefficients and residual variance from their posterior distribution, then draws each missing value from the normal distribution they imply; here through the R package `mice`. With one auxiliary that is jointly normal with the marker within each group, it is the correct model for this design.
+
+[^rubin]: Rubin's rules combine the completed-data estimates of one quantity: the estimate is their average, and its variance is the average within-dataset variance plus the between-dataset variance inflated by $1 + 1/L$. [CITE: Rubin 1987, Multiple Imputation for Nonresponse in Surveys; not in the Zotero library]{.cite}

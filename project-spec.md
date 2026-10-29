@@ -33,11 +33,11 @@ Filled twice: the plan when the spec is written, the answers after the verdict (
 
 **Plot:** `pilot-c/results/coverage-by-cell.png`, the coverage of each band and set in every cell, written by `pilot-c/verdict.R`.
 
-**The three pilot answers:** after the run.
+**The three pilot answers:** status `piloted-close-call`, by the pre-registered rule, from `pilot-c/results/verdict.rds`; 1,300 replicates per cell (the pre-registered 2,000 lowered by the time box), run label `pilot`.
 
-1. Does the effect exist? [after the run]
-2. Is it large enough to matter at realistic sample sizes? [after the run]
-3. Is there an obvious fix or diagnostic? [after the run]
+1. Does the effect exist? Yes. In the base cell the reported index exceeds the true accuracy of the chosen cutoff by 0.0261 (MCSE 0.0010), and the pointwise Rubin's intervals read as a band contain the true curve at all 41 thresholds in 0.280 (MCSE 0.012) of replicates.
+2. Is it large enough to matter at realistic sample sizes? Yes: the optimism is 0.0261 in the base cell and 0.0386 (MCSE 0.0014) with 60% missing, above 0.01.
+3. Is there an obvious fix or diagnostic? Nearly. The 20-imputation correction leaves 0.21 (MCSE 0.04) of the optimism in the base cell and 0.17 (MCSE 0.05) in the normal twin. The comparison-based sets contain the best threshold in 0.997 and 0.995 of the base cell's replicates, at 0.60 and 0.58 of the band-based sets' length. The bands cover in 0.939 (bootstrap) and 0.941 (hybrid) of replicates without imputation and in 0.942 and 0.941 with normal imputation, but in 0.927 (MCSE 0.007) and 0.923 (MCSE 0.007) in the base cell, below and near the 0.93 limit.
 
 ## 4. ADEMP skeleton
 
