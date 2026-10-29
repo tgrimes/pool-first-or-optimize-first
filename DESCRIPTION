@@ -13,10 +13,13 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Imports:
     foreign,
+    graphics,
     mice,
+    parallel,
     stats
 Suggests:
     devtools,
+    grDevices,
     here,
     knitr,
     reticulate,

@@ -5,8 +5,8 @@
 | Workflow version | 0.2.3 (2026-10-29) |
 | Project | Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data |
 | Package | micutoff |
-| Stage | 2, piloted-pass |
-| Open stop | none: stage 2 complete, pilot-c read as a pass by the user on 2026-10-29; stage 3 (`workflow/03-manuscript.md`) starts on the user's word, paused at the user's request |
+| Stage | 3, drafting |
+| Open stop | none: stage 3 in progress |
 | Last update | 2026-10-29 |
 
 The Stage row reads "stage number, state". The states a stage can be in:
