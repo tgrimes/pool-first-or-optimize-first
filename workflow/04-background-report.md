@@ -2,18 +2,18 @@
 
 ## Purpose
 
-Write the detailed companion to the final manuscript: the literature its Introduction rests on, source by source, and every result it uses, proved step by step with a justification for each step, at a level a reader with graduate training in statistics and no familiarity with the topic can follow, or can see what to learn to follow. The report is also the first independent check of the manuscript: a proof that does not go through, or a source the Introduction should have cited, is an issue raised to the user, not a note buried in the report.
+Write the detailed companion to the settled manuscript, before the production run is spent, so that the user understands the literature and every derivation before deciding to run it: the literature its Introduction rests on, source by source, and every result it uses, proved step by step with a justification for each step, at a level a reader with graduate training in statistics and no familiarity with the topic can follow, or can see what to learn to follow. The report is also the first independent check of the manuscript: a proof that does not go through, or a source the Introduction should have cited, is an issue raised to the user, not a note buried in the report.
 
 ## Inputs
 
-- The manuscript: `manuscript/manuscript.qmd` with `_supplement.qmd`, and `manuscript/manuscript.html` rendered in final mode (stage 3, step 6); `manuscript/citations.csv` with its passages; `manuscript/references.bib`.
+- The settled manuscript: `manuscript/manuscript.qmd` with `_supplement.qmd`, and `manuscript/manuscript.html` as rendered at the last revision round (draft mode, quick-run numbers); `manuscript/citations.csv` with its passages; `manuscript/references.bib`.
 - The package in `R/` and `results/`, for the numerical checks.
 - `templates/background-report.qmd` and `manuscript/manuscript-helpers.R` (the report reads `results/` through the same helpers).
 - `workflow/rules.md`, in full.
 
 ## Preconditions
 
-- `STATUS.md` says `3, final`. If the user asks for the report before the production run, it is written on the settled draft, its numbers carry the quick label, and it is rendered again after stage 3, step 6.
+- `STATUS.md` says `3, settled`: the draft has had the user's comments and its revision rounds. The report's numbers carry the quick label; stage 3, step 6 renders it again after the production run, when they carry the production label. (Before 0.2.4 the report followed the production run; the order was reversed so that the user reads it before a long run is spent.)
 - Zotero is serving; every core citation has its full text attached, and a supporting citation may be abstract-only (`rules.md`, section 2; the Zotero check of stage 1 and the references step of stage 3 guarantee it; confirm with a ping).
 - The log is `log/04-background-report.md`.
 
@@ -58,7 +58,7 @@ Write the detailed companion to the final manuscript: the literature its Introdu
 3. Make one revision pass (`03-manuscript.md`, step 4) on the report, and render again.
 4. Set `STATUS.md` to `4, report at stop`, write the stage record line naming `background/background.html`, and commit with the rendered report ("Stage 4, step 5: background report").
 
-**Stop.** Return the report and `issues.md`. If `issues.md` has a blocking or substantive issue, say so first: the manuscript goes back to stage 3 for a revision round before anything else, and the report is updated and rendered again after it. When the user declares the report done, `STATUS.md` says `4, done`.
+**Stop.** Return the report and `issues.md`, with the production run's estimated runtime from the quick run, so that the user decides both at once. If `issues.md` has a blocking or substantive issue, say so first: the manuscript goes back to stage 3 for a revision round before anything else, and the report is updated and rendered again after it. When the user declares the report done, `STATUS.md` says `4, done`, and stage 3, step 6 (the production run and the final render) starts on the user's word.
 
 ## Outputs
 

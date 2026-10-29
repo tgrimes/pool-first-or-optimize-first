@@ -2,6 +2,10 @@
 
 Dated lessons. Each line says what changed in which file and which project taught it.
 
+## 0.2.4 (2026-10-29)
+
+- The background report comes before the production run. The order is now: the first draft, the user's comments and the revision rounds, `3, settled`, stage 4 on the settled draft (quick-run numbers), the user's reading of the report and its issues, then stage 3, step 6 (the production run and the final render, which renders the report again), then the mock review on the final render. Decided by the user during the first project's stage 3, when the production run was estimated at several hours: the report lets the user understand the literature and every derivation before the run is spent. `03-manuscript.md`, `04-background-report.md`, `05-mock-review.md`, `STATUS.md`, the READMEs, and `CLAUDE.md` changed; the eight-hour wait in step 6 went, since step 6 now starts on the user's word.
+
 ## 0.2.3 (2026-10-29)
 
 Lessons from the first run of stage 2, on the project pool-first-or-optimize-first (three pilots, 32 process-feedback items in its `log/02-pilot.md`, about 3 h 45 min of wall time of which the runs were most), and the author-line change.

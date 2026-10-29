@@ -12,7 +12,7 @@ This is one research project, from an idea to a manuscript and its presentation,
 4. Do what the stage file says for the user's message. A stage ends at a stop with one deliverable the user reads; update `STATUS.md` when you reach it, and wait.
 5. Commit at the points `workflow/rules.md`, section 1, names (a pre-registration, a stop, a revision round, a production run, the end of a stage) without being asked, and never push unless asked.
 
-The user's message starts each stage ("look at idea.md", "the proposal is final", "the pilot passed", "here are my comments on the draft", "publish it"). No stage starts itself.
+The user's message starts each stage ("look at idea.md", "the proposal is final", "the pilot passed", "here are my comments on the draft", "the draft is settled", "run production", "run the review", "publish it"). No stage starts itself. The background report (stage 4) comes between the settled draft and the production run, so that the user reads the literature and the derivations before a long run is spent.
 
 ## Project structure and the two rules
 

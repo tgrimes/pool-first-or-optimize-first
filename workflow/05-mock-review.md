@@ -14,7 +14,7 @@ Put the final manuscript through the review it would get at the target journal, 
 
 ## Preconditions
 
-- `STATUS.md` says `4, done`, so the manuscript is final and the background report's issues are resolved.
+- `STATUS.md` says `3, final`: the background report is done (`4, done` came before it), its issues are resolved, and the production run and the final render have been made.
 - The log is `log/05-mock-review.md`.
 
 ## Procedure

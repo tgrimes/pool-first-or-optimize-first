@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Take a passed pilot and produce the manuscript: a first draft in draft mode on quick-run numbers, revision rounds on the user's comments until the draft is settled, then the production run and the final render. The repository is the research compendium, so every number is read from `results/` at render time, every claim rests on a Zotero item with its passage recorded, and the draft carries its markers until the user closes them.
+Take a passed pilot and produce the manuscript: a first draft in draft mode on quick-run numbers, revision rounds on the user's comments until the draft is settled, then, after the background report of stage 4 has been read, the production run and the final render. The background report comes before the production run so that the user understands the literature and every derivation before the long run is spent. The repository is the research compendium, so every number is read from `results/` at render time, every claim rests on a Zotero item with its passage recorded, and the draft carries its markers until the user closes them.
 
 ## Inputs
 
@@ -110,18 +110,18 @@ Each step ends in a file someone can open. **Stop** marks a point where the step
 4. Run the revision pass (step 4) again when the round changed more than three sentences in any section.
 5. Render and check; after step 6 has run, render in final mode and check with `--final`. A round that changes the design is a change to `protocol.md` with a dated reason, and step 6 runs again.
 6. Commit the round as one commit with the rendered page ("Stage 3, revision round N"). Return the table and the proposed rules.
-7. The draft is settled when the user says so: `STATUS.md` becomes `3, settled`, and step 6 starts.
+7. The draft is settled when the user says so: `STATUS.md` becomes `3, settled`, and stage 4 (the background report) runs on the settled draft. Step 6 starts when the report is done (`4, done`) and the user says to run production; a blocking or substantive issue from the report is a revision round here first.
 
-**6. Production run and final render.** When the user declares the draft settled.
+**6. Production run and final render.** When the background report is done (`STATUS.md` says `4, done`) and the user says to run production.
 
 1. Set `STATUS.md` to `3, production run`. Confirm from `protocol.md` the production replicate count (`n_rep_production` in the run file) and that its "Changes after production" table is empty or explained.
-2. Estimate the runtime from the quick run's time and the replicate ratio, and say it in one message before starting. If it exceeds eight hours, wait for the user's go-ahead; otherwise go on.
+2. Estimate the runtime from the quick run's time and the replicate ratio, and say it in the message that starts the run, with the cores it will use.
 3. Run `analysis/01_simulation.R` at the production replicate count in the background, within the core cap, and the application script if its quick-run numbers came from a reduced version. Confirm `results/run_info.rds` says `run = "production"` and that `sessionInfo()` was saved.
 4. Compare quick against production: for every number in the Abstract and Results, the quick-run value, the production value, and its Monte Carlo standard error, as a table in the log under `## Production run`. List every sentence whose claim changes (a difference called nonzero that is now within noise, or the reverse) and revise it; a changed claim goes through the revision pass (step 4), and anything the user should judge gets a marker.
 5. Set the authors: `Rscript tools/authors.R --author "Given Family" [--coauthor "Given Family"]... --email ADDRESS --affiliation "..."` writes DESCRIPTION, LICENSE, README.md, and the manuscript's YAML, which held placeholders until now; ask the user for the names if they are not in the log. Then resolve the markers: a final render refuses any marker, so every `[TO CONFIRM]`, `[CITE]`, and `[FILL]` must be closed. If any remain, **stop** with the list; the user closes them in a revision round.
 6. Render in final mode: `quarto render manuscript/manuscript.qmd -P draft:false`. The banner and gap table disappear, `prov()` refuses anything not labeled production, and the checker in `--final` errors on any marker. Run the checker with `--final`; fix every error.
 7. Set `STATUS.md` to `3, final`, write the stage record line, and commit with the final render ("Stage 3, step 6: production run and final render").
-8. Return: the runtime and the replicate count; the comparison table's rows whose difference exceeds its Monte Carlo standard error; the sentences changed; the path to the final HTML. **Stop.** Stages 4, 5, and 8 read the final render.
+8. Render the background report again (`04-background-report.md`, step 5), since its numbers now carry the production label, and commit it. Return: the runtime and the replicate count; the comparison table's rows whose difference exceeds its Monte Carlo standard error; the sentences changed; the path to the final HTML. **Stop.** Stages 5 and 8 read the final render.
 
 ## Memo mode
 

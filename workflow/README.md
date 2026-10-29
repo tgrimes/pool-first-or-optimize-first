@@ -7,9 +7,9 @@ Everything the agent follows is in this folder, one file per stage, so that anyo
 | `rules.md` | all | | The rules every stage obeys, and the vocabulary |
 | `01-idea-review.md` | 1 | the user asks the agent to look at `idea.md` | `proposal.md`, for the user to review; then the Zotero check |
 | `02-pilot.md` | 2 | the proposal is final | `project-spec.md`, the pilot, its report, and a pass or fail |
-| `03-manuscript.md` | 3 | the pilot passed, or the idea was dropped or parked | the manuscript draft, then revision rounds on the user's comments, then the production run and the final render; or, in memo mode, the memo of a study not carried further |
-| `04-background-report.md` | 4 | the manuscript is settled | `background/background.html`, and an issues list if the report found errors in the manuscript |
-| `05-mock-review.md`, `reviewers/` | 5 | the background report is done | `review/round-1/reviewer_{1,2,3}.md`, then responses and further rounds |
+| `03-manuscript.md` | 3 | the pilot passed, or the idea was dropped or parked | the manuscript draft, then revision rounds on the user's comments; after stage 4, the production run and the final render (step 6); or, in memo mode, the memo of a study not carried further |
+| `04-background-report.md` | 4 | the draft is settled, before the production run | `background/background.html`, and an issues list if the report found errors in the manuscript; then the user decides on the production run |
+| `05-mock-review.md`, `reviewers/` | 5 | the manuscript is final | `review/round-1/reviewer_{1,2,3}.md`, then responses and further rounds |
 | `06-slides.md` | 6 | the review is complete | `slides/` (not yet written) |
 | `07-poster.md` | 7 | the slides are done | `poster/` (not yet written) |
 | `08-publish.md` | 8 | the user asks to publish | a clean copy of the project outside the repository, with only the code, data, results, and manuscript, verified from a fresh restore |
