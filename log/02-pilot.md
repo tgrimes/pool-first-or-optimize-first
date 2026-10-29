@@ -171,3 +171,10 @@ The verdict: questions 1 and 2 pass; question 3 passes clause (a) and the compar
 30. **Cells fewer than workers.** Pilot-c has five cells and seven workers, so cells were split into seeded blocks of 100 replicates (seed $20261030 + 1000k + b$); the per-cell seed of the earlier pilots would have left two workers idle. The stage file's "each cell its own seed" could allow seeded blocks within a cell.
 31. **A timing run with fewer tasks than workers.** Pilot-c's timing ran one task per cell, five tasks on seven workers, so it measured the per-replicate time under less load than the run had; the run took 62 minutes against 57 projected. The timing run should load every worker, for example by timing blocks.
 32. **Time.** Pilot-c took about 1 h 28 min from the user's answer to the commit, 62 minutes of it the run; the stage, three pilots, about 3 h 45 min of wall time.
+
+## Pilot-c stop: the user's answer, and the end of stage 2 (2026-10-29, 08:42)
+
+- D-S8. The user read pilot-c's close call as a pass: "start stage 3, with the band's calibration under predictive mean matching, the set's conservative critical value, and the 60% PMM cell recheck as design questions for the protocol." `STATUS.md` reads `2, piloted-pass`. The three questions are carried into stage 3's design proposal (`log/03-manuscript.md`).
+- D-S10. The user asked to pause once stage 2 was closed; stage 3 has not started (its file and the manuscript skeleton were read, nothing written). Both Zotero servers answered at 08:43, a stage 3 precondition.
+- D-S9. The core allowance of eight was given for pilot-c; stage 3 returns to the three of `rules.md`, section 5, unless the user extends it.
+- Stage 2 took three pilots (`pilot/`, `pilot-b/`, `pilot-c/`), two revision sections of the proposal (12 and 13), and about 3 h 45 min of wall time on 2026-10-28 and 29.

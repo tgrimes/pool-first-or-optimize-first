@@ -5,8 +5,8 @@
 | Workflow version | 0.2.2 (2026-10-29; synced from the template during the re-pilot) |
 | Project | Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data |
 | Package | micutoff |
-| Stage | 2, piloted-close-call |
-| Open stop | Stop at the end of pilot-c: the user reads `pilot-c/pilot-report.html` and decides on the close call: pass (stage 3 starts), another revision and pilot, or dropped or parked (stage 3 then writes the memo) |
+| Stage | 2, piloted-pass |
+| Open stop | none: stage 2 complete, pilot-c read as a pass by the user on 2026-10-29; stage 3 (`workflow/03-manuscript.md`) starts on the user's word, paused at the user's request |
 | Last update | 2026-10-29 |
 
 The Stage row reads "stage number, state". The states a stage can be in:
@@ -33,3 +33,4 @@ One line per stage boundary, newest last: the date, the stage reached, the path 
 | 2026-10-29 | 2, piloted-fail | `pilot/pilot-report.html` (verdict: `pilot/results/verdict.csv`; decisions: `pilot/decisions.md`; spec: `project-spec.md`; log: `log/02-pilot.md`) | The pilot stop: the user decides between a revised proposal with a re-pilot, a re-scope, and a drop |
 | 2026-10-29 | 2, piloted-close-call | `pilot-b/pilot-report.html` (re-pilot of the re-scoped proposal, `proposal.md` section 12; verdict: `pilot-b/results/verdict.csv`; decisions: `pilot-b/decisions.md`; spec: `project-spec.md`; log: `log/02-pilot.md`) | The re-pilot stop: the user decides the close call, and reviews the re-scope and its pass rule, which were not shown before the run |
 | 2026-10-29 | 2, piloted-close-call | `pilot-c/pilot-report.html` (pilot-c, `proposal.md` section 13; verdict: `pilot-c/results/verdict.csv`; decisions: `pilot-c/decisions.md`; spec: `project-spec.md`; log: `log/02-pilot.md`) | The pilot-c stop: the user decides the close call, and reviews pilot-c's pass rule, which was not shown before the run |
+| 2026-10-29 | 2, piloted-pass | `pilot-c/pilot-report.html` | none: the user read pilot-c's close call as a pass; stage 3 waits for the user's word, with three design questions for the protocol (`log/02-pilot.md`, D-S8) |
