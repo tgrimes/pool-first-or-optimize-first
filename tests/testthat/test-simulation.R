@@ -84,3 +84,25 @@ test_that("BlasPinned pins every BLAS to one thread", {
   expect_true(all(b == "1"))
   expect_true("VECLIB_MAXIMUM_THREADS" %in% names(b))
 })
+
+test_that("RunBlocksParallel runs every block on a worker, seeded per block", {
+  root <- normalizePath(test_path("..", ".."), mustWork = FALSE)
+  skip_if_not(file.exists(file.path(root, "DESCRIPTION")),
+              "the package source is not two levels up (R CMD check)")
+  ToyReplicate <- function(cell, truth) data.frame(x = stats::runif(1))
+  blocks <- BlockTable(PilotDesignC()[1:2, ], 4L, block_size = 2L)
+  log_file <- tempfile()
+  out <- RunBlocksParallel(blocks, 1L, log_file = log_file, root = root,
+                           replicate_fun = ToyReplicate)
+  expect_equal(nrow(out$replicates), 8)
+  expect_equal(nrow(out$block_seconds), 4)
+  expect_length(readLines(log_file), 8)
+  kind <- RNGkind()
+  on.exit(RNGkind(kind[1], kind[2], kind[3]))
+  serial <- CollectBlocks(lapply(split(blocks, seq_len(nrow(blocks))),
+                                 function(b) {
+    reps <- RunBlock(b, replicate_fun = ToyReplicate)
+    list(reps = reps, seconds = attr(reps, "seconds"))
+  }))
+  expect_equal(out$replicates$x, serial$replicates$x)
+})

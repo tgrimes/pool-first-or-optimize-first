@@ -1,24 +1,15 @@
 ---
-title: "[FILL: title that names the procedure and the condition]"
+title: "Inference for the Youden curve of a multiply imputed biomarker: a band, a set of near-optimal cutoffs, and a corrected index"
 author:
-  - name: "Tyler Grimes"
-    corresponding: true
-    email: "tyler.grimes@unf.edu"
-    affiliations:
-      - name: "[FILL: affiliation]"
-  - name: "[FILL: second author]"
-    affiliations:
-      - name: "[FILL: affiliation]"
+  - name: "[TO CONFIRM: the author line; tools/authors.R sets it before the final render]{.tc}"
 date: today
 bibliography: references.bib
 link-citations: true
-# csl: copy the file named in the journal's profile (workflow/journals/) beside this
-# file and name it here for the submission render; the draft renders in Quarto's default author-date style.
-# A memo (03-manuscript.md, memo mode) copies workflow/journals/csl/apa.csl beside this file and sets csl: apa.csl.
+csl: sage-vancouver.csl
 params:
   draft: true
   memo: false
-  journal: "[FILL: journal slug from workflow/journals/journals.csv]"
+  journal: "statistical-methods-in-medical-research"
 crossref:
   custom:
     - kind: float
@@ -131,11 +122,23 @@ did not do, and ending with what has not been derived. Paragraph 3: what this pa
 order of the sections. Almost every sentence is a fact with a reference; the rest build the tension
 and resolve it. Plain language before the formal statement. The claims are the aims, as questions. -->
 
-[FILL: paragraph 1]
+A threshold on a biomarker decides who is counted as having a condition. Serum cotinine, a metabolite of nicotine, is one example: a threshold on it separates people who smoke cigarettes from people who do not, and its value has been estimated in national survey data [@benowitz2009; @tompkins2019]. One criterion for the best threshold maximizes the sum of sensitivity and specificity, and that sum minus one is the Youden index [@hassanzad2024]. When the biomarker is missing for some participants, multiple imputation, one of the most popular approaches to missing data [@bartlett2020], fills in the missing values several times and analyses each completed dataset. In the paper that proposed nonparametric multiple imputation for ROC analysis, depression screening scores missing for part of a cohort of pregnant women were multiply imputed, the true and false positive rates were averaged across the completed datasets at each threshold, and one score was reported as "the unanimous optimum threshold", with no statement of its uncertainty [@long2011]. Applied studies impute a marker and then report an optimal cutoff [@abdulrahman2022; @atlantis2016; @wirth2024], and the two whose full text was read do not say how the completed datasets were combined [@abdulrahman2022; @atlantis2016]; many studies do not report the precision of their cutpoints at all [@thiele2023].
 
-[FILL: paragraph 2]
+The reported index overstates the accuracy of the threshold it picks, because the threshold is chosen where the estimated curve happens to be high. With $F_0$ and $F_1$ the distribution functions of the marker among people without and with the condition, and a person called positive when the marker exceeds $c$, the Youden curve, its best threshold, and its maximum are
+$$
+\begin{aligned}
+J(c) &= F_0(c) - F_1(c), \\
+c^* &= \arg\max_c J(c), \\
+J^* &= J(c^*).
+\end{aligned}
+$$
+From $L$ completed datasets the analyst averages the empirical curves $\hat J_1, \dots, \hat J_L$ into $\bar J$, takes $\hat c = \arg\max_c \bar J(c)$, and reports $\bar J(\hat c)$. Because $\bar J(\hat c) \ge \bar J(c^*)$ in every dataset and $J(\hat c) \le J^*$, the reported index exceeds the true accuracy of the chosen threshold on average whenever the averaged curve is unbiased at $c^*$:
+$$
+\mathrm{E}\{\bar J(\hat c)\} - \mathrm{E}\{J(\hat c)\} \;\ge\; \mathrm{E}\{\bar J(c^*)\} - J^* \;=\; 0 .
+$$
+Without missing data the empirical index has the largest upward bias of the usual estimators [@fluss2005], intervals exist for the index and the threshold [@bantis2019], and confidence regions exist for the sensitivity and specificity at the estimated threshold [@bantis2014]. The empirical threshold converges at the cube-root rate to a non-normal limit [[CITE: the cube-root rate and the non-normal limit of an argmax of a step criterion (Kim and Pollard 1990; no readable text in Zotero)]{.cite}; @cattaneo2020], as does a weighted Youden threshold [@wang2025weighted], so Rubin's rules, which assume approximately normal estimates [@leyrat2019], do not apply to it, and the standard bootstrap is inconsistent for it [@cattaneo2020]. When the disease status rather than the marker is missing, the ROC curve [@fluss2009] and intervals for the Youden index [@wang2025interval; @jia2026] have been derived. When the marker is missing, imputation methods give the ROC curve and its area [@long2011; @karakaya2015; @cheng2020]. No method gives a band for the Youden curve, a set of thresholds that the data cannot separate from the best one, or a correction of the reported index from multiply imputed data.
 
-[FILL: paragraph 3]
+This paper proposes all three and asks whether each works. The band estimates the covariance of the averaged curve by bootstrapping the data and imputing each resample [@bartlett2020], and takes a sup-t critical value [@montielolea2019]. The near-optimal set keeps every threshold that no other threshold beats by more than the uncertainty of their difference, in the manner of multiple comparisons with the best [@hsu1996; [CITE: multiple comparisons with the best (Hsu 1984; no PDF in Zotero)]{.cite}]. The correction subtracts a bootstrap estimate of the optimism [[CITE: the bootstrap estimate of optimism (Efron 1983; Harrell, Lee, and Mark 1996; no readable text in Zotero)]{.cite}], with each resample imputed as many times as the analysis. A simulation study then asks four questions. Does the band cover the whole curve at the nominal rate, under predictive mean matching as well as under a correctly specified imputation model? Does the set contain the best threshold at least as often as its level promises, and how much narrower is it than the set the band itself gives? Does the correction remove the optimism of the reported index? And, as a note on the order of operations, how far apart are the index from averaging the curves first and the index from maximizing in each completed dataset first? An application to serum cotinine and smoking in the National Health and Nutrition Examination Survey [CITE: the NHANES 2013 to 2018 data files (no item in Zotero)]{.cite} closes the paper.
 
 # Methods
 

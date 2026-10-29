@@ -132,10 +132,13 @@ RunBlocksParallel <- function(blocks, n_workers, log_file = NULL,
     NULL
   }, .libPaths(), BlasPinned(), root))
   tasks <- split(blocks, seq_len(nrow(blocks)))
-  runs <- parallel::parLapplyLB(cl, tasks, function(block, log_file, fun) {
-    out <- RunBlock(block, replicate_fun = fun, log_file = log_file)
+  # The extra arguments must not be named `fun` or `x`, which
+  # parLapplyLB() passes on to clusterApplyLB() as its own.
+  runs <- parallel::parLapplyLB(cl, tasks, function(block, log_path,
+                                                    one_rep) {
+    out <- RunBlock(block, replicate_fun = one_rep, log_file = log_path)
     list(reps = out, seconds = attr(out, "seconds"))
-  }, log_file = log_file, fun = replicate_fun, chunk.size = 1)
+  }, log_path = log_file, one_rep = replicate_fun, chunk.size = 1)
   CollectBlocks(runs)
 }
 

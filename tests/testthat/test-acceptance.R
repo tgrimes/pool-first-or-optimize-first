@@ -71,7 +71,8 @@ test_that("a full rerun of pilot-c reproduces every per-cell summary", {
   saved <- readRDS(fixture("pilot-c-cell-summaries.rds"))
   design <- PilotCDesignTable()
   blocks <- BlockTable(design, 1300L, block_size = 100L)
-  out <- RunBlocksParallel(blocks, 3L, root = test_path("..", ".."))
+  out <- RunBlocksParallel(blocks, 3L,
+                           root = normalizePath(test_path("..", "..")))
   again <- SummarizeAllCellsC(out$replicates, design)
   expect_equal(again, saved, tolerance = 1e-12)
 })
