@@ -5,8 +5,8 @@
 | Workflow version | 0.2.2 (2026-10-29; synced from the template during the re-pilot) |
 | Project | Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data |
 | Package | micutoff |
-| Stage | 2, piloted-close-call |
-| Open stop | Stop at the end of the re-pilot: the user reads `pilot-b/pilot-report.html` and decides on the close call: pass (stage 3 starts), a revised proposal and a re-pilot in `pilot-c/`, or dropped or parked (stage 3 then writes the memo) |
+| Stage | 2, spec |
+| Open stop | none: stage 2 in progress (pilot-c in `pilot-c/` after the revision of 2026-10-29, `proposal.md` section 13) |
 | Last update | 2026-10-29 |
 
 The Stage row reads "stage number, state". The states a stage can be in:

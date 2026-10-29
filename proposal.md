@@ -4,7 +4,7 @@
 |---|---|
 | From | `idea.md`, 2026-10-28 |
 | Written | 2026-10-28, workflow 0.2.0 |
-| Status | final 2026-10-28; re-scoped 2026-10-29 (section 12) |
+| Status | final 2026-10-28; re-scoped 2026-10-29 (section 12); revised for pilot-c 2026-10-29 (section 13) |
 
 ## 1. Summary and verdict
 
@@ -192,6 +192,7 @@ Not on the list, because the proposal does not cite them: the `mice` reference p
 - 2026-10-28, stop 1, sixth round. The user changed the rule: a supporting citation is cited from its abstract when the abstract states the claim; full text is needed for a core citation (`workflow/rules.md`, section 2; `01-idea-review.md`, step 9; `CHANGELOG.md`). Wang, Fang, and Li 2025; Wang, Shi, and Qin 2025; Jia, Wang, and Qin 2026; and Wirth et al. 2024 return as supporting citations marked "abstract suffices" in sections 3, 4, 5, and 10. Fluss et al. 2009 and Atlantis et al. 2016 stay.
 - 2026-10-28, step 9, the Zotero check. All 38 sources are in the library; stop 2 was needed once (the van der Vaart book and Fluss et al. 2009 added, the Wirth abstract entered, the ROCnReg journal record added). Citations rebuilt from the keys in `manuscript/citations.csv`: the years now follow the records (Leyrat et al. 2019, Bantis, Nakas, and Reiser 2019, Zhang et al. 2020, Wirth et al. 2024, van der Vaart 2000). Section 10 carries the keys. Record faults are deferred to the manuscript stage by the user. Proposal final.
 - 2026-10-29, after the stage 2 pilot (`piloted-fail`): re-scoped by the user's decision, with Aim 2 leading; section 12 holds the revision and the re-pilot's plan.
+- 2026-10-29, after the re-pilot (`piloted-close-call`): revised for pilot-c by the user's decision; section 13.
 
 ## 12. Revision 2026-10-29: re-scope after the pilot
 
@@ -256,3 +257,33 @@ The kernel and Box-Cox estimators, 1,000 per group, impute-then-bootstrap (inval
 ### Open questions for the user
 
 - `[TO CONFIRM: the re-pilot's three questions and pass rule above were written by the agent and pre-registered without a stop, at the user's instruction to re-pilot after the revision]{.tc}`
+
+## 13. Revision 2026-10-29: pilot-c after the re-pilot's close call
+
+The user's decision at the re-pilot's stop (`pilot-b/`, `piloted-close-call`): revise as the agent suggested and re-pilot in `pilot-c/`. Section 12 stands except where this section changes it. The numbers below are from `pilot-b/results/cell_summaries.csv` and `pilot-b/results/verdict.csv` (500 replicates per cell, run label `pilot`).
+
+### What the re-pilot showed, and what each revision answers
+
+1. **The near-optimal set was built more crudely than the proposal defined it.** Section 3, row 2, defines the set through "the upper bound for J(c) - J*", a statement about differences between thresholds; section 12 replaced it with the band's upper limit against its highest lower limit, which counts the band's uncertainty twice. The sets covered $c^*$ but spanned about two-thirds of the grid. Revision: the set is built from simultaneous one-sided comparisons of each threshold with every other, in the manner of multiple comparisons with the best `[CITE: a source for multiple comparisons with the best; not in the Zotero library]{.cite}`: a grid threshold $c_k$ stays in the set unless some $c_j$ is better by more than $q\,\mathrm{SE}(\bar J(c_j) - \bar J(c_k))$. Differences between nearby thresholds vary much less than the curve itself, so the set should be narrower with the same guarantee: if the comparisons involving the grid's best threshold hold, that threshold is in the set. The pass rule gains a width criterion.
+2. **The optimism correction used 2 imputations per resample where the analysis uses 20.** With normal imputation the true optimism fell as the missing fraction rose (sharp shape: 0.022, 0.016, 0.0095 at 0%, 40%, 60%), because averaging 20 imputations smooths the imputed part of the curve (the conjecture of section 4, item 8), while the correction stayed near 0.016 in every normal cell; with predictive mean matching it reached 0.034 at 60%. Revision: the correction's resamples are imputed 20 times, as the analysis is, with 100 resamples; the 2-imputation version is reported beside it. This is a likely explanation of the overshoot, not a demonstrated one: without missing values the correction was also low (0.016 against 0.022), which fits the bootstrap's known difficulty with a cube-root estimator (Cattaneo, Jansson, and Nagasawa 2020).
+3. **The band's calibration was not settled.** The bootstrap-then-impute band covered 0.910 (MCSE 0.013) in the base cell and 0.922 without imputation. Revision: 1,000 resamples instead of 200; a hybrid band beside it, with the bootstrap-then-impute covariance and a critical value from the normal law (the Rubin's-rules band's critical value covered 0.936 and 0.954 without imputation); 2,000 replicates per cell unless the hour does not allow it; and a pass rule that requires calibration in the null cell as well.
+4. **The grid built from observed values missed $c^*$** for the flat shape in 35% of replicates at 40% missing and 98% at 60%. Revision: the grid spans the 10% to 90% quantiles of the completed values, all 20 completed datasets together.
+5. **The design is narrowed** to the sharp shape: the null cell, 40% and 60% missing with each engine, five cells. The flat shape returns in the full design.
+
+Not added, as before: a subsampling or m-out-of-n bootstrap for the cube-root problem (`project-spec.md`, section 8, parks it), 1,000 per group, the kernel estimator, and the application.
+
+### The pilot-c plan
+
+As section 12 except: the grid of item 4; 1,000 bootstrap-then-impute resamples with 2 imputations each for the bands and the sets; 100 further resamples with 20 imputations each for the optimism correction; the bootstrap band, the hybrid band, and the Rubin's-rules band; the band-based set of section 12 and the comparison-based set of item 1, each from the bootstrap and the hybrid construction; the target of a set is the grid threshold with the largest true $J$; five sharp-shape cells; 2,000 replicates per cell, split into seeded blocks so that seven workers share the cells, lowered by the timing run if the hour requires.
+
+**The three questions and the pass rule, decided before any run:**
+
+1. Does the problem exist? As section 12: in the base cell the apparent index's optimism exceeds 3 MCSE, and the pointwise intervals read as a band cover the curve in less than 0.90 of replicates.
+2. Is it large enough? As section 12: the optimism is at least 0.01 in the base cell or the 60% cell.
+3. Is there a fix? Pass if (a) the 20-imputation corrected index's absolute bias against $J(\hat c)$ is at most half the apparent index's optimism in the base cell and in its normal twin; and (b) for at least one of the two constructions, bootstrap or hybrid: its band covers the curve over the grid in 0.93 to 0.97 of replicates in the null cell, the base cell, and the normal twin; and its comparison-based set contains the grid's best threshold in at least 0.93 of replicates in the base cell and the normal twin, with a mean length at most 0.75 of the band-based set's from the same construction in both.
+
+The status combines the answers as before. The 60% cells are reported beside the rule and decide nothing.
+
+### Open question for the user
+
+- `[TO CONFIRM: the pilot-c pass rule above was written by the agent from the revisions the user approved, and pre-registered without a separate stop]{.tc}`

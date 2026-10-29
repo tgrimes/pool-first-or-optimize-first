@@ -132,3 +132,17 @@ The run (`pilot-b/results/run_info.rds`) finished in 9.1 minutes against a proje
 26. **A coverage criterion without a width criterion.** The re-pilot's clause on the near-optimal set passed because the sets are wide, about two-thirds of the grid; coverage alone cannot fail a set that includes nearly everything. The stage 1 guidance on pass rules could ask for a size criterion beside every coverage criterion.
 27. **Two sessions in one repository.** Workflow 0.2.2 was committed here by another session at 01:03, while this session was in step 7; it touched only `workflow/`, so nothing collided, but `STATUS.md`'s version row went stale until updated here. A template sync could update that row itself, or wait for a stop.
 28. **Time.** The re-pilot took about 33 minutes from the user's answer to the commit, 9 of them the run; the whole stage, both pilots, about 2 hours.
+
+## Re-pilot stop: the user's answer (2026-10-29, 01:22)
+
+- D-S5. Asked first what revisions the agent would suggest for a pilot-c; the agent named five (the comparison-based set the proposal defined, matched imputations for the optimism correction, the band's calibration with more resamples and replicates and a null-cell criterion, a grid from completed values, a sharp-only design). The user approved them: "Go ahead with these revisions for pilot-c."
+- D-S6. The user allowed up to 8 cores for pilot-c's compute, against the 3 of `rules.md` section 5. Applied for pilot-c only: seven PSOCK workers and the coordinating process. Recorded here as the user's ruling; whether the rule should change is the user's to decide.
+- D-S7. The revision is `proposal.md`, section 13. Its pass rule was written by the agent from the approved revisions and pre-registered without a separate stop, as at the re-scope; the revision carries a `[TO CONFIRM]` marker.
+
+# Pilot-c (`pilot-c/`)
+
+## Time per step
+
+| Step | Started | Ended | Agent time | Notes |
+|---|---|---|---|---|
+| 0. Decision recorded; proposal section 13 | 01:22 | 01:26 | 4 min | |
