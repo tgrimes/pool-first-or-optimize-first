@@ -6,7 +6,7 @@
 | Project | Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data |
 | Package | micutoff |
 | Stage | 3, drafting |
-| Open stop | none: stage 3 in progress |
+| Open stop | Step 2, references: six sources missing and ten record faults (`log/03-manuscript.md`, section "Step 2: references"); the user updates Zotero |
 | Last update | 2026-10-29 |
 
 The Stage row reads "stage number, state". The states a stage can be in:
@@ -34,3 +34,4 @@ One line per stage boundary, newest last: the date, the stage reached, the path 
 | 2026-10-29 | 2, piloted-close-call | `pilot-b/pilot-report.html` (re-pilot of the re-scoped proposal, `proposal.md` section 12; verdict: `pilot-b/results/verdict.csv`; decisions: `pilot-b/decisions.md`; spec: `project-spec.md`; log: `log/02-pilot.md`) | The re-pilot stop: the user decides the close call, and reviews the re-scope and its pass rule, which were not shown before the run |
 | 2026-10-29 | 2, piloted-close-call | `pilot-c/pilot-report.html` (pilot-c, `proposal.md` section 13; verdict: `pilot-c/results/verdict.csv`; decisions: `pilot-c/decisions.md`; spec: `project-spec.md`; log: `log/02-pilot.md`) | The pilot-c stop: the user decides the close call, and reviews pilot-c's pass rule, which was not shown before the run |
 | 2026-10-29 | 2, piloted-pass | `pilot-c/pilot-report.html` | none: the user read pilot-c's close call as a pass; stage 3 waits for the user's word, with three design questions for the protocol (`log/02-pilot.md`, D-S8) |
+| 2026-10-29 | 3, drafting | `log/03-manuscript.md`, section "Step 2: references" (the three lists) | Step 2, references: the user adds the NHANES data items, attaches or fixes four PDFs, completes one record, and corrects ten record fields |

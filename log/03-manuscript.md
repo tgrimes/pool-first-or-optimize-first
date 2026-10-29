@@ -13,6 +13,9 @@ Workflow 0.2.3 (`workflow/03-manuscript.md`, `workflow/rules.md`). Started 2026-
 | 1. Promote the pilot: script, functions, tests, fixtures | 09:05 | 09:07 | 2 min | `R/simulation.R`, `R/figures.R`, `analysis/01_simulation.R`, three test files |
 | 1. Acceptance test, sample mode | 09:07 | 09:09 | 1.5 min | one core; 69 expectations, 0 failures |
 | 1. Test suite and check | 09:09 | 09:12 | 3 min | 2,633 expectations, 0 failures; check 0/0/0 after one fix (D2) |
+| 1. Acceptance test, full mode, first attempt | 09:12 | 09:14 | 2 min | failed at once: an argument-name clash in `RunBlocksParallel()` (D3); fixed, with a one-worker test |
+| 1. Acceptance test, full mode, rerun | 09:15 | | | three workers, in the background during step 2 |
+| 2. References: inventory, availability, the three lists | 09:13 | 09:20 | 7 min | local API and the connector; four Crossref lookups (D4) |
 
 ## Preconditions
 
@@ -60,7 +63,122 @@ Workflow 0.2.3 (`workflow/03-manuscript.md`, `workflow/rules.md`). Started 2026-
 
 **Clean check (step 1.8).** `devtools::document()`; `devtools::test()` 2,633 expectations, 0 failures, 3 skips (the gated acceptance tests); `devtools::check()` 0 errors, 0 warnings, 0 notes at 09:11, after D2. `renv::status()` reports the lockfile consistent (the new imports are base packages).
 
+## Step 2: references
+
+### Inventory
+
+Every source the draft is expected to cite: the 38 rows of `manuscript/citations.csv` as stage 1 left them, less one no longer needed; the eleven items the user added on 2026-10-29 between 08:48 and 08:59 for stage 3 (Zotero's `dateAdded`), which cover the `[CITE]` markers of `proposal.md` sections 12 and 13 (the bootstrap optimism correction, multiple comparisons with the best), the sources the pilot reports marked `[CITE]` (Rubin 1987, Silverman 1986), the software the method calls, a source on predictive mean matching, one on sup-t bands, and the two seed entries of `references.bib`; and the application's data, which no item yet covers. Sections: I Introduction, M Methods, S simulation design, A Application, D Discussion, Sup supplementary note.
+
+| Key | Grade | Section | Why | Origin |
+|---|---|---|---|---|
+| long2011 | core | I, M, D | the pooled curve read without uncertainty; the published example of paragraph 1 (EPDS, "unanimous optimum threshold") | proposal |
+| long2012 | definitional | M | the doubly robust nearest-neighbour imputation | proposal |
+| mitra2016 | core | I, D | the order-of-operations precedent for propensity scores | proposal |
+| leyrat2019 | core | I, M | Rubin's rules assume approximately normal estimates; the propensity-score precedent | proposal |
+| granger2019 | core | D | Across against Within | proposal |
+| wood2008 | core | D | a discrete decision made across imputations | proposal |
+| mertens2026 | core | D | averaging predictions against pooling a model; what shrinks with $L$ | proposal |
+| heinze2013 | supporting | D | pooling a whole distribution function across imputations | proposal |
+| kim1990 | core | I, M, Sup | the cube-root rate and the non-normal limit of an argmax of a step criterion | proposal |
+| cattaneo2020 | core | M, D | the standard bootstrap is inconsistent for cube-root estimators | proposal |
+| seijo2011 | supporting | Sup | the argmax theorem for several maximizers | proposal |
+| vandervaart1998 | core | Sup | consistency of the argmax under uniform convergence | proposal |
+| schomaker2018 | supporting | M | which combinations of the bootstrap and imputation are valid | proposal |
+| bartlett2020 | core | M | bootstrap-then-impute is valid under uncongeniality, impute-then-bootstrap is not | proposal |
+| vonhippel2021 | supporting | M | bootstrap-then-impute with few imputations per resample | proposal |
+| fluss2005 | core | I, M | the empirical Youden estimator and its upward bias | proposal |
+| fluss2009 | supporting | I | the ROC curve when the disease status is missing | proposal |
+| yin2016 | supporting | D | the kernel cutoff is asymptotically normal | proposal |
+| bantis2019 | core | I, M, S | complete-data intervals for the index and the cutoff; the complete-case comparator | proposal |
+| bantis2014 | supporting | I | confidence regions for sensitivity and specificity at the estimated cutoff | proposal |
+| thiele2023 | supporting | I | many authors do not report the precision of their cutpoints | proposal |
+| zhang2020 | supporting | D | the bagged cutoff, optimize then average over resamples | proposal |
+| inacio2017 | supporting | D | the covariate-specific Youden index and cutoff | proposal |
+| rodriguezalvarez2021 | definitional | D | the `ROCnReg` package | proposal |
+| xu2014 | supporting | D | a model-free covariate-adjusted cutoff | proposal |
+| ghosal2025 | supporting | D | covariates in cutoff estimation | proposal |
+| wang2025weighted | supporting | M, Sup | the cube-root limit for a weighted Youden cutoff (abstract) | proposal |
+| wang2025interval | supporting | I | Youden intervals under verification bias (abstract) | proposal |
+| jia2026 | supporting | I | partial Youden intervals under verification bias (abstract) | proposal |
+| cheng2020 | supporting | I | ROC inference with a missing marker stops at the curve | proposal |
+| karakaya2015 | supporting | I | imputation for the AUC | proposal |
+| abdulrahman2022 | supporting | I | an applied study that imputes and reports a cutoff, order unstated | proposal |
+| atlantis2016 | supporting | I | the same, with five imputed datasets | proposal |
+| wirth2024 | supporting | I | the same, Youden cutoffs after imputation (abstract) | proposal |
+| benowitz2009 | core | A | cotinine cutoffs by race/ethnicity, NHANES 1999 to 2004 | proposal |
+| tompkins2019 | core | A | the 3.63 ng/mL adult cutoff, NHANES 2009 to 2014 | proposal |
+| hassanzad2024 | definitional | I | the criteria for an optimal cutpoint | proposal |
+| rubin1987 | definitional | M | Rubin's rules | pilot reports (`[CITE]`), added 2026-10-29 |
+| efron1983 | core | M | the bootstrap estimate of the optimism of an apparent error | proposal section 12 `[CITE]`, added 2026-10-29 |
+| harrell1996 | supporting | M | the bootstrap optimism correction in prognostic modelling | added 2026-10-29 |
+| hsu1984 | core | M | multiple comparisons with the best, the comparison-based set's construction | proposal section 13 `[CITE]`, added 2026-10-29 |
+| hsu1996 | supporting | M | the same, in the textbook | added 2026-10-29 |
+| vanbuuren2011 | definitional | M | the `mice` package | stage 2 (both engines), added 2026-10-29 |
+| morris2014 | core | M, D | predictive mean matching where donors are sparse | `pilot-c/decisions.md` D1, added 2026-10-29 |
+| montielolea2019 | core | M | sup-t simultaneous bands | pilot-c bands, added 2026-10-29 |
+| silverman1986 | definitional | M | the kernel bandwidth rule, if the kernel estimator returns at the design stop | pilot reports (`[CITE]`), added 2026-10-29 |
+| morris2019 | supporting | S | the ADEMP structure (`parts/ademp-sentence.md`) | seed bib |
+| marwick2018 | definitional | M | the research compendium (`parts/reproducibility.md`) | seed bib |
+| nhanes | definitional | M, A | the NHANES 2013 to 2018 cotinine, smoking, and demographics files | spec section 5 |
+
+Left out: li2015 (the ADNI precedent; ADNI was set aside at stage 1).
+
+### Availability
+
+Checked at 09:16 to 09:20 through Zotero's local API (each record's fields, its children, and the length of each attachment's indexed full text) and the connector's `get_content` for the two items whose full text the API did not return. Available means: the record is complete enough to cite, and a PDF with readable text is attached, or the citation is supporting and the record's abstract states the claim, or the item is a book or pre-1980. A definitional citation is read as needing only a complete record (D5).
+
+The three lists, as returned at the stop:
+
+**(1) Available: 43 of 49.** long2011, long2012, mitra2016, leyrat2019, granger2019, wood2008, mertens2026, heinze2013, cattaneo2020, vandervaart1998 (book), schomaker2018, bartlett2020, vonhippel2021, fluss2005, fluss2009, yin2016, bantis2019, bantis2014, thiele2023, zhang2020, inacio2017, rodriguezalvarez2021, xu2014, ghosal2025, wang2025weighted (abstract), wang2025interval (abstract), jia2026 (abstract), cheng2020, karakaya2015, abdulrahman2022, atlantis2016, wirth2024 (abstract), benowitz2009, tompkins2019, hassanzad2024, rubin1987 (book), hsu1996 (book), vanbuuren2011 (definitional, no PDF), morris2014, montielolea2019, silverman1986 (book), morris2019, marwick2018.
+
+**(2) Missing: 6.**
+
+- Add the item:
+  - NHANES 2013-2014, 2015-2016, and 2017-2018 data: serum cotinine (`COT_H`, `COT_I`, `COT_J`), smoking questionnaire (`SMQ_H`, `SMQ_I`, `SMQ_J`), demographics (`DEMO_H`, `DEMO_I`, `DEMO_J`), National Center for Health Statistics, at `https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/`, `.../2015/DataFiles/`, `.../2017/DataFiles/` (URLs as used by `analysis/00_download.R`). Needed for the Data section and the Application. One Dataset item per cycle, or one for the survey, as the user prefers; the cotinine laboratory documentation pages (method, limit of detection 0.015 ng/mL) can be attached to them.
+- Attach the PDF:
+  - Hsu JC. Constrained simultaneous confidence intervals for multiple comparisons with the best. Ann Statist. 1984;12(3):1136-1144. DOI 10.1214/aos/1176346732 (seen on Crossref, D4). Zotero YN7P6WNQ has no attachment and no abstract. Needed as the core source of the comparison-based set (Methods). If it is to be cited only for the idea, with the textbook (hsu1996, available) carrying the method, an abstract entered in the record would do instead.
+- Attach a PDF with a text layer (the attached PDF's text cannot be read):
+  - Kim J, Pollard D. Cube root asymptotics. Ann Statist. 1990;18(1):191-219. DOI 10.1214/aos/1176347498. Zotero K6CHKTHU: the PDF is a scan whose text layer holds only a 150-character notice. Core: the cube-root rate of the empirical cutoff (Introduction, Methods, supplement). Running OCR on the PDF in Zotero, or attaching a version with text, would do.
+  - Efron B. Estimating the error rate of a prediction rule: improvement on cross-validation. J Am Stat Assoc. 1983;78(382):316-331. DOI 10.1080/01621459.1983.10477973. Zotero MQZ6DURG: the connector reports "PDF text extraction returned empty result" and the record has no abstract. Core: the bootstrap optimism correction (Methods). If the PDF does have text, Zotero's "Reindex Item" may be all it needs.
+  - Harrell FE, Lee KL, Mark DB. Multivariable prognostic models: issues in developing models, evaluating assumptions and adequacy, and measuring and reducing errors. Stat Med. 1996;15(4):361-387. DOI 10.1002/(SICI)1097-0258(19960229)15:4<361::AID-SIM168>3.0.CO;2-4. Zotero GG8ZJ475: the same empty extraction, no abstract. Supporting: the correction's use in prognostic modelling (Methods); entering the abstract would also do.
+- Complete the metadata:
+  - Seijo E, Sen B. A continuous mapping theorem for the smallest argmax functional. Zotero 386ZU8ZS has no journal, volume, pages, or DOI. Enter: Electronic Journal of Statistics; volume 5; pages 421-439; DOI 10.1214/11-EJS613 (the DOI and volume seen at stage 1, the pages on Crossref, D4). Supplement.
+
+**(3) Record faults in available items, with the value to enter.**
+
+| Item | Zotero | Field | Now | Enter |
+|---|---|---|---|---|
+| kim1990 | K6CHKTHU | volume, issue | empty | 18, 1 (Crossref, D4) |
+| hsu1984 | YN7P6WNQ | volume, issue, DOI | empty | 12, 3, 10.1214/aos/1176346732 (Crossref, D4) |
+| li2015 | L2ADE5CM | DOI | empty | 10.1111/biom.12312 (seen at stage 1; Crossref) |
+| long2012 | 68BTQRIH | issue, pages | empty; "149" | issue 1 (Crossref); the full page range, which neither the attached author manuscript nor Crossref shows |
+| vanbuuren2011 | TT3PCD89 | author; issue | "Buuren, Stef van"; empty | last name "van Buuren", first name "Stef"; issue 3 (the record's own DOI, jss.v045.i03) |
+| inacio2017 | DXULDB7M | authors | "Inácio De Carvalho", "De Carvalho" | "Inácio de Carvalho", "de Carvalho" |
+| vonhippel2021 | GAD48MU6 | author | "Von Hippel" | "von Hippel" |
+| vandervaart1998 | MFX4FI2X | author; title; publisher; volume | "Van der Vaart"; "Asymptotic statistics"; "Cambridge university press"; "3" | "van der Vaart"; "Asymptotic Statistics"; "Cambridge University Press"; move 3 to the series number and enter the series title printed on the book. The date reads 2000 (the printing in the record); keep it or enter the first edition's year, as the user prefers |
+| thiele2023 | SPUB9EGM | journal | "plos one" | "PLOS ONE" |
+| silverman1986 | APEC2L4I | date, publisher, place, series | 2018, Routledge | 1986, Chapman and Hall, London, Monographs on Statistics and Applied Probability (the attached PDF: "Published in Monographs on Statistics and Applied Probability, London: Chapman and Hall, 1986.") |
+
+Faults stage 1 recorded that are now fixed in the library: the DOIs of bantis2014, thiele2023, abdulrahman2022, benowitz2009, and vonhippel2021; benowitz2009's journal; vonhippel2021's title.
+
 ## Decisions
 
 - D1. The acceptance test runs in two gated modes. The stage file asks for the pilot's grid and seeds rerun with every per-cell summary compared; for pilot-c that is 6,500 replicates of about 1.4 seconds each on one core (from the sample run), about an hour on three workers. The `sample` mode, which reruns one replicate from every seed and recomputes every summary from the saved replicates, takes about 90 seconds and is the mode to run after any change to the code; the `full` mode is the stage file's test and was run once, in the background, during step 2.
 - D2. `grDevices` moved from Imports to Suggests: the figure functions use only `graphics`, and the check flagged an unused import. The first check also raised "unable to verify current time", a NOTE from the check's clock lookup with no network time; checks run with `_R_CHECK_SYSTEM_CLOCK_=0`.
+- D3. The full acceptance test's first attempt failed in every block with "unused argument": `RunBlocksParallel()` passed its extra arguments to `parLapplyLB()` under the name `fun`, which `parLapplyLB()` forwards to `clusterApplyLB()` as that function's own argument. Renamed (`log_path`, `one_rep`), with a comment, and a test that runs four blocks on one PSOCK worker and compares them with the same blocks run serially. The sample mode could not catch it, because it runs blocks in the test process; the analysis script would have failed at the quick run.
+- D4. Four identifiers were looked up on Crossref (`api.crossref.org/works/<DOI>`, and one title query for Hsu 1984), on 2026-10-29 at 09:18, to give the value to enter for record faults of items already in the library: long2012 (issue), seijo2011 (pages), li2015 (confirming the DOI seen at stage 1), kim1990 (volume and issue), hsu1984 (DOI, volume, issue). No new source was sought; the stage file allows no literature search here, and these are lookups of identifiers, not searches.
+- D5. A definitional citation (one that only names a method, a package, or a dataset) is read as available with a complete record and no PDF: `rules.md`, section 2, sets a requirement for core and supporting citations only. This makes `vanbuuren2011` available without its PDF.
+- D6. `li2015` is left out of the inventory: its role was the ADNI precedent, and ADNI was set aside at stage 1.
+
+## Process feedback
+
+What in the stage file, the skeleton, the helpers, the checker, or the rules left the agent guessing, was unclear, or could be simpler, with the time it cost. Written as the stage goes; times are from the table at the top.
+
+1. **The acceptance test costs a second pilot (step 1.6, D1).** "Runs the pilot's grid and seeds ... and compares every per-cell summary" means rerunning all 6,500 of pilot-c's replicates, about an hour on three cores. A sample mode (one replicate per seed, every summary recomputed from the saved replicates) took 90 seconds and carries most of the assurance. The stage file could name the two modes, and say that the per-replicate file goes into the fixtures beside the summaries, since a replicate cannot be compared without it (the stage file says only "the saved summaries").
+2. **The cheap mode missed the bug the expensive one caught (D3).** The sample mode ran blocks in the test process; the bug was in the parallel runner the script uses. The stage file could ask that the acceptance test, in any mode, go through the same runner as the analysis script (a few blocks on the workers), so that the script's own path is tested before the quick run. Cost: 2 minutes, and a restart of the full run.
+3. **The references stop has no state.** `STATUS.md` lists `3, design stop` and `3, drafting` but no state for step 2's stop; the Stage row stayed `3, drafting` and the Open stop row names the stop.
+4. **Definitional citations and availability (step 2.2, D5).** The availability rule names core and supporting citations, a pre-1980 record, and a book; a definitional citation (a package, a dataset) is not covered. Read as needing a complete record only.
+5. **Values to enter for record faults (step 2.3, D4).** The stop asks for "the value to enter" for each fault, but a missing DOI or volume is often not anywhere the agent may look: the record lacks it and the stage allows no search. Four Crossref lookups of identifiers filled the gap; the stage file could allow identifier lookups for faults explicitly, as stage 1 does for identifiers of sources already cited.
+6. **Items added between stages.** The eleven items the user added for stage 3 were found by sorting the library by date added; neither the stage 2 log nor `citations.csv` lists them. A hand-over line in the previous stage's log (key, Zotero item, why) would make the inventory a lookup rather than a search.
+7. **The spec's application after a re-scope.** `project-spec.md`, section 5, "What to show", still names the first proposal's pooling-order comparison, although section 12 of the proposal re-scoped the paper; stage 2's re-scope rewrote spec sections 1 to 4 and 8 and 9 but not 5. Re-posed at the design stop.
+8. **`R CMD check` without network time.** The check raised "unable to verify current time" (a 60-second timeout and a NOTE); `_R_CHECK_SYSTEM_CLOCK_=0` removes it. `rules.md`, section 5, or the stage file could set it for every check.
