@@ -1,45 +1,106 @@
-<!--
-The supplementary note: the derivations the paper relies on, included by manuscript.qmd after the
-references (stage 3, step 3.4). One subsection per result, S1.1, S1.2, and so on. Each derivation is
-one step per line with the step's justification after the display, and ends with where the paper
-uses the result and which test in tests/testthat/ checks it. Markers, prov(), and lvl() work here as
-in the paper, and the checker scans this file too.
+This note derives the six results the paper uses: why the reported index overstates the chosen threshold's accuracy, how fast that excess shrinks, how far maximizing first moves the index, why the covariance split targets the analysis's own estimate, why the comparison-based set holds the best threshold, and why one cutoff per stratum can be chosen stratum by stratum. Each is short, and each is checked by a test in the package or by the simulation.
 
-Supplementary figures and tables are numbered Figure S1, Table S1, ... by the cross-reference kinds
-in manuscript.qmd's YAML. Write each as a fenced div whose id starts with sfig- or stbl-, with the
-chunk inside (no fig- or tbl- label) and the caption as the div's last paragraph, and refer to it
-as @sfig-name or @stbl-name. A chunk label of the form sfig-name does not work. Delete these comments.
--->
+Notation: $J$, $c^*$, $J^*$, $\bar J$, $\hat c$, $\hat J_l$, $\hat c_l$, $\Sigma$, $V$, $W$, $M$, $L$, and $\mathrm{SE}_{jk}$ are as in the Methods, and $n$ is the size of each group.
 
-[FILL: one plain-language paragraph: what this note derives and why the paper needs it.]
+### S1.1 The reported index is optimistic {.unnumbered}
 
-[FILL: the notation in one sentence, in the paper's symbols.]
-
-### S1.1 [FILL: the first result] {.unnumbered}
-
-[FILL: the statement, in the paper's notation.]
-
+If the pooled curve is unbiased at the best threshold, $\mathrm{E}\{\bar J(c^*)\} = J^*$, then the reported index exceeds the accuracy of the chosen threshold in expectation:
 $$
 \begin{aligned}
-a &= b \\
-  &= c
+\max_c \bar J(c) &\ge \bar J(c^*), \\
+\mathrm{E}\{\max_c \bar J(c)\} &\ge \mathrm{E}\{\bar J(c^*)\} = J^*, \\
+J^* &\ge J(\hat c), \\
+\mathrm{E}\{\max_c \bar J(c)\} - \mathrm{E}\{J(\hat c)\} &\ge 0 .
 \end{aligned}
 $$
+Line 1 holds in every dataset, since a maximum is at least the value at any point. Line 2 takes expectations and uses the premise. Line 3 holds because $J^*$ is the maximum of $J$. Line 4 combines lines 2 and 3. The premise fails when the imputations are biased, which is the case the predictive-mean-matching cells probe. The paper uses the result in the Introduction and the Methods; the test that `RunReplicateC()` returns a maximum at least the curve's value at the chosen threshold checks the first line in code, and the null cells of the simulation show the excess with nothing missing.
 
-[FILL: the justification of each line, numbered as the lines; where the paper uses the result; the test that checks it.]
+### S1.2 The excess is of order $n^{-2/3}$ (a sketch) {.unnumbered}
 
-### S1.2 [FILL: a supplementary figure or table, if any] {.unnumbered}
+This is a sketch, not a proof. Assume complete data, a unique maximum with curvature $\kappa = -J''(c^*) > 0$, and positive densities at $c^*$. The empirical threshold maximizes a sum of indicator functions, the setting of cube-root asymptotics: $n^{1/3}(\hat c - c^*)$ converges to the maximizer of a Gaussian process with a quadratic drift [CITE: the cube-root limit (Kim and Pollard 1990; no readable text in Zotero)]{.cite} [@cattaneo2020]. Write $G = \bar J - J$ for the centred curve. Then
+$$
+\begin{aligned}
+\max_c \bar J(c) - J(\hat c) &= \{\max_c \bar J(c) - \bar J(\hat c)\} + G(\hat c), \\
+G(\hat c) &= G(c^*) + \{G(\hat c) - G(c^*)\}, \\
+\mathrm{E}\{G(c^*)\} &= 0, \\
+G(\hat c) - G(c^*) &= O_p(n^{-1/2} \lvert \hat c - c^* \rvert^{1/2}) = O_p(n^{-2/3}).
+\end{aligned}
+$$
+Line 1 adds and subtracts $\bar J(\hat c)$; the braced term is zero when the maximum is reached at $\hat c$, and of lower order when tied intervals lie apart. Line 2 adds and subtracts $G(c^*)$. Line 3 holds because $\bar J(c^*)$ is an average of unbiased proportions. Line 4 uses the modulus of continuity of the empirical process, whose increment over a distance $\delta$ has standard deviation of order $(\delta / n)^{1/2}$, with $\delta = O_p(n^{-1/3})$. The excess is therefore of order $n^{-2/3}$ in expectation, given uniform integrability, which the sketch assumes. A full derivation must also carry the imputation: proper imputation with an unbiased model inflates the variance of $G$ without changing its order. The paper uses the order in the Methods; the simulation's size gradient checks it, since the optimism at the three sizes of the sharp shape should fall along a line of slope near $-2/3$ on the log scale.
 
-[FILL: the sentence that refers to it, as @sfig-example.]
+### S1.3 The order of pooling {.unnumbered}
 
-::: {#sfig-example}
+The mean of the per-dataset maxima is never below the maximum of the mean curve, and for curves that are quadratic near their peaks the gap is close to $\kappa \hat B_c / 2$:
+$$
+\begin{aligned}
+\hat J_l(c) &\le \max_{c'} \hat J_l(c') \quad \text{for every } c, l, \\
+\bar J(c) &\le L^{-1} \textstyle\sum_l \max_{c'} \hat J_l(c') \quad \text{for every } c, \\
+\max_c \bar J(c) &\le L^{-1} \textstyle\sum_l \max_{c'} \hat J_l(c'), \\
+\hat J_l(c) &= m_l - (\kappa_l / 2)(c - \hat c_l)^2 \quad \text{near the peaks}, \\
+\arg\max_c \bar J(c) &= \tilde c_\kappa = \textstyle\sum_l \kappa_l \hat c_l / \sum_l \kappa_l, \\
+L^{-1} \textstyle\sum_l m_l - \max_c \bar J(c) &= L^{-1} \textstyle\sum_l (\kappa_l / 2)(\hat c_l - \tilde c_\kappa)^2 .
+\end{aligned}
+$$
+Line 1 is the definition of a maximum. Line 2 averages line 1 over $l$. Line 3 maximizes the left side of line 2 over $c$, so the gap is never negative; it is zero when one threshold maximizes every curve, as in the cells without missing values. Line 4 is the quadratic approximation, valid for smooth curves with every per-dataset cutoff in the region where it holds. Line 5 sets the derivative of the averaged quadratic to zero. Line 6 substitutes line 5 into the averaged quadratic. With equal curvatures $\kappa_l = \kappa$, the right side of line 6 is $\kappa \hat B_c / 2$. The empirical curve is a step function and has no curvature, so for it the formula is an approximation that the simulation compares with the observed gap. The paper uses the result in the Methods and the note on the order of pooling; the unit tests of the pooling rules check lines 1 to 3 on curves in code (a gap of exactly zero for identical curves), and the package's known-answer tests on synthetic quadratic curves find line 6 to machine precision.
+
+### S1.4 The covariance split {.unnumbered}
+
+Write the $m$-th imputed curve of resample $b$ as $\hat J_{bm} = A_b + e_{bm}$, with $A_b$ the curve the resample would give with infinitely many imputations and $e_{bm}$ the imputation noise, independent across $m$ given the resample, with mean zero and covariance $W$. Then
+$$
+\begin{aligned}
+\bar J_b &= A_b + M^{-1} \textstyle\sum_m e_{bm}, \\
+\mathrm{Cov}(\bar J_b) &= \mathrm{Cov}(A_b) + W / M = V, \\
+\mathrm{E}\{(M-1)^{-1} \textstyle\sum_m (\hat J_{bm} - \bar J_b)(\hat J_{bm} - \bar J_b)^\top\} &= W, \\
+\mathrm{Cov}(A_b) + W / L &= V - W / M + W / L .
+\end{aligned}
+$$
+Line 1 averages the $M$ imputations. Line 2 uses the independence of the noise from $A_b$ and across imputations. Line 3 is the unbiasedness of the sample covariance of $M$ draws about their mean. Line 4 is the covariance of an estimate built from $L$ imputations, written in terms of what the resamples estimate; with $L > M$ it is smaller than $V$. The bootstrap supplies $\mathrm{Cov}(A_b)$ as the sampling covariance of the data's own curve when the resample mimics the sample [@bartlett2020]. The paper uses the result for both bands and both sets; the known-answer test of the covariance split, on synthetic resamples with known parts, checks a diagonal and an off-diagonal entry.
+
+### S1.5 The comparison-based set holds the best threshold {.unnumbered}
+
+Let $k^*$ be the grid point with the largest $J(c_k)$. If every comparison of $k^*$ with another grid point is within its bound,
+$$
+\begin{aligned}
+\{\bar J(c_j) - \bar J(c_{k^*})\} - \{J(c_j) - J(c_{k^*})\} &\le q_D\,\mathrm{SE}_{jk^*} \quad \text{for every } j \ne k^*, \\
+J(c_j) - J(c_{k^*}) &\le 0, \\
+\bar J(c_j) - \bar J(c_{k^*}) &\le q_D\,\mathrm{SE}_{jk^*},
+\end{aligned}
+$$
+then $k^* \in S_C$. Line 1 is the event. Line 2 holds because $k^*$ is best. Line 3 adds lines 1 and 2, which is the condition for membership. The event of line 1 has probability `r lvl(100 * nominal)`% in the limit when the differences are jointly normal with covariance from $\Sigma$ and $q_D \ge q_{k^*}$; the largest per-point quantile $q_D = \max_k q_k$ meets that whichever point is best. The plug-in value $q_{\hat k}$ equals $q_{k^*}$ when $\hat k = k^*$ and otherwise carries no guarantee. The paper uses the result in the Methods; the known-answer tests check the critical value for two independent coordinates, $\Phi^{-1}(0.95)$, and that a set built on the true curve holds the best grid point.
+
+### S1.6 One cutoff per stratum {.unnumbered}
+
+A rule that calls a person positive when $X > c(V)$, with one cutoff for each value $v$ of a discrete covariate $V$, has Youden index
+$$
+\begin{aligned}
+J_{\mathrm{rule}} &= P\{X \le c(V) \mid D = 0\} - P\{X \le c(V) \mid D = 1\} \\
+&= \textstyle\sum_v \{w_0(v) F_0(c(v) \mid v) - w_1(v) F_1(c(v) \mid v)\},
+\end{aligned}
+$$
+with $w_d(v) = P(V = v \mid D = d)$. Line 1 is the definition. Line 2 conditions on $V$. Each term of the sum depends on one cutoff only, so the rule is maximized term by term, and the population-optimal cutoff of stratum $v$ maximizes $w_0(v) F_0(c \mid v) - w_1(v) F_1(c \mid v)$. With densities, its first-order condition is $w_0(v) f_0(c \mid v) = w_1(v) f_1(c \mid v)$, while the stratum's own Youden cutoff solves $f_0(c \mid v) = f_1(c \mid v)$. The two agree when $w_0(v) = w_1(v)$. At the stratum's own cutoff the derivative of the population criterion is $\{w_0(v) - w_1(v)\} f_0(c \mid v)$, so a stratum that holds a larger share of the controls than of the cases has a population-optimal cutoff above its own, for a curve with one peak. The paper uses the result in the application; the tests of `StratumCutoffs()` check that equal shares give the stratum's own cutoff and that a larger share of controls does not lower it.
+
+### S1.7 Every cell of the simulation {.unnumbered}
+
+@stbl-cells gives, for every cell of the simulation study, the measures of the bands, the sets, and the index that the Results report, and @stbl-cutoffs the measures of the threshold and the order of pooling.
+
+::: {#stbl-cells}
 
 ```{r}
-#| eval: false
-
-# Draw from the results objects only; the figure function lives in R/.
+gap_register("stbl-cells", what = "every measure, every cell", cells = nrow(s), n_rep = ri$n_rep)
+kable_w(cell_rows, widths = c(22, 8, 8, 8, 8, 8, 9, 9, 10, 8))
 ```
 
-[FILL: the caption, computed numbers through prov() like any caption.]
+`r cap_cells`
+
+:::
+
+::: {#stbl-cutoffs}
+
+```{r}
+gap_register("stbl-cutoffs", what = "cutoffs and the order of pooling, every cell", cells = nrow(s), n_rep = ri$n_rep)
+kable_w(cutoff_rows, widths = c(30, 14, 14, 14, 14, 14))
+```
+
+`r cap_cutoffs`
 
 :::

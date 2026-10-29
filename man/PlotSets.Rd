@@ -4,14 +4,14 @@
 \alias{PlotSets}
 \title{Coverage and length of the near-optimal sets in every cell}
 \usage{
-PlotSets(s, labels, limit = 0.93)
+PlotSets(s, labels, limit = 0.95)
 }
 \arguments{
 \item{s}{Per-cell summaries.}
 
 \item{labels}{Row labels, one per cell.}
 
-\item{limit}{Reference line for the coverage, drawn dashed.}
+\item{limit}{Reference line for the coverage (the nominal level).}
 }
 \value{
 \code{NULL}, invisibly.

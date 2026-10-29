@@ -1,6 +1,6 @@
 # Drafting log (stage 3)
 
-Paper test: yes on all seven questions for a constructive method paper (the Youden curve, its maximizer, and its maximum as functionals; a bootstrap-then-impute band, a comparison-based near-optimal set, and a matched optimism correction, with pilot-c's simulation behind them), with two plain noes: no closed form for the optimism of the step curve beyond its order, and no formula for the band's undercoverage under predictive mean matching; the application's "what to show" still names the first proposal's pooling-order comparison and is re-posed at the design stop, and the discrete-covariate aim has no code yet.
+Paper test: yes on all seven questions for a constructive method paper (the Youden curve, its maximizer, and its maximum as functionals; a bootstrap-then-impute band, a comparison-based near-optimal set, and a matched optimism correction, shown by a 44-cell simulation and the NHANES application), with two plain noes: no closed form for the optimism of the step curve beyond its order (a sketch gives $n^{-2/3}$), and no formula for the band's undercoverage under predictive mean matching, which the simulation traces to bias of the imputed curve; the first draft rests on the quick run (100 replicates per cell), six sources are missing from Zotero, and the discrete-covariate aim enters through the application and the supplement only.
 
 Workflow 0.2.3 (`workflow/03-manuscript.md`, `workflow/rules.md`). Started 2026-10-29 at 09:01 EDT, in a session started by the stage 2 coordinator session, on Opus 5.5 with every subagent on Sonnet 5.5; stops on. Inputs read in full: `STATUS.md` (`2, piloted-pass`), `workflow/03-manuscript.md`, `workflow/rules.md`, `proposal.md` with sections 12 and 13, `project-spec.md`, `protocol.md` (the template), `log/02-pilot.md`, `pilot-c/` (pre-registration, decisions, `pilot.R`, `verdict.R`, the saved summaries, timing, and run file), the functions in `R/` that pilot-c calls, `manuscript/` (the skeleton, the supplement, the helpers, the parts, the seed bib, `citations.csv`, the checker), the target journal's profile, and the three hand-over notes in the shared notes folder. `pilot/` and `pilot-b/` were read through their decisions logs, their verdicts, and `proposal.md` sections 12 and 13, which summarize them.
 
@@ -31,6 +31,13 @@ Workflow 0.2.3 (`workflow/03-manuscript.md`, `workflow/rules.md`). Started 2026-
 | 3.3 Quick run, first attempt | 09:44 | 10:46 | 62 min of compute | failed in cell 27 (D15); nothing saved |
 | 1. Acceptance test, full mode | 09:16 | 10:47 | 91 min of compute | three workers, under load; 70 expectations, 0 failures: all 6,500 replicates of pilot-c reproduced |
 | 3.3 Fix, tests, protocol amendment | 10:46 | 10:52 | 6 min | `FullRankColumns()`; the runner saves finished blocks |
+| 3.3 Quick run, second attempt | 10:50 | 11:27 | 36.7 min of compute | seven workers; `run = "quick"`, 100 replicates, 44 cells |
+| 3.4 Results, Discussion findings, supplement tables | 11:27 | 11:31 | 4 min | |
+| 3.5 Introduction revised, Abstract | 11:29 | 11:31 | 2 min | |
+| 4. Render, checker, revision pass, second pass on the Abstract | 11:31 | 11:38 | 7 min | five renders; checker errors to zero (D16) |
+| 5. Clone test | 11:38 | 12:18 | 40 min of compute | passed (below); the log finished meanwhile |
+| 5. Render, check, STATUS, commit, stop message | 12:18 | 12:22 | 4 min | |
+| Total | 09:01 | 12:22 | about 3 h 20 min | of which about 3 h of compute in the background: the full acceptance test (91 min), two quick runs (62 and 37 min), the application (8 min), the clone test (40 min); about 1 h 40 min of the agent's own work, spread around the runs, and two stops answered in a minute each |
 
 ## Preconditions
 
@@ -240,6 +247,104 @@ New code before the quick run: the complete-case and ten-donor engines, unequal 
 
 - D15. The first quick run (09:44 to 10:46) stopped when one block failed: cell 27 (sharp, 100 per group, 60% missing, predictive mean matching), replicate 9, has 10 of 100 cases observed, and a bootstrap resample left the imputation's predictors collinear among the observed rows; `mice.impute.pmm()` called outside `mice()` then stops with "object 'state' not found" (its logging looks for `mice()`'s state). `parLapplyLB()` returned the error only after all 44 blocks had run, and the script saved nothing, so 62 minutes of compute were lost and no result was read. Fixes: `FullRankColumns()` drops constant or collinear predictors before each univariate call, as `mice()` removes collinear predictors, and leaves every other dataset unchanged (the sample-mode acceptance test confirms pilot-c is still reproduced); the runner now catches a block's error, finishes the other blocks, saves them to `results/simulation_partial.rds`, and stops naming the failed block. Recorded as a dated amendment in `protocol.md`, committed before the rerun.
 
+- D-S4. The user, during the quick run: 60% missing is probably too high when NHANES has about 10%; levels 0, 10, 20, 30, 40 might have served better; no change now. The agent's answer: the overall fraction understates how informative the simulated missingness is. Under the fixed mechanism, the sharp shape at an overall 20% has 7% of controls and 33% of cases missing (60%: 40% and 81%), while NHANES has 9.4% of nonsmokers and 10.0% of smokers missing. So NHANES sits below the 20% cell in donor sparsity, and 60% is where the method's boundary shows. To be done in the draft: report missing shares by group beside the overall fraction, place NHANES on that axis, and say that the application's imposed 40% used a weaker mechanism than the simulation's. A 10% level, or a second, weaker mechanism, remains possible as a dated amendment before the production run, if the user wants it.
+
+### 3.4 to 3.6 The sections
+
+What each section was carried from, and what was written new:
+
+| Section | Carried from | Written new |
+|---|---|---|
+| Methods: estimand, pooled curve | the proposal's section 3 (row 3) and section 4 (the mechanism) for the mathematics | every sentence; the inequality and its premise as stated |
+| Methods: band, set, correction | `pilot-c/preregistration.md`, section 2, and the code in `R/procedure.R` for the formulas | every sentence; the split's justification moved to S1.4 |
+| Methods: data | `R/nhanes.R`, the stage 2 log (method, limit of detection), the codebooks (D12) | every sentence |
+| Simulation design | `protocol.md` | sentences; the design table built from `results/design.rds` |
+| Results | `results/cell_summaries.rds` (quick run) | all |
+| Application | `results/application.rds` | all |
+| Discussion | the pilot-c report's "Critiquing the model" table for the limitations (rows not made factors: the point mass, the fixed auxiliary strength and missingness coefficients, one auxiliary and a correct normal model, MAR only, the rescaled covariance, the grid's best threshold), the spec's out-of-scope list item by item for future work (second dataset, continuous covariate, missing disease status, other criteria, a cube-root bootstrap, a software release, a reporting guide) | the findings, the advice, the novelty table |
+| Supplement | the proposal's section 4 for S1.3 and S1.6; pilot-c's pre-registration for S1.5 | S1.1, S1.2 (a labelled sketch), S1.4, the tables S1 and S2 |
+| Back matter | `parts/` (reproducibility, ADEMP sentence); the journal profile for the AI statement's placement | the AI statement written to the profile's policy; the Statements and Declarations section with a marker |
+
+**Step 3.6, the second Zotero batch.** Drafting cited nothing outside the inventory; the NHANES codebook pages (D12) are documentation of the dataset whose items are already listed as missing. No batch, no stop.
+
+**The bounded literature pass.** No search was run. Every source opened in this stage, through the connector's `search_fulltext` on the item's own text: `bartlett2020` (multiple imputation "one of the most popular approaches"), `long2011` (the EPDS application, "the unanimous optimum threshold", sum of sensitivity and specificity), `fluss2005` (the empirical method worst in bias, others positively biased), `cattaneo2020` (cube-root asymptotics, Chernoff-type limits, the standard bootstrap invalid), `montielolea2019` (the sup-t band as the default), `hassanzad2024` (Youden's J first among the criteria), `morris2014` (around ten donors; donor sparsity leads to bias), `morris2019` (ADEMP, reported in that order). The connector's `get_content` was opened on `efron1983` and `harrell1996` (empty text). The other citations rest on the passages stage 1 recorded in `citations.csv`. Spot check: the eight passages above were read directly in the full text, not delegated, so no delegated reading needs a spot check.
+
+**Citation counts** (checker, final render): 36 distinct keys cited, 4 definitional (`rubin1987`, `vanbuuren2011`, `marwick2018`, `hsu1996`), 32 passage-backed; 10 `[CITE]` markers for the six missing sources.
+
+**Deviations from Zotero records.** None is patched in the bib (`rules.md`, section 2). The faults in cited items stay as exported and are listed in `manuscript/zotero-fixes.md`, with the step 2 list above: `thiele2023`'s journal in lower case, `vanbuuren2011`'s particle with the given name (rendered "Buuren S van"), `inacio2017`'s capitalized particles, `vandervaart1998` and `silverman1986` (not cited in the draft), and three false alarms (a DOI asked of three books, an apostrophe in `mertens2026`). The record years the bib carries were checked against the proposal's: `leyrat2019`, `bantis2019`, `zhang2020`, `wirth2024` follow the records, as in stage 1.
+
+## Revision pass
+
+The rendered page was read from the title to the end of the Discussion as a reader who has not seen the spec, the protocol, or this log would read it (the text extracted from `manuscript/manuscript.html`, the five figures extracted and viewed).
+
+**Paragraphs: the question each answers for that reader.**
+
+| Section | Paragraph | Question | First sentence states the answer? |
+|---|---|---|---|
+| Abstract | one | What is proposed and does it work? | yes |
+| Introduction | 1 | Why does a threshold matter, how is it chosen, and what do studies with imputed markers report? | rewritten: the first two sentences merged so that the opening claim carries its source |
+| Introduction | 2 | What does the reported index estimate, and what is known about inferring it? | yes |
+| Introduction | 3 | What does this paper do? | yes |
+| Methods 2.1 | 1 | What is estimated? | yes |
+| Methods 2.2 | 1 | How is the curve pooled and the index read? | yes |
+| Methods 2.2 | 2 | Why is the index biased, and how much? | yes |
+| Methods 2.3 | 1 | How is the band built? | yes |
+| Methods 2.3 | 2 | What is it compared with? | yes |
+| Methods 2.4 | 1 | What is the near-optimal set and why is it narrower? | yes |
+| Methods 2.5 | 1 | How is the index corrected? | yes |
+| Methods 2.6 | 1 | What is recorded for the order of pooling? | yes |
+| Methods 2.7 | 1 | What are the data? | yes |
+| Methods 2.7 | 2 | How were they analysed? | yes |
+| Methods 2.8 | 1, 2 | How is the work reproduced? | yes (part) |
+| Simulation design | ADEMP paragraphs | aims, mechanisms, estimands, methods, measures, replicates | yes |
+| Results, bands | 1 | Did the bands cover? | yes |
+| Results, bands | 2 | Where they did not, why? | rewritten: from an interpretation ("because the curve was biased") to the observed fact, since Results do not interpret |
+| Results, sets | 1 | Did the sets hold the best threshold, and how long were they? | yes |
+| Results, correction | 1 | Did the correction remove the optimism? | yes |
+| Results, pooling | 1 | How far apart were the two orders? | yes |
+| Application 4.1 | 1 | What does the application ask, and where do the data sit? | yes |
+| Application 4.2 | 1 | Can the data choose a cutoff? | yes |
+| Application 4.2 | 2 | Does the procedure recover a known curve? | yes |
+| Application 4.2 | 3 | What do the strata show? | yes |
+| Discussion | 1 | What are the answers to the four questions? | yes (the novelty table's reference first) |
+| Discussion | 2 | What should a user do differently? | yes |
+| Discussion | 3 | What limits the simulation? | yes |
+| Discussion | 4 | What lies outside the paper? | yes |
+
+**Changes, by section, quoting the rendered page.**
+
+- Abstract (rewritten twice; over the journal's 200 words at 245, then 222 and 205 by the checker's count; 199 after). Kept every claim with its number and uncertainty; cut "of replicates" where the context gives it, the year range of NHANES, and "built by bootstrapping and then imputing" to "by bootstrap-then-impute". Reason: the limit.
+- Introduction, paragraph 1: "A threshold on a biomarker decides who is counted as having a condition. Serum cotinine ... is one example" became one sentence carrying its source. Reason: the first sentence made a claim without one.
+- Introduction, paragraph 2: "The empirical threshold converges ... so Rubin's rules, which assume approximately normal estimates, do not apply to it, and the standard bootstrap is inconsistent for it" split in two. Reason: three ideas in one sentence.
+- Introduction, paragraph 3: "closes the paper" became "then asks whether the data can choose between a published cutoff and the cohort's own". Reason: revised against the Application's finding.
+- Methods 2.3: "which stays valid when the imputation and analysis models are uncongenial" became "whose variance estimates hold when ..."; Reason: "valid" without saying what it refers to.
+- Methods 2.7 and Application 4.1: counts printed as "17948" became "17,948" (a helper for counts). Reason: readability.
+- Simulation design: "most often at high values" became "above all at high values" (a justify-or-replace word); the design table's levels printed "2.00, 1.00" and "0.00, 0.20" became "2, 1" and "0%, 20%". Reason: readability.
+- Results, bands, paragraph 2: see the table above.
+- Application 4.1 and 4.2, after the user's question on the missing fraction (D-S4): the placement table now gives the missing shares by group for NHANES and for the sharp shape at 20%, and the imposed analysis is described as "depending on smoking status, age, and sex only, a weaker dependence than the simulation's". Reason: the overall fraction alone misplaces the data.
+- Discussion: the future-work sentences ("would test", "would turn", "would need", "might remove", "would make") rewritten as statements; "their bands rarely covered the curve" became "missed the curve in most replicates". Reason: justify-or-replace words.
+- Figures: the cell labels were cut off at the left in Figures 1 to 3; the margin now follows the longest label. The second panel of Figure 2 repeated the labels over the first; it now has none. The application's panels started at zero, flattening the band; they now start just below the band. Captions printed "0.97 ." with a space; fixed.
+
+**Second pass.** The first pass changed more than three sentences in the Abstract and the Discussion. The second pass over the Abstract is its two further cuts above. In the Discussion, the second pass read the four rewritten future-work sentences and the limitations against each other and cut nothing further: the splitting of the first pass did not lengthen them.
+
+**Cross-checks.** Every claim in the Abstract carries a number with its uncertainty, and each comes from the same expression in Results or the Application (`rng(nrm$cover_hybrid, ...)`, `rng(pmm_hi$cover_hybrid, ...)`, `rng(s$compset_hybrid, ...)`, `span(s$length_ratio_hybrid)`, `rng(nul$optimism, ...)`, `rng(nul$corrected_bias_20, ...)`, the application's set range). The Introduction's four questions are answered in the Discussion's first paragraph in the same order and the same words. Every label a caption uses is defined in the caption or in the text before it (PMM, MCSE, SD / SE, the set names, $\kappa \hat B_c / 2$).
+
+### Checker warnings kept, with reasons
+
+- "often (4), can (3), would (1)": "at least as often as its level promises" is the coverage statement itself (three times, the question and its answer); "can" appears in the two questions the Application asks and in the supplement's "can be chosen stratum by stratum", a statement of what the derivation allows; "would" is the supplement's "the curve the resample would give with infinitely many imputations", a counterfactual by definition.
+- "valid (2)": the supplement's "the quadratic approximation, valid for smooth curves with every per-dataset cutoff in the region where it holds", which names its scope; and the novelty table's "which combinations [of the bootstrap and imputation] are valid", the cited papers' own question, which the table cell names.
+- "correct (4)": each is "the correct model" or "correctly specified", naming the imputation model, which is what the word refers to.
+- "body has 10,883 words; limit around 8,000": the checker counts the supplementary note (3,616 words), which goes to the journal as online supplementary material. The main text from the Introduction to the Discussion is about 7,100 words, plus ten displays at about 200 words each, so about 9,100 in the journal's terms: over by about a tenth. Cutting it is a decision for the revision rounds, after the production numbers: the candidates are the Methods' data paragraph and the Results' long sentences of ranges.
+
+### Decisions (drafting)
+
+- D16. The checker reported the en dashes of the reference list's page ranges as errors: with the numeric Sage Vancouver style, each reference is a nested `div`, and the checker's pattern for skipping the reference list stops inside the first entry. One line added to `manuscript/check-manuscript.py` removes the whole References section before the dash check. It also flagged `@stbl-` cross-references in the Results as literature citations; the two references to the supplementary tables are written as "Table S1" and "Table S2" in the Results, and as cross-references in the supplement itself, where they resolve.
+
+## Step 5: render, check, clone
+
+- Rendered in draft mode (`quarto render manuscript/manuscript.qmd`); the checker (`--journal statistical-methods-in-medical-research`) reports no errors and five warnings, each answered above under "Checker warnings kept".
+- **The clone test** (11:38 to 12:18, `scratchpad/clonetest/run.sh`): a fresh `git clone` with the uncommitted draft files copied in (all but the user's `idea.md` edit); `data/raw/` empty in the clone, since the raw files are git-ignored; `renv::restore()` linked 134 packages from the cache; `analysis/00_download.R` downloaded all nine NHANES files, whose md5 sums equal the originals'; `uv sync` and `uv run pytest` (1 passed); `devtools::test()` 2,745 expectations, 0 failures, 3 skips; `devtools::check()` 0 errors, 0 warnings, 0 notes; the quick run rerun on seven workers with the application beside it on one; `results/cell_summaries.rds`, `results/design.rds`, and `results/application.rds` (less its timing field) equal to this session's to $10^{-12}$; the run file says `quick`, 100 replicates, 44 cells; the draft rendered and the checker found no errors. Passed.
+
 ## Decisions
 
 - D1. The acceptance test runs in two gated modes. The stage file asks for the pilot's grid and seeds rerun with every per-cell summary compared; for pilot-c that is 6,500 replicates of about 1.4 seconds each on one core (from the sample run), about an hour on three workers. The `sample` mode, which reruns one replicate from every seed and recomputes every summary from the saved replicates, takes about 90 seconds and is the mode to run after any change to the code; the `full` mode is the stage file's test and was run once, in the background, during step 2.
@@ -269,3 +374,14 @@ What in the stage file, the skeleton, the helpers, the checker, or the rules lef
 10. **`build-bib.py`'s false alarms.** It asks for a DOI on books and reads an apostrophe ("Rubin’s") as a closing quote running into the next word; four of its eight lines here are of those kinds.
 11. **The design proposal's scope against the spec.** The spec's ADEMP skeleton lists more factors and methods (three peak shapes including two near-equal maxima, a strength-of-auxiliary factor, the kernel estimator, the nearest-neighbour engine with several auxiliaries, impute-then-bootstrap, the complete-case intervals of Bantis et al., the discrete covariate) than an hour's quick run and a day's production run allow; the proposal cuts them with reasons. The stage file could say whether the spec's skeleton is a menu or a commitment.
 12. **Power for a study with no test.** `rules.md`, section 3, says a simulation always plans power; this design has confidence bands and sets but no test. The proposal names width and length as the analogue; the rule could say so.
+13. **Section headings for a constructive paper.** The skeleton's Methods headings ("What the procedure estimates", "The fix or the diagnostic") are a critique's; for a constructive paper they became the procedure's parts (the estimand, the pooled curve, the band, the set, the correction, the order of pooling). The stage file's "What each section must contain" could carry a constructive variant.
+14. **Back matter for the target journal.** The profile says Sage requires a "Statements and Declarations" section with every subheading present, but does not list the subheadings; the draft carries a marker there. The AI statement went to Acknowledgements, where the profile places it, rather than to the skeleton's own section.
+15. **One failed block lost the whole quick run (D15, 62 minutes).** The runner returned an error only after every block had run and saved nothing. The template's runner should save each block's output as it finishes, or at least the finished blocks on failure (now done here); and the design-proposal timing, which used 40% missing only, should include the smallest size at the highest missing fraction, where degenerate resamples appear.
+16. **Calling `mice`'s univariate functions directly.** The pilots called `mice.impute.pmm()` and `mice.impute.norm()` outside `mice()` for speed (first pilot, D3). Outside `mice()` they stop on collinear predictors instead of dropping them, a failure no pilot cell reached and the quick run's smallest cell did. The guard is now in the package; a note in `CLAUDE.md` or the pilot stage file would prevent it in the next project.
+17. **One procedure for the simulation and the application.** The pilot code put the procedure inside the replicate function, so the application could not call it; moving it into `MiYoudenInference()` at step 3 meant a refactor checked by the acceptance test. Step 1 of this file could ask for the procedure as its own function, taking the data and an imputation function, when the pilot is promoted.
+18. **Runs that overlap.** The full acceptance test (step 1) took 91 minutes under load and was still running when the quick run (step 3) started; the quick run's 35-minute projection became 62 minutes with the machine shared. The stage file could say that the full acceptance test runs before the timing of the design proposal, or in the sample mode only when the quick run follows soon.
+19. **The checker and a numeric style.** The target journal's numeric CSL nests a `div` per reference; the checker's regular expression for skipping the reference list stopped inside it and reported every page range's en dash (D16). It also counts `@stbl-` cross-references as citations inside Results. The template's checker could take both fixes.
+20. **The abstract's word count.** The checker splits each decimal into two words, so a 200-word abstract with five ranges and their Monte Carlo errors has about 20 words less room than a plain count; it took three cuts. The stage file's advice to trust the checker at the limit was right, and worth stating as "plan for about 180 plain words".
+21. **Reading the rendered page.** The built-in browser could not open a local file, so the page was read as text extracted from the HTML and the figures as images extracted from it. The stage file could say how the agent reads the rendered page when no browser is available.
+22. **Supplementary tables against the "no cell dropped" rule.** With 44 cells, every finding's cells fit only in supplementary tables (S1, S2) and in tall figures; the stage file's display rule is met that way, at the cost of figures ten inches tall.
+23. **Time.** The stage, from the first read to the stop, took about 3 h 20 min of wall time, two stops included, of which about 3 h were background compute and about 1 h 40 min the agent's own work. The quick run's one-hour box held on seven workers (37 min); the full acceptance test, the failed first quick run, and the clone test's rerun cost more compute than the quick run itself.

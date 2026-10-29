@@ -114,6 +114,7 @@ own_html = re.sub(r'<nav id="TOC".*?</nav>', "", visible, flags=re.S)
 own_html = re.sub(r'<div class="apparatus">.*?</div>\s*', "", own_html, flags=re.S)
 own_html = re.sub(r'<header id="title-block-header".*?</header>', "", own_html, flags=re.S)
 own_html = re.sub(r'<div id="refs".*?</div>\s*</div>', "", own_html, flags=re.S)   # the reference list: citeproc's dashes are not the paper's
+own_html = re.sub(r'<section id="references"[^>]*>.*?</section>', "", own_html, flags=re.S)   # a numeric style nests a div per entry, which the line above stops inside
 # numeric in-text citations: citeproc writes a range such as [14-16] with an en dash (fixed in the SS1 copy)
 own_html = re.sub(r'<span class="citation"[^>]*>.*?</span>', " CITE ", own_html, flags=re.S)
 own = re.sub(r"\s+", " ", htmlmod.unescape(re.sub(r"<[^>]+>", " ", own_html)))

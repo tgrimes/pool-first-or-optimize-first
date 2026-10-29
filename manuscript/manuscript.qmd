@@ -47,25 +47,6 @@ execute:
   message: false
 ---
 
-<!--
-HOW TO USE THIS FILE (the manual is workflow/03-manuscript.md)
-- Replace every [FILL: ...] and delete the HTML comments that instruct you. Chunks marked eval: false
-  are patterns to copy; remove that line once a chunk is real.
-- Every number in the text comes through prov(), from results/. Never type a result.
-- Markers are spans: [TO CONFIRM: the decision]{.tc} for anything a person must decide,
-  [CITE: the claim]{.cite} for a claim without a usable source.
-- Write in this order: purpose draft of the Introduction; the design proposal (stop); the quick run;
-  Methods, Design, Results, Discussion; Introduction revised; Abstract.
-- No workflow words in the paper (pilot, card, worker, quick run, spec, harness, known-answer check, the report).
-- The proofs go in _supplement.qmd, included after the references as the supplementary note.
-- Render: quarto render manuscript.qmd            (draft mode, with the banner and gap table)
-          quarto render manuscript.qmd -P draft:false   (final mode, when production numbers exist)
-          quarto render manuscript.qmd -P draft:false -P memo:true   (memo mode: a pilot's numbers, no marks)
-- Supplementary figures and tables take the labels sfig-... and stbl-... (Figure S1, Table S1); see _supplement.qmd.
-- Check:  python3 -I check-manuscript.py manuscript.qmd manuscript.html --citations citations.csv --bib references.bib --journals ../workflow/journals/journals.csv --journal <slug>
-          (add --final for the final render, or --memo and no --journal for a memo)
--->
-
 ```{r}
 #| label: setup
 #| include: false
@@ -76,9 +57,198 @@ prov_set_mode(params$draft, memo = params$memo)
 ri <- if (params$memo) read_run_info(pilot_path("run_info.rds")) else read_run_info()
 if (!params$draft || params$memo) check_no_markers("manuscript.qmd")
 
-# [FILL] Load every results file here and compute every quoted number from these objects.
-# reps <- read_results("simulation_replicates.rds")
-# design <- read_results("design.rds")
+# The package's functions (the figure functions, and the procedure's
+# settings read from its defaults), then every results file.
+suppressMessages(devtools::load_all(project_root(), quiet = TRUE))
+proc <- lapply(formals(MiYoudenInference)[c("n_imp", "n_boot", "m_boot",
+                                            "n_boot_opt", "n_boot_opt2",
+                                            "grid_n", "n_draw")], eval)
+grid_probs <- eval(formals(GridFromCompleted)$probs)
+nominal <- eval(formals(SupTCritical)$level)
+sim_args <- formals(SimulateMarkerData)
+design <- read_results("design.rds")
+s <- read_results("cell_summaries.rds")
+app <- read_results("application.rds")
+ari <- read_results("application_run_info.rds")
+pr <- function(x, digits = 3) prov(x, digits, run = ari$run)
+cnt <- function(x) prov(text = formatC(x, format = "d", big.mark = ","), run = ari$run)
+session <- ri$session
+
+# The design's levels, read from the design table.
+n_base <- design$n[design$base]
+n_sizes <- sort(unique(design$n[design$n == design$n1]))
+unb <- design[design$n != design$n1, ][1, ]
+tol_region <- eval(formals(TrueNearRegionLength)$tol)
+shape_order <- c("sharp", "flat", "separated")
+truths <- do.call(rbind, lapply(shape_order, function(sh) {
+  d <- design[design$shape == sh, ][1, ]
+  t <- MarkerTruth(d$delta, d$sigma1)
+  data.frame(shape = sh, delta = d$delta, sigma1 = d$sigma1,
+             c_star = t$c_star, j_star = t$j_star, kappa = t$kappa)
+}))
+miss_levels <- sort(unique(design$miss_rate))
+design_rows <- data.frame(
+  Factor = c("Shape of the curve", "Group size", "Missing fraction",
+             "Imputation", "Group balance"),
+  Levels = c(
+    paste(sprintf("%s ($\\delta = %s$, $\\sigma_1 = %s$: $J^* = %s$, $\\kappa = %s$)",
+                  truths$shape, vapply(truths$delta, lvl, ""), vapply(truths$sigma1, lvl, ""),
+                  fmt(truths$j_star, 2), fmt(truths$kappa, 2)),
+          collapse = "; "),
+    sprintf("%s per group in every shape; %s for the sharp shape",
+            lvl(n_base), paste(lvl(setdiff(n_sizes, n_base)), collapse = " and ")),
+    paste0(paste(lvl(100 * miss_levels), collapse = "%, "), "%"),
+    "PMM with five donors and normal imputation in every cell with missing values; PMM with ten donors, and complete cases, for the sharp shape",
+    sprintf("equal; %s cases and %s controls (sharp shape)", lvl(unb$n1), lvl(unb$n))),
+  Reason = c(
+    "the curvature at the peak sets how long a near-optimal set is, and the peak's height and curvature set the optimism",
+    "from a small clinical study to one survey cycle; the optimism falls with size",
+    "from complete data to a fraction at which donors are sparse near the best threshold",
+    "the usual default; a correctly specified model, which separates a failure of the inference from bias in the imputations; the larger donor pool recommended against sparse donors; no imputation",
+    "the application's groups are unequal"),
+  check.names = FALSE)
+cap_design <- paste0(
+  "Factors varied in the simulation study, their levels, and the reason for each. ",
+  "Sharp, flat, and separated name three shapes of the Youden curve: the marker is standard normal among controls and normal with mean $\\delta$ and standard deviation $\\sigma_1$ among cases; $J^*$ is the curve's maximum and $\\kappa$ its curvature at the peak. ",
+  "PMM is predictive mean matching; normal imputation draws from a normal linear regression, the correct model here. ",
+  "Every shape and size has a cell without missing values, where the answer is known.")
+
+# Groups of cells and the numbers the Results quote.
+rng <- function(x, se, d = 2) prov(text = range_mcse(x, se, d, 3))
+one <- function(x, se, d = 3) prov(text = mcse(x, se, d, d + 1))
+span <- function(x, d = 2) prov(text = fmt_range(x, d))
+nul <- s[s$engine == "none", ]
+nrm <- s[s$engine == "norm", ]
+pmm <- s[s$engine == "pmm", ]
+p10 <- s[s$engine == "pmm10", ]
+ccs <- s[s$engine == "cc", ]
+imp <- s[s$engine %in% c("pmm", "pmm10", "norm"), ]
+pmm_lo <- pmm[pmm$miss_rate < max(pmm$miss_rate), ]
+pmm_hi <- pmm[pmm$miss_rate == max(pmm$miss_rate), ]
+worst <- pmm[which.min(pmm$cover_hybrid), ]
+small_null <- PickCell(s, n = min(n_sizes), miss_rate = 0, engine = "none")
+big_null <- PickCell(s, n = max(n_sizes), miss_rate = 0, engine = "none")
+sharp_nulls <- s[s$shape == "sharp" & s$engine == "none" & s$n == s$n1, ]
+slope <- OptimismSlope(sharp_nulls)
+miss_sharp <- t(vapply(miss_levels[miss_levels > 0], function(m) {
+  d <- PickCell(design, miss_rate = m)
+  MissingShares(d$alpha0, d$delta, d$sigma1)
+}, numeric(2)))
+
+# The simulation's displays.
+mc <- function(x, se, d = 3) prov(text = mcse(x, se, d, d + 1))
+sharp_cells <- s[s$shape == "sharp" & s$n == n_base & s$n1 == n_base & s$miss_rate > 0 &
+                   s$engine %in% c("pmm", "pmm10", "norm"), ]
+sharp_cells <- sharp_cells[order(sharp_cells$miss_rate, match(sharp_cells$engine, c("pmm", "pmm10", "norm"))), ]
+diag_rows <- data.frame(
+  Cell = sharp_cells$label,
+  `Bias at the best threshold` = prov(sharp_cells$curve_bias_best, 4),
+  `MCSE` = prov(sharp_cells$curve_bias_best_mcse, 4),
+  `SD / SE, bootstrap` = prov(sharp_cells$sd_se_ratio, 2),
+  `SD / SE, Rubin` = prov(sharp_cells$sd_se_ratio_rubin, 2),
+  `Hybrid band coverage` = prov(sharp_cells$cover_hybrid, 3),
+  check.names = FALSE)
+cap_diagnostic <- paste(
+  "Why the bands fall short: the averaged curve at the grid's best threshold, sharp shape,", lvl(n_base), "per group.",
+  "Bias is the mean of the averaged curve minus the true curve there, with its Monte Carlo standard error (MCSE).",
+  "SD / SE is the Monte Carlo standard deviation of that difference over its mean standard error, from the bootstrap-then-impute covariance",
+  "or from Rubin's rules; a ratio above one means the standard error is too small.",
+  "PMM is predictive mean matching; every cell of every arm is in Table S1.")
+cap_bands <- paste(
+  "Simultaneous coverage of the whole Youden curve over the grid, in every cell: the bootstrap band (black circles) and the hybrid band (blue triangles),",
+  "each with plus and minus two Monte Carlo standard errors; the Rubin's-rules band (open squares); and the pointwise Rubin's intervals read as a band (orange crosses).",
+  "The solid line is the nominal", paste0(lvl(100 * nominal), "%;"), "the dashed lines are", lvl(nominal - 0.02, 2), "and", paste0(lvl(nominal + 0.02, 2), "."),
+  "Rows name the shape, the group size, the missing fraction, and the imputation: PMM is predictive mean matching (five donors unless stated), normal is normal imputation.")
+cap_sets <- paste(
+  "The near-optimal sets in every cell. Left: the share of replicates in which a set holds the grid's best threshold;",
+  "right: its mean length on the marker's scale. Comparison-based sets are filled (bootstrap black circles, hybrid blue triangles),",
+  "band-based sets open, and the hybrid comparison-based set with the plug-in critical value is an orange diamond;",
+  "grey crosses mark the length of the true range of thresholds whose index is within", lvl(tol_region), "of $J^*$.",
+  "The vertical line is the nominal", paste0(lvl(100 * nominal), "%."))
+cap_optimism <- paste(
+  "The reported index against the true accuracy of the chosen threshold, in every cell: the mean optimism of the reported index (open circles),",
+  "the bias of the corrected index with", lvl(proc$n_imp), "imputations per resample (filled circles), each with plus and minus two Monte Carlo standard errors,",
+  "and the bias of the corrected index with", lvl(proc$m_boot), "imputations per resample (grey triangles). The solid line is zero; the dashed line is", paste0(lvl(tol_region), "."))
+cap_gap <- paste(
+  "The order of pooling: the mean gap between the index from maximizing in each completed dataset first and the index of the pooled curve,",
+  "against the mean of its quadratic approximation $\\kappa \\hat B_c / 2$, one point per cell with imputed values, with plus and minus two Monte Carlo standard errors.",
+  "Circles, triangles, and squares are the sharp, flat, and separated shapes; black is predictive mean matching, blue normal imputation. The dashed line is equality.")
+cell_rows <- data.frame(
+  Cell = s$label,
+  `Hybrid band` = prov(s$cover_hybrid, 2),
+  `Bootstrap band` = prov(s$cover_boot, 2),
+  `Rubin band` = prov(s$cover_rubin, 2),
+  `Set holds best` = prov(s$compset_hybrid, 2),
+  `Set length` = prov(s$compset_hybrid_length, 2),
+  `Optimism` = prov(s$optimism, 3),
+  `Corrected bias` = prov(s$corrected_bias_20, 3),
+  `Curve bias at best` = prov(s$curve_bias_best, 3),
+  `SD / SE` = prov(s$sd_se_ratio, 2),
+  check.names = FALSE)
+cutoff_rows <- data.frame(
+  Cell = s$label,
+  `RMSE, pooled` = prov(s$cutoff_rmse, 3),
+  `Averaged / pooled` = prov(s$rmse_ratio, 2),
+  `Bagged / pooled` = prov(s$rmse_ratio_bag, 2),
+  `Gap` = prov(s$gap, 4),
+  `kappa B / 2` = prov(s$pred_gap, 4),
+  check.names = FALSE)
+cap_cutoffs <- paste(
+  "The chosen threshold and the order of pooling in every cell.",
+  "RMSE, pooled: root mean squared error of the pooled curve's maximizer against $c^*$ (MCSE at most", prov(max(s$cutoff_rmse_mcse), 3), ");",
+  "averaged / pooled and bagged / pooled: the root mean squared errors of the mean per-dataset cutoff and of the bagged cutoff over the pooled one's",
+  "(MCSE at most", prov(max(s$rmse_ratio_mcse, s$rmse_ratio_bag_mcse, na.rm = TRUE), 3), ");",
+  "gap: the mean per-dataset maximum minus the pooled maximum; kappa B / 2: the mean of $\\kappa \\hat B_c / 2$.")
+cap_cells <- paste(
+  "Every cell of the simulation study,", prov(ri$n_rep, 0), "replicates each.",
+  "Hybrid, bootstrap, and Rubin band: simultaneous coverage of the curve over the grid (MCSE at most", prov(max(s$cover_hybrid_mcse, s$cover_boot_mcse, s$cover_rubin_mcse), 3), ").",
+  "Set holds best and set length: the hybrid comparison-based set with the largest critical value.",
+  "Optimism: the reported index minus the true accuracy of the chosen threshold (MCSE at most", prov(max(s$optimism_mcse), 4), ");",
+  "corrected bias: the same for the corrected index with", proc$n_imp, "imputations per resample (MCSE at most", prov(max(s$corrected_bias_20_mcse), 4), ");",
+  "curve bias at best: the averaged curve minus the true curve at the grid's best threshold (MCSE at most", prov(max(s$curve_bias_best_mcse), 3), ");",
+  "SD / SE: the Monte Carlo standard deviation of that difference over the mean standard error from the bootstrap-then-impute covariance.")
+
+# The application's displays.
+placement_rows <- data.frame(
+  Quantity = c("Maximum of the Youden curve", "Curvature at the peak (standardized scale)",
+               "Participants per group", "Missing fraction", "Cases to controls"),
+  Symbol = c("$J^*$", "$\\kappa$", "$n$", "", ""),
+  NHANES = c(pr(app$placement$j_star_empirical, 2), pr(app$placement$kappa, 2),
+             paste(cnt(sum(app$by_cycle$smokers)), "smokers,", cnt(sum(app$by_cycle$nonsmokers)), "nonsmokers"),
+             paste0(pr(100 * app$missing_by_status[["0"]], 1), "% of nonsmokers and ", pr(100 * app$missing_by_status[["1"]], 1), "% of smokers (real); ", pr(100 * app$imposed_share, 0), "% overall (imposed)"),
+             paste0("1 to ", pr(sum(app$by_cycle$nonsmokers) / sum(app$by_cycle$smokers), 1))),
+  Simulation = c(paste(fmt(truths$j_star, 2), collapse = ", "),
+                 paste(fmt(truths$kappa, 2), collapse = ", "),
+                 paste(lvl(n_sizes), collapse = ", "),
+                 paste0(paste(lvl(100 * miss_levels), collapse = "%, "), "% overall; at ", lvl(100 * miss_levels[2]), "%, ", prov(100 * miss_sharp[1, "controls"], 0), "% of controls and ", prov(100 * miss_sharp[1, "cases"], 0), "% of cases (sharp shape)"),
+                 paste0("1 to 1; 1 to ", lvl(unb$n / unb$n1))),
+  check.names = FALSE)
+cap_placement <- paste(
+  "Where the NHANES data sit on the simulation's gradients.",
+  "$J^*$ and $\\kappa$ are the maximum and the curvature at the peak of the complete-case curve,",
+  "the curvature on the scale of log10 cotinine standardized by the nonsmokers' mean and standard deviation (the simulation's scale);",
+  "the simulation's values are those of the sharp, flat, and separated shapes;",
+  "$n$ is the number of participants in each group.")
+cap_application <- paste(
+  "The NHANES pooled Youden curve of log10 cotinine (black), its hybrid band (grey), the chosen threshold (solid vertical line),",
+  "the hybrid comparison-based set (orange squares at the bottom), and the published adult cutoff of",
+  lvl(app$placement$reference_ng_ml, 2), "ng/mL (dashed). Left: the real missing values imputed.",
+  "Right: missing values imposed at random on the complete cases, with the complete-case curve in grey.")
+strata_rows <- data.frame(
+  `Race/ethnicity` = app$strata$race,
+  Smokers = cnt(app$strata$smokers), Nonsmokers = cnt(app$strata$nonsmokers),
+  `Stratum-specific cutoff (ng/mL)` = pr(10^app$strata$c_cs, 2),
+  `Population-optimal cutoff (ng/mL)` = pr(10^app$strata$c_pop, 2),
+  `Comparison-based set (ng/mL)` = paste(pr(10^app$strata$set_lo, 2), "to", pr(10^app$strata$set_hi, 2)),
+  `Index, reported and corrected` = paste(pr(app$strata$apparent, 3), "and", pr(app$strata$corrected_20, 3)),
+  check.names = FALSE)
+cap_strata <- paste(
+  "Cutoffs by race/ethnicity, each from the analysis run within the group with its missing values imputed.",
+  "The stratum-specific cutoff maximizes the group's own Youden curve; the population-optimal cutoff maximizes the group's contribution",
+  "to the Youden index of a rule with one cutoff per group (Supplementary note S1.6).",
+  "The set is the hybrid comparison-based set; the index is the group's reported maximum and its matched correction.")
+r_version <- session$R.version$version.string
+mice_version <- c(session$otherPkgs, session$loadedOnly)$mice$Version
 ```
 
 ```{r}
@@ -99,30 +269,13 @@ cat(memo_note())
 
 # Abstract {.unnumbered}
 
-<!-- The headings and word limit of the target journal's profile (journals/profiles/<slug>.md).
-BMC Bioinformatics: Background, Results, Conclusions, 350 words. PLOS ONE: unstructured, 300 words.
-Every claim carries a numeric result with its uncertainty, through prov(): an estimate with its
-confidence interval or Monte Carlo SE, a rate with its band, a count against its permutation count.
-Quick-run numbers in the first draft. Write it last. -->
+Studies that impute a missing biomarker report the threshold where the averaged Youden curve peaks, without uncertainty, overstating its accuracy. We propose a band for the pooled curve by bootstrap-then-impute, a set of thresholds no other threshold beats beyond their difference's uncertainty, and a bootstrap correction of the index. In simulation, the band covered the curve in `r rng(nrm$cover_hybrid, nrm$cover_hybrid_mcse)` of replicates with normal imputation, but in `r rng(pmm_hi$cover_hybrid, pmm_hi$cover_hybrid_mcse)` with predictive mean matching at `r lvl(100 * max(miss_levels))`% missing, where imputations were biased. The set held the best threshold in `r rng(s$compset_hybrid, s$compset_hybrid_mcse)` at `r span(s$length_ratio_hybrid)` of a band-based set's length. Without missing data the index exceeded the chosen threshold's accuracy by `r rng(nul$optimism, nul$optimism_mcse, 3)`; the correction left `r rng(nul$corrected_bias_20, nul$corrected_bias_20_mcse, 3)`. In NHANES, the cotinine set, `r pr(10^app$real$set_ranges$comp_hybrid[1], 2)` to `r pr(10^app$real$set_ranges$comp_hybrid[2], 2)` ng/mL, held the published `r lvl(app$placement$reference_ng_ml, 2)` ng/mL cutoff.
 
-**Background.** [FILL]
-
-**Results.** [FILL]
-
-**Conclusions.** [FILL]
+*Keywords:* multiple imputation; Youden index; optimal cutoff; simultaneous confidence band; multiple comparisons with the best; bootstrap
 
 # Introduction
 
-<!-- Paragraph 1: open with why (the scientific question the procedure serves and what a user hopes to
-learn from it), then the procedure people use, where and how it is used, and what its output is taken
-to estimate, ending with one concrete published example: the data, what was computed, and how its
-authors read the estimate. Paragraph 2: the realistic condition; what the procedure estimates under it, in words and
-then as a formula; what has been observed or derived before, saying for each source what it did and
-did not do, and ending with what has not been derived. Paragraph 3: what this paper does, in the
-order of the sections. Almost every sentence is a fact with a reference; the rest build the tension
-and resolve it. Plain language before the formal statement. The claims are the aims, as questions. -->
-
-A threshold on a biomarker decides who is counted as having a condition. Serum cotinine, a metabolite of nicotine, is one example: a threshold on it separates people who smoke cigarettes from people who do not, and its value has been estimated in national survey data [@benowitz2009; @tompkins2019]. One criterion for the best threshold maximizes the sum of sensitivity and specificity, and that sum minus one is the Youden index [@hassanzad2024]. When the biomarker is missing for some participants, multiple imputation, one of the most popular approaches to missing data [@bartlett2020], fills in the missing values several times and analyses each completed dataset. In the paper that proposed nonparametric multiple imputation for ROC analysis, depression screening scores missing for part of a cohort of pregnant women were multiply imputed, the true and false positive rates were averaged across the completed datasets at each threshold, and one score was reported as "the unanimous optimum threshold", with no statement of its uncertainty [@long2011]. Applied studies impute a marker and then report an optimal cutoff [@abdulrahman2022; @atlantis2016; @wirth2024], and the two whose full text was read do not say how the completed datasets were combined [@abdulrahman2022; @atlantis2016]; many studies do not report the precision of their cutpoints at all [@thiele2023].
+A threshold on a biomarker decides who is counted as having a condition: a threshold on serum cotinine, a metabolite of nicotine, separates people who smoke cigarettes from people who do not, and its value has been estimated from national survey data [@benowitz2009; @tompkins2019]. One criterion for the best threshold maximizes the sum of sensitivity and specificity, and that sum minus one is the Youden index [@hassanzad2024]. When the biomarker is missing for some participants, multiple imputation, one of the most popular approaches to missing data [@bartlett2020], fills in the missing values several times and analyses each completed dataset. In the paper that proposed nonparametric multiple imputation for ROC analysis, depression screening scores missing for part of a cohort of pregnant women were multiply imputed, the true and false positive rates were averaged across the completed datasets at each threshold, and one score was reported as "the unanimous optimum threshold", with no statement of its uncertainty [@long2011]. Applied studies impute a marker and then report an optimal cutoff [@abdulrahman2022; @atlantis2016; @wirth2024], and the two whose full text was read do not say how the completed datasets were combined [@abdulrahman2022; @atlantis2016]; many studies do not report the precision of their cutpoints at all [@thiele2023].
 
 The reported index overstates the accuracy of the threshold it picks, because the threshold is chosen where the estimated curve happens to be high. With $F_0$ and $F_1$ the distribution functions of the marker among people without and with the condition, and a person called positive when the marker exceeds $c$, the Youden curve, its best threshold, and its maximum are
 $$
@@ -132,59 +285,91 @@ c^* &= \arg\max_c J(c), \\
 J^* &= J(c^*).
 \end{aligned}
 $$
-From $L$ completed datasets the analyst averages the empirical curves $\hat J_1, \dots, \hat J_L$ into $\bar J$, takes $\hat c = \arg\max_c \bar J(c)$, and reports $\bar J(\hat c)$. Because $\bar J(\hat c) \ge \bar J(c^*)$ in every dataset and $J(\hat c) \le J^*$, the reported index exceeds the true accuracy of the chosen threshold on average whenever the averaged curve is unbiased at $c^*$:
+From $L$ completed datasets the analyst averages the empirical curves $\hat J_1, \dots, \hat J_L$ into $\bar J$, takes the threshold $\hat c$ at which $\bar J$ peaks, and reports the peak, $\max_c \bar J(c)$. Because $\max_c \bar J(c) \ge \bar J(c^*)$ in every dataset and $J(\hat c) \le J^*$, the reported index exceeds the true accuracy of the chosen threshold on average whenever the averaged curve is unbiased at $c^*$:
 $$
-\mathrm{E}\{\bar J(\hat c)\} - \mathrm{E}\{J(\hat c)\} \;\ge\; \mathrm{E}\{\bar J(c^*)\} - J^* \;=\; 0 .
+\mathrm{E}\{\max_c \bar J(c)\} - \mathrm{E}\{J(\hat c)\} \;\ge\; \mathrm{E}\{\bar J(c^*)\} - J^* \;=\; 0 .
 $$
-Without missing data the empirical index has the largest upward bias of the usual estimators [@fluss2005], intervals exist for the index and the threshold [@bantis2019], and confidence regions exist for the sensitivity and specificity at the estimated threshold [@bantis2014]. The empirical threshold converges at the cube-root rate to a non-normal limit [[CITE: the cube-root rate and the non-normal limit of an argmax of a step criterion (Kim and Pollard 1990; no readable text in Zotero)]{.cite}; @cattaneo2020], as does a weighted Youden threshold [@wang2025weighted], so Rubin's rules, which assume approximately normal estimates [@leyrat2019], do not apply to it, and the standard bootstrap is inconsistent for it [@cattaneo2020]. When the disease status rather than the marker is missing, the ROC curve [@fluss2009] and intervals for the Youden index [@wang2025interval; @jia2026] have been derived. When the marker is missing, imputation methods give the ROC curve and its area [@long2011; @karakaya2015; @cheng2020]. No method gives a band for the Youden curve, a set of thresholds that the data cannot separate from the best one, or a correction of the reported index from multiply imputed data.
+Without missing data the empirical index has the largest upward bias of the usual estimators [@fluss2005], intervals exist for the index and the threshold [@bantis2019], and confidence regions exist for the sensitivity and specificity at the estimated threshold [@bantis2014]. The empirical threshold converges at the cube-root rate to a non-normal limit [CITE: the cube-root rate and the non-normal limit of an argmax of a step criterion (Kim and Pollard 1990; no readable text in Zotero)]{.cite} [@cattaneo2020], as does a weighted Youden threshold [@wang2025weighted]. Rubin's rules assume approximately normal estimates [@leyrat2019], so they do not apply to the threshold, and the standard bootstrap is inconsistent for it [@cattaneo2020]. When the disease status rather than the marker is missing, the ROC curve [@fluss2009] and intervals for the Youden index [@wang2025interval; @jia2026] have been derived. When the marker is missing, imputation methods give the ROC curve and its area [@long2011; @karakaya2015; @cheng2020]. No method gives a band for the Youden curve, a set of thresholds that the data cannot separate from the best one, or a correction of the reported index from multiply imputed data.
 
-This paper proposes all three and asks whether each works. The band estimates the covariance of the averaged curve by bootstrapping the data and imputing each resample [@bartlett2020], and takes a sup-t critical value [@montielolea2019]. The near-optimal set keeps every threshold that no other threshold beats by more than the uncertainty of their difference, in the manner of multiple comparisons with the best [@hsu1996; [CITE: multiple comparisons with the best (Hsu 1984; no PDF in Zotero)]{.cite}]. The correction subtracts a bootstrap estimate of the optimism [[CITE: the bootstrap estimate of optimism (Efron 1983; Harrell, Lee, and Mark 1996; no readable text in Zotero)]{.cite}], with each resample imputed as many times as the analysis. A simulation study then asks four questions. Does the band cover the whole curve at the nominal rate, under predictive mean matching as well as under a correctly specified imputation model? Does the set contain the best threshold at least as often as its level promises, and how much narrower is it than the set the band itself gives? Does the correction remove the optimism of the reported index? And, as a note on the order of operations, how far apart are the index from averaging the curves first and the index from maximizing in each completed dataset first? An application to serum cotinine and smoking in the National Health and Nutrition Examination Survey [CITE: the NHANES 2013 to 2018 data files (no item in Zotero)]{.cite} closes the paper.
+This paper proposes all three and asks whether each works. The band estimates the covariance of the averaged curve by bootstrapping the data and imputing each resample [@bartlett2020], and takes a sup-t critical value [@montielolea2019]. The near-optimal set keeps every threshold that no other threshold beats by more than the uncertainty of their difference, in the manner of multiple comparisons with the best [@hsu1996] [CITE: multiple comparisons with the best (Hsu 1984; no PDF in Zotero)]{.cite}. The correction subtracts a bootstrap estimate of the optimism [CITE: the bootstrap estimate of optimism (Efron 1983; Harrell, Lee, and Mark 1996; no readable text in Zotero)]{.cite}, with each resample imputed as many times as the analysis. A simulation study then asks four questions. Does the band cover the whole curve at the nominal rate, under predictive mean matching as well as under a correctly specified imputation model? Does the set contain the best threshold at least as often as its level promises, and how much narrower is it than the set the band itself gives? Does the correction remove the optimism of the reported index? And, as a note on the order of operations, how far apart are the index from averaging the curves first and the index from maximizing in each completed dataset first? An application to serum cotinine and smoking in the National Health and Nutrition Examination Survey [CITE: the NHANES 2013 to 2018 data files (no item in Zotero)]{.cite} then asks whether the data can choose between a published cutoff and the cohort's own.
 
 # Methods
 
-## The estimand and the procedure
+## The estimand
 
-<!-- The estimand as a feature of a population, in plain words first, then as a functional of the
-relevant distribution. Then each procedure as a recipe applied to data: the equations with one clause per
-line, each symbol defined in the sentence that introduces it or in the equation's label; no table of
-notation. Carried from the report's
-"In symbols" section; the mathematics is the mathematics, the sentences are new. -->
-
-[FILL]
-
+The question a threshold answers is how accurate it is, and the question a study answers is which threshold is most accurate. We therefore take as estimand the whole Youden curve and its peak, not one threshold. With $F_d$ the distribution function of the marker $X$ in group $D = d$, and a person called positive when $X > c$, the curve, its best threshold, and its maximum are
 $$
 \begin{aligned}
-[FILL: equations, one clause per line]
+J(c) &= F_0(c) - F_1(c), \\
+c^* &= \arg\max_c J(c), \\
+J^* &= J(c^*).
 \end{aligned}
 $$
+A study that picks a threshold $\hat c$ from data delivers the accuracy $J(\hat c)$, which falls short of $J^*$ by the regret $J^* - J(\hat c)$. The marker is missing for some participants, at random given the disease status and observed covariates, and the disease status is always observed.
 
+## The pooled curve and its index
 
-## What the procedure estimates
+The analysis completes the data $L$ times and averages the empirical curves of the completed datasets. With $X_i^{(l)}$ the marker of participant $i$ in completed dataset $l$, observed or imputed, and $n_d$ the size of group $d$,
+$$
+\begin{aligned}
+\hat F_{dl}(c) &= n_d^{-1} \textstyle\sum_{i : D_i = d} 1\{X_i^{(l)} \le c\}, \\
+\hat J_l(c) &= \hat F_{0l}(c) - \hat F_{1l}(c), \\
+\bar J(c) &= L^{-1} \textstyle\sum_{l=1}^{L} \hat J_l(c).
+\end{aligned}
+$$
+The pooled curve $\bar J$ is a step function. The reported index is its maximum, $\max_c \bar J(c)$, and the chosen threshold $\hat c$ is the midpoint of the interval on which the maximum is reached, or the mean of those midpoints when several intervals tie. This is the procedure of Long, Zhang, and Hsu [@long2011], who averaged the curves of the completed datasets. The alternative, maximizing in each completed dataset first, reports the mean of the per-dataset maxima and the mean $\tilde c = L^{-1} \sum_l \hat c_l$ of the per-dataset cutoffs.
 
-<!-- The target under the realistic condition and the bias as a formula: when it is zero, what makes it
-large. Where no formula exists for a method or setting, say so plainly. Proofs go to
-_supplement.qmd; state the results here and point at the supplement. -->
+At a fixed threshold the pooled curve is an average of differences of two proportions, so it is a regular estimate, and Rubin's rules apply to it under proper imputation [@leyrat2019]. Its maximum is not regular. The reported index exceeds the accuracy the chosen threshold delivers, in expectation, whenever the pooled curve is unbiased at $c^*$; the argument takes two lines (Supplementary note, S1.1). For the empirical curve the excess is of order $n^{-2/3}$, because the empirical threshold converges at the cube-root rate [CITE: the cube-root rate of an argmax of a step criterion (Kim and Pollard 1990; no readable text in Zotero)]{.cite} [@cattaneo2020] (S1.2). Maximizing first adds to that excess a gap that is never negative and is close to $\kappa \hat B_c / 2$, with $\kappa = -J''(c^*)$ the curvature at the peak and $\hat B_c$ the variance of the per-dataset cutoffs (S1.3).
 
-[FILL]
+## A band for the curve
 
-## The fix or the diagnostic
+A band that contains the whole curve with probability `r lvl(100 * nominal)`% brackets the accuracy of every threshold at once. We estimate the covariance of the pooled curve on a grid by bootstrapping the data and imputing each resample, whose variance estimates hold when the imputation and analysis models are uncongenial [@bartlett2020], and we impute each resample only $M$ times, which is enough when the variance is split into its parts [@vonhippel2021]. The grid holds $K = `r lvl(proc$grid_n)`$ equally spaced thresholds $c_1 < \dots < c_K$ between the `r lvl(100 * grid_probs[1])`% and `r lvl(100 * grid_probs[2])`% quantiles of all completed values. In each of $R_B = `r lvl(proc$n_boot)`$ resamples, drawn with replacement within each disease group, the resample is imputed $M = `r lvl(proc$m_boot)`$ times, giving curves $\hat J_{b1}, \dots, \hat J_{bM}$ on the grid with mean $\bar J_b$. Then
+$$
+\begin{aligned}
+V &= \widehat{\mathrm{Cov}}_b(\bar J_b), \\
+W &= R_B^{-1} \textstyle\sum_b (M - 1)^{-1} \sum_m (\hat J_{bm} - \bar J_b)(\hat J_{bm} - \bar J_b)^\top, \\
+\Sigma &= V - W / M + W / L,
+\end{aligned}
+$$
+with negative eigenvalues of $\Sigma$ set to zero. Here $V$ is the covariance of an $M$-imputation estimate and $W$ the covariance of one imputation about its resample's mean, so $\Sigma$ is the covariance of the $L$-imputation estimate the analysis reports (S1.4). With $\mathrm{SE}_k = \Sigma_{kk}^{1/2}$, the band is $\bar J(c_k) \pm q\,\mathrm{SE}_k$ for $k = 1, \dots, K$, with a sup-t critical value $q$ [@montielolea2019]. The bootstrap band takes $q$ as the `r lvl(100 * nominal)`% quantile over resamples of $\max_k \lvert \bar J_b(c_k) - m_k \rvert / V_{kk}^{1/2}$, with $m$ the mean of the $\bar J_b$. The hybrid band takes $q$ as the same quantile of $\max_k \lvert Z_k \rvert / \mathrm{SE}_k$ over `r lvl(proc$n_draw)` draws of $Z \sim N(0, \Sigma)$.
 
-<!-- What to change so the gap vanishes, or what to check so a user knows whether it matters. -->
+We compared both with two bands built from Rubin's rules [@rubin1987]. The pointwise intervals combine, at each threshold, the binomial within-imputation variance of the two proportions with the between-imputation variance. The Rubin's-rules band uses the whole covariance: the within-imputation covariance of an empirical distribution function, $\{F(a) - F(a)F(b)\}/n$ for $a \le b$, plus $(1 + 1/L)$ times the between-imputation covariance of the curves, with a sup-t critical value from the normal law. Because the within-imputation covariance of the empirical curve is known in closed form, this band also stands for imputing first and bootstrapping each completed dataset.
 
-[FILL]
+## A set of near-optimal thresholds
+
+The thresholds a study cannot tell apart from the best one are the useful answer to "which threshold", and a band gives a first such set: the thresholds whose upper limit reaches the band's highest lower limit, $\{k : U_k \ge \max_j L_j\}$. That set uses the band's width twice. The comparison-based set compares thresholds with each other, in the manner of multiple comparisons with the best [@hsu1996] [CITE: multiple comparisons with the best (Hsu 1984; no PDF in Zotero)]{.cite}. With $\mathrm{SE}_{jk} = (\Sigma_{jj} + \Sigma_{kk} - 2 \Sigma_{jk})^{1/2}$ the standard error of the difference between thresholds $j$ and $k$, a threshold stays in the set unless another beats it by more than its critical value:
+$$
+S_C = \{ k : \bar J(c_j) - \bar J(c_k) \le q_D\,\mathrm{SE}_{jk} \text{ for every } j \ne k \}.
+$$
+Nearby thresholds share most of their errors, so $\mathrm{SE}_{jk}$ is small where $c_j$ is close to $c_k$, and $S_C$ is narrower than the band-based set. For each grid point $k$, let $q_k$ be the `r lvl(100 * nominal)`% quantile of $\max_{j \ne k} (D_j - D_k)/s_{jk}$, over the centred resample means with $s_{jk}$ from $V$ (bootstrap) or over draws of $N(0, \Sigma)$ with $s_{jk} = \mathrm{SE}_{jk}$ (hybrid). The critical value $q_D = \max_k q_k$ guarantees that the grid's best threshold is in the set whenever the comparisons involving it hold (S1.5); the plug-in value $q_D = q_{\hat k}$, at the estimated best grid point $\hat k$, is smaller.
+
+## A correction of the reported index
+
+The bootstrap estimates how far a maximum overshoots by repeating the whole analysis on resamples and measuring each resample's overshoot against the original data [CITE: the bootstrap estimate of optimism (Efron 1983; Harrell, Lee, and Mark 1996; no readable text in Zotero)]{.cite}. In each of $R_O = `r lvl(proc$n_boot_opt)`$ further resamples, drawn within disease groups and imputed $L$ times as the analysis is, we took the resample's pooled curve $\bar J_b$ and its maximizer $\hat c_b$, and computed
+$$
+\begin{aligned}
+o_b &= \bar J_b(\hat c_b) - \bar J(\hat c_b), \\
+\hat J_{\mathrm{corr}} &= \bar J(\hat c) - R_O^{-1} \textstyle\sum_b o_b .
+\end{aligned}
+$$
+The correction starts from the pooled curve at the chosen threshold, which equals the maximum unless tied intervals lie apart.
+The same correction from the first $`r lvl(proc$n_boot_opt2)`$ curve resamples, imputed $M$ times each, was computed for comparison. The standard bootstrap does not reproduce the distribution of a cube-root estimator [@cattaneo2020], so whether the correction removes the optimism is a question for the simulation, not a property of the method.
+
+## The order of pooling
+
+For the note on the order of operations, we also recorded the mean of the per-dataset cutoffs $\tilde c$ and of the per-dataset maxima, the variance $\hat B_c = L^{-1} \sum_l (\hat c_l - \tilde c)^2$, and a bagged cutoff, the mean of the cutoffs $\hat c_b$ of the $R_O$ correction resamples, the resampling analogue of maximizing first [@zhang2020].
 
 ## Data
 
-<!-- The cohort or dataset: source paper and accession, who was sampled, sizes, the measurement scale,
-the processing applied. Carried from the report's "The study" subsection. -->
+The application used the National Health and Nutrition Examination Survey (NHANES) cycles 2013 to 2014, 2015 to 2016, and 2017 to 2018 [CITE: the NHANES 2013 to 2018 data files (no item in Zotero)]{.cite}: the serum cotinine laboratory files, the smoking questionnaire, and the demographics files, downloaded from the survey's public data pages. The cohort was every participant aged eighteen or over who answered whether they had smoked one hundred cigarettes in their life; a current smoker had, and now smoked every day or some days, and everyone else who answered was a nonsmoker. The three cycles measured cotinine with the same laboratory method and limit of detection, and values below the limit are stored at the limit divided by the square root of two. The marker was log10 cotinine in ng/mL. The cohort held `r cnt(app$n_adults)` adults, `r cnt(sum(app$by_cycle$smokers))` of them current smokers, and cotinine was missing for `r cnt(sum(app$by_cycle$cotinine_missing))` (`r pr(100 * sum(app$by_cycle$cotinine_missing) / app$n_adults, 1)`%).
 
-[FILL]
+Missing cotinine was imputed by predictive mean matching [@vanbuuren2011] with five donors on smoking status, age and its square, sex, the interactions of smoking status with age and sex, race/ethnicity, cycle, education, and the ratio of family income to poverty, with refused, unknown, and unasked education and income as their own category. The analysis of the real missing values was repeated on the complete cases without imputation, as a benchmark, and on the complete cases with `r lvl(100 * app$imposed_rate)`% of cotinine values set missing at random, with probability $\mathrm{expit}(\alpha_0 + 0.5 D - 0.3 a + 0.2 m)$, $a$ the standardized age and $m$ the male indicator, so that the complete-case curve is the truth the analysis should recover. For each race/ethnicity group $v$ the analysis was run within the group. Its stratum-specific cutoff maximizes $\bar F_0(c \mid v) - \bar F_1(c \mid v)$. Its population-optimal cutoff maximizes $w_0(v) \bar F_0(c \mid v) - w_1(v) \bar F_1(c \mid v)$, with $w_d(v)$ the group's share of all participants with $D = d$; one such cutoff per group maximizes the Youden index of the whole population (S1.6). No survey weights were used: the estimand is the curve in the sample's population, as in the simulation.
 
 ## Software and reproducibility
 
 {{< include parts/reproducibility.md >}}
 
-[FILL: software and package versions, from the session information saved in results/, and the repository URL.]
+The analyses used `r r_version` and the R package `mice` version `r mice_version` [@vanbuuren2011] for both imputation engines. [TO CONFIRM: the repository URL, withheld while review is double-anonymized]{.tc}
 
 # Simulation study
 
@@ -192,102 +377,185 @@ the processing applied. Carried from the report's "The study" subsection. -->
 
 {{< include parts/ademp-sentence.md >}}
 
-<!-- Aims (the paper's claims, as questions); data-generating mechanisms with the factors varied, their
-levels, and the reason for each, the factors fixed and why, and the cells where the answer is known;
-estimands; methods precise enough to reimplement; performance measures by target; replicates and the
-Monte Carlo SE they give. This is the production design, approved at the design stop; the run behind the
-numbers is named in the banner, not here. -->
+*Aims.* The study asked four questions, in the order of the Introduction. Does the bootstrap band, or the hybrid band, cover the whole curve in `r lvl(100 * nominal)`% of replicates, under predictive mean matching as under a correctly specified imputation model? Does the comparison-based set hold the grid's best threshold at least that often, and how long is it? Does the matched correction remove the optimism of the reported index? And how large is the gap between the two orders of pooling, against $\kappa \hat B_c / 2$?
 
-[FILL]
+*Data-generating mechanisms.* The marker was normal in each group, $X \mid D = 0 \sim N(0, 1)$ and $X \mid D = 1 \sim N(\delta, \sigma_1^2)$, with an auxiliary variable $Z = X + e$, $e \sim N(0, 1)$, observed for everyone. The marker was missing with probability $\mathrm{expit}(\alpha_0 + Z + 0.5 D)$, at random given $Z$ and $D$, and above all at high values of the marker, where donors for predictive mean matching are sparse; $\alpha_0$ was solved for each target fraction. @tbl-design lists the factors varied, their levels, and the reason for each. The design had five arms, `r lvl(nrow(design))` cells in all: the three shapes at `r lvl(n_base)` per group, each with a cell without missing values and the three missing fractions crossed with the two main imputation engines; the sharp shape at `r paste(lvl(setdiff(n_sizes, n_base)), collapse = " and ")` per group with the same cells; the sharp shape with ten donors, and with complete cases, at the three missing fractions; and the sharp shape with `r lvl(unb$n1)` cases and `r lvl(unb$n)` controls. Fixed were $L = `r lvl(proc$n_imp)`$ imputations, the empirical estimator, the auxiliary's strength, and the missingness coefficients, as in an applied analysis with one strong auxiliary. In every cell without missing values the completed datasets are identical, so the bands are complete-data bands and the gap between the orders of pooling is exactly zero.
 
 ```{r}
 #| label: tbl-design
-#| tbl-cap: "Factors of the simulation design, their levels, and the reason for each."
-#| eval: false
+#| tbl-cap: !expr cap_design
 
-design_table(data.frame(Factor = c("[FILL]"), Levels = c("[FILL]"), Reason = c("[FILL]")))
+design_table(design_rows, widths = c(16, 44, 40))
 ```
+
+*Estimands.* The Youden curve $J$ on each replicate's grid, the grid's best threshold $c_{k^*}$ with $k^* = \arg\max_k J(c_k)$, the maximum $J^*$, and the accuracy $J(\hat c)$ of the chosen threshold.
+
+*Methods.* In every replicate, the procedure of the Methods with $L = `r lvl(proc$n_imp)`$, $K = `r lvl(proc$grid_n)`$, $R_B = `r lvl(proc$n_boot)`$ resamples with $M = `r lvl(proc$m_boot)`$ imputations each, and $R_O = `r lvl(proc$n_boot_opt)`$ correction resamples: the pointwise intervals, the Rubin's-rules band, the bootstrap band, and the hybrid band; the band-based set and the comparison-based set of each construction, the latter with the largest and with the plug-in critical value; the reported index, the matched correction, and the two-imputation correction; the pooled, averaged, and bagged cutoffs. Predictive mean matching used type 1 matching with five or ten donors, and normal imputation drew the regression parameters and then the missing values; both used $D$, $Z$, and $D \times Z$ as predictors [@vanbuuren2011]. Complete cases ran the same procedure without imputation on the participants with the marker observed.
+
+*Performance measures.* For each band, its simultaneous coverage, the share of replicates in which it contained the true curve at every grid point, and its mean half-width. For each set, the share of replicates in which it held $c_{k^*}$, its mean length (the number of grid points times the grid step), and its length against the band-based set's and against the length of the true range of thresholds within `r lvl(tol_region)` of $J^*$. For each index, its mean minus $J(\hat c)$: the optimism of the reported index, and the bias of each corrected index. For each cutoff, its bias, empirical standard error, and root mean squared error against $c^*$. For the pooling order, the mean gap against the mean of $\kappa \hat B_c / 2$. At $c_{k^*}$, the averaged curve's bias, and the ratio of its Monte Carlo standard deviation to its mean standard error from $\Sigma$ and from Rubin's rules, which tells a biased curve from an underestimated variance. A difference was called nonzero only when it exceeded three Monte Carlo standard errors.
+
+*Replicates.* The study used `r prov(ri$n_rep, 0)` replicates per cell, in seeded blocks so that results do not depend on the computer that ran them; the Monte Carlo standard error of a coverage near `r lvl(nominal)` is then `r prov(sqrt(nominal * (1 - nominal) / ri$n_rep), 3)`. The protocol's production design has `r lvl(ri$n_rep_production)` replicates per cell, a Monte Carlo standard error of `r lvl(sqrt(nominal * (1 - nominal) / ri$n_rep_production), 3)`.
 
 ## Results
 
-<!-- One subsection per aim. Each has its figure or table chunk reading results/ (never hard-coding
-factor levels) and prose that states facts in past tense, cites nothing, and states a difference only
-when it exceeds about three Monte Carlo SEs; otherwise [TO CONFIRM: ...]{.tc}. Every figure and
-table is referenced in the text. Register each output with gap_register() in its chunk. -->
+### The bands
 
-### [FILL: aim 1, as a short heading]
+Without missing values the bands are complete-data bands, and the hybrid band covered the whole curve in `r rng(nul$cover_hybrid, nul$cover_hybrid_mcse)` of replicates across shapes, sizes, and balance (@fig-bands). The lowest, `r one(small_null$cover_hybrid, small_null$cover_hybrid_mcse, 2)`, was at `r lvl(min(n_sizes))` per group [TO CONFIRM: whether the band undercovers at 100 per group without missing values; the shortfall from 0.95 is under three Monte Carlo standard errors at 100 replicates]{.tc}. With normal imputation the hybrid band covered in `r rng(nrm$cover_hybrid, nrm$cover_hybrid_mcse)` of replicates and the bootstrap band in `r rng(nrm$cover_boot, nrm$cover_boot_mcse)`. With predictive mean matching the hybrid band covered in `r rng(pmm_lo$cover_hybrid, pmm_lo$cover_hybrid_mcse)` of replicates at `r lvl(100 * miss_levels[2])`% and `r lvl(100 * miss_levels[3])`% missing, and in `r rng(pmm_hi$cover_hybrid, pmm_hi$cover_hybrid_mcse)` at `r lvl(100 * max(miss_levels))`%, lowest for the `r worst$shape` shape. Ten donors in place of five gave `r span(p10$cover_hybrid)` at the three missing fractions. The Rubin's-rules band covered in `r span(nrm$cover_rubin)` of replicates with normal imputation and in `r span(pmm$cover_rubin)` with predictive mean matching, the pointwise intervals read as a band in at most `r prov(max(s$cover_pointwise), 2)`, and the bands of the complete cases in `r span(ccs$cover_hybrid)`.
 
-[FILL: the finding, with every number through prov() and a reference to the figure, written as an at-sign followed by fig-aim1.]
+Where the bands fell short under predictive mean matching, the averaged curve was biased at the best threshold, while its standard error matched its Monte Carlo spread (@tbl-diagnostic). At the grid's best threshold the bias of the averaged curve reached `r one(worst$curve_bias_best, worst$curve_bias_best_mcse)` in the `r worst$shape` shape at `r lvl(100 * worst$miss_rate)`% missing (Table S1). Across every cell with imputed values, the Monte Carlo standard deviation of the averaged curve there was `r span(imp$sd_se_ratio)` times the mean standard error from the bootstrap-then-impute covariance. The same ratio for the Rubin's-rules standard error reached `r prov(max(pmm$sd_se_ratio_rubin), 2)` under predictive mean matching. Under the missingness model, `r lvl(100 * miss_levels[2])`% missing overall meant `r prov(100 * miss_sharp[1, "controls"], 0)`% of controls and `r prov(100 * miss_sharp[1, "cases"], 0)`% of cases for the sharp shape, and `r lvl(100 * max(miss_levels))`% overall meant `r prov(100 * miss_sharp[nrow(miss_sharp), "controls"], 0)`% and `r prov(100 * miss_sharp[nrow(miss_sharp), "cases"], 0)`%.
 
 ```{r}
-#| label: fig-aim1
-#| fig-cap: "[FILL: what is plotted, what the bars or band mean, the reference line.]"
-#| fig-width: 7
-#| fig-height: 4.2
-#| eval: false
+#| label: fig-bands
+#| fig-cap: !expr cap_bands
+#| fig-width: 9
+#| fig-height: 10
 
-gap_register("fig-aim1", what = "[FILL]", cells = NA, n_rep = ri$n_rep, production = "[FILL: cells and replicates of the production design]")
-# Draw from the results objects only.
+gap_register("fig-bands", what = "simultaneous coverage of the four bands, every cell", cells = nrow(s), n_rep = ri$n_rep)
+PlotBandCoverage(s, s$label)
 ```
 
-### [FILL: aim 2]
+```{r}
+#| label: tbl-diagnostic
+#| tbl-cap: !expr cap_diagnostic
 
-[FILL]
+gap_register("tbl-diagnostic", what = "bias and SD/SE at the best threshold, sharp shape", cells = nrow(diag_rows), n_rep = ri$n_rep)
+kable_w(diag_rows, widths = c(30, 14, 14, 14, 14, 14))
+```
+
+### The near-optimal sets
+
+The hybrid comparison-based set held the grid's best threshold in `r rng(s$compset_hybrid, s$compset_hybrid_mcse)` of replicates across all cells, and the bootstrap one in `r rng(s$compset_boot, s$compset_boot_mcse)` (@fig-sets). The hybrid set's length was `r span(s$length_ratio_hybrid)` of the band-based set's, and `r span(s$compset_hybrid_length / s$true_region_length, 1)` times the length of the true range of thresholds whose index is within `r lvl(tol_region)` of $J^*$. Without missing values in the sharp shape, its length fell from `r prov(small_null$compset_hybrid_length, 2)` at `r lvl(min(n_sizes))` per group to `r prov(big_null$compset_hybrid_length, 2)` at `r lvl(max(n_sizes))`. The plug-in critical value, `r span(s$q_plug_hybrid)` across cells against `r span(s$q_comp_hybrid)` for the largest per-point quantile, shortened the hybrid set to `r span(s$length_ratio_plug_hybrid)` of the band-based set's length, and that set held the best threshold in `r rng(s$compplug_hybrid, s$compplug_hybrid_mcse)` of replicates.
+
+```{r}
+#| label: fig-sets
+#| fig-cap: !expr cap_sets
+#| fig-width: 10
+#| fig-height: 10
+
+gap_register("fig-sets", what = "coverage and length of the near-optimal sets, every cell", cells = nrow(s), n_rep = ri$n_rep)
+PlotSets(s, s$label, limit = nominal)
+```
+
+### The corrected index
+
+Without missing values the reported index exceeded the true accuracy of the chosen threshold by `r rng(nul$optimism, nul$optimism_mcse, 3)` (@fig-optimism). For the sharp shape the optimism fell with group size, from `r one(small_null$optimism, small_null$optimism_mcse)` at `r lvl(min(n_sizes))` per group to `r one(big_null$optimism, big_null$optimism_mcse)` at `r lvl(max(n_sizes))`, a slope of `r one(slope[["slope"]], slope[["se"]], 2)` on the log scale [TO CONFIRM: the slope lies between minus one half and the minus two thirds of Supplementary note S1.2 within the precision of 100 replicates]{.tc}. The correction with `r lvl(proc$n_imp)` imputations per resample left `r rng(nul$corrected_bias_20, nul$corrected_bias_20_mcse, 3)` in those cells. With normal imputation the optimism was `r rng(nrm$optimism, nrm$optimism_mcse, 3)` and the corrected index's bias `r rng(nrm$corrected_bias_20, nrm$corrected_bias_20_mcse, 3)`. With predictive mean matching the corrected index's bias was `r rng(pmm$corrected_bias_20, pmm$corrected_bias_20_mcse, 3)`, lowest where the averaged curve was most biased. The correction with `r lvl(proc$m_boot)` imputations per resample had a bias of `r rng(s$corrected_bias_2, s$corrected_bias_2_mcse, 3)` across all cells.
+
+```{r}
+#| label: fig-optimism
+#| fig-cap: !expr cap_optimism
+#| fig-width: 9
+#| fig-height: 10
+
+gap_register("fig-optimism", what = "optimism and corrected-index bias, every cell", cells = nrow(s), n_rep = ri$n_rep)
+PlotOptimism(s, s$label)
+```
+
+### The order of pooling
+
+Maximizing in each completed dataset first raised the index above the pooled maximum by `r rng(imp$gap, imp$gap_mcse, 4)` in the cells with imputed values (@fig-gap). The gap was `r span(pmm$gap_ratio)` times the mean of $\kappa \hat B_c / 2$ under predictive mean matching and `r span(nrm$gap_ratio)` times under normal imputation. The averaged cutoff's root mean squared error was `r span(imp$rmse_ratio)` of the pooled cutoff's, and the bagged cutoff's `r span(s$rmse_ratio_bag)` (Table S2).
+
+```{r}
+#| label: fig-gap
+#| fig-cap: !expr cap_gap
+#| fig-width: 6
+#| fig-height: 5
+
+gap_register("fig-gap", what = "pooling-order gap against kappa B_c / 2", cells = sum(s$miss_rate > 0 & s$engine != "cc"), n_rep = ri$n_rep)
+PlotGap(s)
+```
 
 # Application
 
 ## Data and comparison
 
-<!-- The dataset's role in one sentence, the comparison (groups, sizes, scale), and where the real data
-sit on the simulation's gradient (the measured shift, the control fraction, the correlation), each
-number through prov() from a results file written by the application script. -->
+The application asks the question of the Introduction on real data: which serum cotinine threshold separates people who smoke cigarettes from people who do not, and how sure can a study be of it, when cotinine is missing for some participants. The cohort, its definitions, and the imputation model are in the Methods. Of the `r cnt(app$n_adults)` adults, `r cnt(sum(app$by_cycle$smokers))` were current smokers, and cotinine was missing for `r pr(100 * app$missing_by_status[["1"]], 1)`% of smokers and `r pr(100 * app$missing_by_status[["0"]], 1)`% of nonsmokers. @tbl-placement places the data on the simulation's gradients: the complete-case curve is as high as the separated shape's and as flat at its peak as the flat shape's, the groups are larger than the largest simulated size, and the real missing fraction, spread evenly over the two groups, is below the smallest simulated one, which falls on the cases above all.
 
-[FILL]
+```{r}
+#| label: tbl-placement
+#| tbl-cap: !expr cap_placement
 
-## [FILL: what the application shows, as a short heading]
+kable_w(placement_rows, widths = c(34, 10, 22, 34))
+```
 
-<!-- The one thing the analysis shows, as a claim about a user's conclusion. If the analysis has not been
-run, the claim stands with [TO CONFIRM: ...]{.tc} and the chunk stays eval: false. -->
+## The data cannot choose between the published cutoff and the cohort's own
 
-[FILL]
+With the real missing values imputed, the pooled curve peaked at `r pr(10^app$real$c_hat, 2)` ng/mL, where its index was `r pr(app$real$apparent, 3)` (@fig-application, left). The matched correction lowered the index by `r pr(app$real$optimism_20, 4)`, to `r pr(app$real$corrected_20, 3)`. The comparison-based set of the hybrid construction ran from `r pr(10^app$real$set_ranges$comp_hybrid[1], 2)` to `r pr(10^app$real$set_ranges$comp_hybrid[2], 2)` ng/mL, and that of the bootstrap construction was the same; the band-based set ran from `r pr(10^app$real$set_ranges$band_hybrid[1], 2)` to `r pr(10^app$real$set_ranges$band_hybrid[2], 2)` ng/mL. The adult cutoff of `r lvl(app$placement$reference_ng_ml, 2)` ng/mL published from the 2009 to 2014 cycles [@tompkins2019] lay inside every set. A study that reports the cohort's optimum as the cutoff therefore reports one point of a range that the data cannot narrow further, and the published cutoff, whose complete-case index is lower by `r pr(app$placement$j_star_empirical - app$placement$j_at_reference, 3)`, is as well supported.
+
+With `r pr(100 * app$imposed_share, 1)`% of the complete cases' cotinine values set missing at random, depending on smoking status, age, and sex only, a weaker dependence than the simulation's, the analysis recovered the complete-case curve (@fig-application, right). The bootstrap band, the hybrid band, the Rubin's-rules band, and even the pointwise intervals contained the complete-case curve at every grid point, and every set held the complete-case curve's best grid threshold. The reported index, `r pr(app$imposed$apparent, 3)`, exceeded the complete-case curve at the chosen threshold, `r pr(app$imposed$benchmark$full_at_c_hat, 3)`, by `r pr(app$imposed$apparent - app$imposed$benchmark$full_at_c_hat, 3)`, and the correction removed `r pr(app$imposed$optimism_20, 4)` of it. In this analysis the hybrid comparison critical value rose to `r pr(app$imposed$hybrid$q_comp, 2)`, against `r pr(app$imposed$hybrid$q_comp_plugin, 2)` for the plug-in value, and the hybrid comparison-based set widened to `r pr(10^app$imposed$set_ranges$comp_hybrid[1], 2)` to `r pr(10^app$imposed$set_ranges$comp_hybrid[2], 2)` ng/mL, while the bootstrap and plug-in sets ran from `r pr(10^app$imposed$set_ranges$comp_boot[1], 2)` to `r pr(10^app$imposed$set_ranges$comp_boot[2], 2)` ng/mL.
 
 ```{r}
 #| label: fig-application
-#| fig-cap: "[FILL]"
-#| fig-width: 7
-#| fig-height: 4.2
-#| eval: false
+#| fig-cap: !expr cap_application
+#| fig-width: 10
+#| fig-height: 4.4
 
-gap_register("fig-application", what = "[FILL]", cells = NA, n_rep = NA, production = "[FILL]")
+gap_register("fig-application", what = "NHANES pooled curves, bands, and sets", cells = NA, n_rep = NA, run = ari$run, production = "the same analysis")
+op <- par(mfrow = c(1, 2), mar = c(4.2, 4.4, 2, 1))
+PlotApplication(app$real, reference = log10(app$placement$reference_ng_ml),
+                main = "Real missing values imputed")
+PlotApplication(app$imposed, benchmark = app$imposed$benchmark$curve,
+                reference = log10(app$placement$reference_ng_ml),
+                main = "Missing values imposed on the complete cases")
+par(op)
+```
+
+By race/ethnicity, the stratum-specific cutoffs ranged from `r pr(min(10^app$strata$c_cs), 2)` to `r pr(max(10^app$strata$c_cs), 2)` ng/mL (@tbl-strata), and the published cutoff lay in the comparison-based set of `r pr(sum(app$strata$reference_in_set), 0)` of the `r pr(nrow(app$strata), 0)` groups. The population-optimal cutoff differed from the stratum-specific one in `r pr(sum(abs(app$strata$c_pop - app$strata$c_cs) > 1e-9), 0)` groups, upward where the group held a larger share of the nonsmokers than of the smokers and downward where it held a smaller share, as S1.6 predicts.
+
+```{r}
+#| label: tbl-strata
+#| tbl-cap: !expr cap_strata
+
+gap_register("tbl-strata", what = "cutoffs by race/ethnicity", cells = NA, n_rep = NA, run = ari$run, production = "the same analysis")
+kable_w(strata_rows, widths = c(22, 10, 10, 14, 14, 16, 14))
 ```
 
 # Discussion
 
-<!-- What was found and what a user should do differently; the novelty table; limitations from the
-critique table's rows that did not become design factors; future work from the spec's out-of-scope
-list, item by item. No new results. -->
+@tbl-novelty sets what this paper adds beside what was known. The four questions of the Introduction have these answers, on `r prov(ri$n_rep, 0)` replicates per cell. Does the band cover the whole curve at the nominal rate, under predictive mean matching as well as under a correctly specified imputation model? Under the correct model, and without missing values, it covered close to the nominal rate; under predictive mean matching it did so at low missing fractions and fell short where the averaged curve itself was biased, at the highest missing fraction. Does the set contain the best threshold at least as often as its level promises, and how much narrower is it than the set the band itself gives? It held the best threshold at least as often as the level promises in every cell, at about half the length of the band-based set, yet still several times longer than the range of thresholds that are truly near-optimal. Does the correction remove the optimism of the reported index? It removed most of it without missing values and under the correct model, and overcorrected where the imputations were biased. How far apart are the index from averaging the curves first and the index from maximizing in each completed dataset first? By a few thousandths of the index, close to $\kappa \hat B_c / 2$, while maximizing first, or bagging, gave a more accurate threshold.
 
-[FILL: the findings restated and the implication for users.]
+For a study that imputes a missing marker and reports a cutoff, three changes follow. Report the pooled curve with its band and the comparison-based set, so that readers see the range of thresholds the data support, as in the cotinine example, where the published cutoff and the cohort's own both fell in the set. Report the corrected index beside the maximum. And treat the imputation model as part of the inference: the bootstrap-then-impute covariance tracked the curve's variance in every cell, so a band that undercovers points to imputations that are biased near the threshold, which ten donors, the pool recommended against sparse donors [@morris2014], did not fix, and which a correctly specified model avoided [TO CONFIRM: this reading rests on the normal engine being the correct model in the simulation; no misspecified parametric model was tried]{.tc}. Complete cases are not an alternative when missingness depends on the marker's correlates: their bands missed the curve in most replicates.
 
 ```{r}
 #| label: tbl-novelty
-#| tbl-cap: "What was known and what this paper adds."
-#| eval: false
+#| tbl-cap: "What was known and what this paper adds. MI is multiple imputation."
 
-novelty_table(data.frame(Element = c("[FILL]"), `Prior literature` = c("[FILL]"), `This paper` = c("[FILL]"), check.names = FALSE))
+novelty_table(data.frame(
+  Element = c("The pooled Youden curve from MI data",
+              "A simultaneous band for the curve",
+              "A set of near-optimal thresholds",
+              "The optimism of the reported index",
+              "The order of pooling",
+              "The bootstrap with MI"),
+  `Prior literature` = c(
+    "curves averaged across completed datasets, a threshold read off without uncertainty [@long2011]",
+    "sup-t bands in general [@montielolea2019]; complete-data intervals for the index and the threshold [@bantis2019]",
+    "multiple comparisons with the best [@hsu1996]; confidence regions at the estimated threshold [@bantis2014]",
+    "the empirical index biased upward without missing data [@fluss2005]",
+    "propensity scores [@mitra2016; @leyrat2019; @granger2019], variable selection [@wood2008], and predictions [@mertens2026] across completed datasets",
+    "which combinations are valid [@schomaker2018; @bartlett2020], few imputations per resample [@vonhippel2021]"),
+  `This paper` = c(
+    "a band, a near-optimal set, and a corrected index for it",
+    "a bootstrap-then-impute sup-t band, with the covariance split from two imputations to the analysis's twenty",
+    "a set built from comparisons between thresholds on the pooled curve, narrower than the set a band gives",
+    "a correction that repeats the imputation as the analysis does, measured under MI",
+    "the gap for the Youden index and its quadratic form, measured",
+    "applied to a whole curve and to a non-regular maximum"),
+  check.names = FALSE), widths = c(20, 40, 40))
 ```
 
-[FILL: limitations.]
+Several features of the simulation limit what it shows. The marker was binormal, while real markers are skewed or, like cotinine below its limit of detection, carry a point mass; the application has one, the simulation does not. The auxiliary's strength and the missingness coefficients were fixed, so the band's shortfall under predictive mean matching was measured at one level of donor sparsity per missing fraction. The imputation model had one auxiliary and, for the normal engine, was correctly specified; real imputation models carry several covariates and are misspecified to some degree. Missingness was at random given the auxiliary and the disease status, and missingness that depends on the marker's own value is corrected by neither engine. The covariance was always estimated from two imputations per resample and rescaled, and the number of resamples and of imputations per resample was not varied. The set's guarantee is for the grid's best threshold, not for $c^*$ itself, and the grid had one resolution.
 
-[FILL: future work, one item per out-of-scope entry.]
+Several directions lie outside this paper. A second dataset is needed to test the procedure on a marker with another shape. A continuous covariate turns the stratum-specific cutoffs of the application into a covariate-specific curve [@inacio2017; @xu2014]. When the disease status rather than the marker is missing, the same questions arise under verification bias [@fluss2009; @wang2025interval]. Criteria other than the Youden index, such as a target sensitivity, need their own sets. A bootstrap with a theory for cube-root estimators [@cattaneo2020], carried through imputation, is the candidate for removing the optimism the plain correction leaves. A software release of the procedure, and a short reporting guide for applied studies that impute a marker and report a cutoff, are the steps that make the procedure usable.
 
-# Statement on AI use {.unnumbered}
+# Acknowledgements {.unnumbered}
 
 {{< include parts/ai-use-statement.md >}}
 
-# Data and code availability {.unnumbered}
+# Statements and declarations {.unnumbered}
 
-[FILL: the data source with accession or URL; the code repository URL. The code is organized as a research compendium (@marwick2018).]
+[TO CONFIRM: the journal requires a Statements and Declarations section with each of its subheadings present, even when not applicable; the subheadings are not listed in the journal's profile]{.tc}
+
+*Data availability.* The NHANES data are public, from the survey's data pages [CITE: the NHANES 2013 to 2018 data files (no item in Zotero)]{.cite}. The code, the results, and this manuscript form a research compendium [@marwick2018]: an R package whose tested functions the analysis scripts call, and which this document reads at render time. [TO CONFIRM: the repository URL, withheld while review is double-anonymized]{.tc}
 
 # References {.unnumbered}
 

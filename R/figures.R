@@ -1,4 +1,15 @@
 # Figure functions shared by the manuscript, the slides, and the poster.
+
+#' Left margin, in lines, that fits row labels
+#'
+#' @param labels Row labels.
+#' @param cex Character expansion of the labels.
+#' @return Margin lines: about half a line per character at `cex = 0.8`,
+#'   plus one.
+#' @keywords internal
+LabelMargin <- function(labels, cex = 0.8) {
+  1 + max(nchar(labels)) * 0.55 * cex
+}
 # Each draws one figure in base graphics from the per-cell summaries of
 # SummarizeAllCellsC() (or the NHANES description) and returns NULL
 # invisibly. Ported from pilot-c's report.
@@ -13,7 +24,7 @@
 #' @export
 PlotBandCoverage <- function(s, labels, limits = c(0.93, 0.97),
                              nominal = 0.95) {
-  op <- graphics::par(mar = c(4.2, 9, 1, 1))
+  op <- graphics::par(mar = c(4.2, LabelMargin(labels), 1, 1))
   on.exit(graphics::par(op))
   y <- seq_len(nrow(s))
   graphics::plot(s$cover_boot, y - 0.12,
@@ -44,11 +55,12 @@ PlotBandCoverage <- function(s, labels, limits = c(0.93, 0.97),
 #'
 #' @param s Per-cell summaries.
 #' @param labels Row labels, one per cell.
-#' @param limit Reference line for the coverage, drawn dashed.
+#' @param limit Reference line for the coverage (the nominal level).
 #' @return `NULL`, invisibly.
 #' @export
-PlotSets <- function(s, labels, limit = 0.93) {
-  op <- graphics::par(mfrow = c(1, 2), mar = c(4.2, 9, 1, 1))
+PlotSets <- function(s, labels, limit = 0.95) {
+  op <- graphics::par(mfrow = c(1, 2), mar = c(4.2, LabelMargin(labels), 1,
+                                                0.5))
   on.exit(graphics::par(op))
   y <- seq_len(nrow(s))
   graphics::plot(s$compset_boot, y - 0.12,
@@ -61,8 +73,9 @@ PlotSets <- function(s, labels, limit = 0.93) {
   if (!is.null(s$compplug_hybrid)) {
     graphics::points(s$compplug_hybrid, y + 0.3, pch = 5, col = "#d95f02")
   }
-  graphics::abline(v = limit, lty = 2, col = "grey40")
+  graphics::abline(v = limit, col = "grey40")
   graphics::axis(2, at = y, labels = labels, las = 1, cex.axis = 0.8)
+  graphics::par(mar = c(4.2, 0.5, 1, 1))
   graphics::plot(s$compset_boot_length, y - 0.12,
                  xlim = c(0, max(s$bandset_boot_length,
                                  s$bandset_hybrid_length)),
@@ -78,7 +91,6 @@ PlotSets <- function(s, labels, limit = 0.93) {
                      col = "#d95f02")
   }
   graphics::points(s$true_region_length, y, pch = 3, col = "grey40")
-  graphics::axis(2, at = y, labels = labels, las = 1, cex.axis = 0.8)
   invisible(NULL)
 }
 
@@ -90,7 +102,7 @@ PlotSets <- function(s, labels, limit = 0.93) {
 #' @return `NULL`, invisibly.
 #' @export
 PlotOptimism <- function(s, labels, reference = 0.01) {
-  op <- graphics::par(mar = c(4.2, 9, 1, 1))
+  op <- graphics::par(mar = c(4.2, LabelMargin(labels), 1, 1))
   on.exit(graphics::par(op))
   y <- seq_len(nrow(s))
   rng <- range(0, s$optimism + 2 * s$optimism_mcse, s$corrected_bias_2,
@@ -183,7 +195,8 @@ PlotApplication <- function(a, construction = "hybrid", benchmark = NULL,
                             reference = NULL, main = "") {
   band <- a[[construction]]
   in_set <- a$sets[[paste0("comp_", construction)]]
-  ylim <- range(c(band$lower, band$upper, benchmark, 0))
+  ylim <- range(c(band$lower, band$upper, benchmark))
+  ylim[1] <- ylim[1] - 0.05 * diff(ylim)
   graphics::plot(a$grid, a$estimate, type = "n", ylim = ylim,
                  xlab = "log10 cotinine (ng/mL)", ylab = "Youden index J(c)",
                  main = main, cex.main = 0.9)

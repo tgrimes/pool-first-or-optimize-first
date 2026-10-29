@@ -146,3 +146,13 @@ test_that("SimulateMarkerData is reproducible under a seed", {
   b <- SimulateMarkerData(30, 2, 1, -1.9)
   expect_identical(a, b)
 })
+
+test_that("MissingShares matches simulated shares and averages to the rate", {
+  a0 <- MissingIntercept(0.4, 2, 1)
+  sh <- MissingShares(a0, 2, 1)
+  expect_equal(mean(sh), 0.4, tolerance = 1e-6)
+  set.seed(31)
+  dat <- SimulateMarkerData(100000, 2, 1, alpha0 = a0)
+  expect_lt(abs(mean(!dat$observed[dat$d == 1]) - sh[["cases"]]), 0.01)
+  expect_equal(MissingShares(NA, 2, 1), c(controls = 0, cases = 0))
+})

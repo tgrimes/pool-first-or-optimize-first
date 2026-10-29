@@ -1,0 +1,90 @@
+2026-10-29 10:50:42 start, quick 
+2026-10-29 10:50:46 cell 1 block 1 started
+2026-10-29 10:50:46 cell 2 block 1 started
+2026-10-29 10:50:46 cell 3 block 1 started
+2026-10-29 10:50:46 cell 4 block 1 started
+2026-10-29 10:50:46 cell 5 block 1 started
+2026-10-29 10:50:46 cell 6 block 1 started
+2026-10-29 10:50:46 cell 7 block 1 started
+2026-10-29 10:53:42 cell 1 block 1 done in 176 s
+2026-10-29 10:53:42 cell 8 block 1 started
+2026-10-29 10:56:35 cell 3 block 1 done in 349 s
+2026-10-29 10:56:35 cell 9 block 1 started
+2026-10-29 10:56:54 cell 5 block 1 done in 368 s
+2026-10-29 10:56:54 cell 10 block 1 started
+2026-10-29 10:57:13 cell 8 block 1 done in 211 s
+2026-10-29 10:57:13 cell 11 block 1 started
+2026-10-29 10:57:13 cell 6 block 1 done in 387 s
+2026-10-29 10:57:13 cell 12 block 1 started
+2026-10-29 10:57:20 cell 7 block 1 done in 394 s
+2026-10-29 10:57:20 cell 13 block 1 started
+2026-10-29 10:57:33 cell 4 block 1 done in 407 s
+2026-10-29 10:57:33 cell 14 block 1 started
+2026-10-29 10:57:50 cell 2 block 1 done in 424 s
+2026-10-29 10:57:50 cell 15 block 1 started
+2026-10-29 11:00:58 cell 15 block 1 done in 188 s
+2026-10-29 11:00:58 cell 16 block 1 started
+2026-10-29 11:02:25 cell 10 block 1 done in 330 s
+2026-10-29 11:02:25 cell 17 block 1 started
+2026-10-29 11:03:02 cell 12 block 1 done in 349 s
+2026-10-29 11:03:02 cell 18 block 1 started
+2026-10-29 11:03:10 cell 9 block 1 done in 395 s
+2026-10-29 11:03:10 cell 19 block 1 started
+2026-10-29 11:03:18 cell 13 block 1 done in 358 s
+2026-10-29 11:03:18 cell 20 block 1 started
+2026-10-29 11:03:34 cell 11 block 1 done in 381 s
+2026-10-29 11:03:34 cell 21 block 1 started
+2026-10-29 11:03:42 cell 14 block 1 done in 369 s
+2026-10-29 11:03:42 cell 22 block 1 started
+2026-10-29 11:06:06 cell 22 block 1 done in 144 s
+2026-10-29 11:06:06 cell 23 block 1 started
+2026-10-29 11:07:05 cell 16 block 1 done in 367 s
+2026-10-29 11:07:05 cell 24 block 1 started
+2026-10-29 11:07:21 cell 17 block 1 done in 297 s
+2026-10-29 11:07:21 cell 25 block 1 started
+2026-10-29 11:08:22 cell 19 block 1 done in 312 s
+2026-10-29 11:08:22 cell 26 block 1 started
+2026-10-29 11:08:38 cell 18 block 1 done in 336 s
+2026-10-29 11:08:38 cell 27 block 1 started
+2026-10-29 11:08:39 cell 20 block 1 done in 322 s
+2026-10-29 11:08:39 cell 28 block 1 started
+2026-10-29 11:09:06 cell 21 block 1 done in 332 s
+2026-10-29 11:09:06 cell 29 block 1 started
+2026-10-29 11:10:23 cell 23 block 1 done in 257 s
+2026-10-29 11:10:23 cell 30 block 1 started
+2026-10-29 11:11:01 cell 24 block 1 done in 236 s
+2026-10-29 11:11:01 cell 31 block 1 started
+2026-10-29 11:11:35 cell 25 block 1 done in 254 s
+2026-10-29 11:11:35 cell 32 block 1 started
+2026-10-29 11:12:18 cell 26 block 1 done in 237 s
+2026-10-29 11:12:18 cell 33 block 1 started
+2026-10-29 11:12:44 cell 28 block 1 done in 245 s
+2026-10-29 11:12:44 cell 34 block 1 started
+2026-10-29 11:12:46 cell 27 block 1 done in 248 s
+2026-10-29 11:12:46 cell 35 block 1 started
+2026-10-29 11:13:04 cell 29 block 1 done in 238 s
+2026-10-29 11:13:04 cell 36 block 1 started
+2026-10-29 11:18:46 cell 36 block 1 done in 341 s
+2026-10-29 11:18:46 cell 37 block 1 started
+2026-10-29 11:19:52 cell 31 block 1 done in 531 s
+2026-10-29 11:19:52 cell 38 block 1 started
+2026-10-29 11:22:14 cell 33 block 1 done in 596 s
+2026-10-29 11:22:14 cell 39 block 1 started
+2026-10-29 11:22:43 cell 30 block 1 done in 740 s
+2026-10-29 11:22:43 cell 40 block 1 started
+2026-10-29 11:22:55 cell 32 block 1 done in 680 s
+2026-10-29 11:22:55 cell 41 block 1 started
+2026-10-29 11:23:05 cell 34 block 1 done in 620 s
+2026-10-29 11:23:05 cell 42 block 1 started
+2026-10-29 11:23:38 cell 35 block 1 done in 652 s
+2026-10-29 11:23:38 cell 43 block 1 started
+2026-10-29 11:24:18 cell 37 block 1 done in 332 s
+2026-10-29 11:24:18 cell 44 block 1 started
+2026-10-29 11:24:44 cell 39 block 1 done in 150 s
+2026-10-29 11:25:05 cell 38 block 1 done in 312 s
+2026-10-29 11:25:07 cell 40 block 1 done in 144 s
+2026-10-29 11:25:12 cell 41 block 1 done in 136 s
+2026-10-29 11:25:31 cell 42 block 1 done in 146 s
+2026-10-29 11:27:12 cell 43 block 1 done in 214 s
+2026-10-29 11:27:22 cell 44 block 1 done in 184 s
+2026-10-29 11:27:22 finished in 36.7 minutes

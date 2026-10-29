@@ -5,8 +5,8 @@
 | Workflow version | 0.2.3 (2026-10-29) |
 | Project | Pool First or Optimize First? Cutoffs from Multiply Imputed Biomarker Data |
 | Package | micutoff |
-| Stage | 3, drafting |
-| Open stop | none: stage 3 in progress |
+| Stage | 3, draft at stop |
+| Open stop | The first draft: the user reads `manuscript/manuscript.html` and comments (revision rounds) or declares it settled |
 | Last update | 2026-10-29 |
 
 The Stage row reads "stage number, state". The states a stage can be in:
@@ -36,3 +36,4 @@ One line per stage boundary, newest last: the date, the stage reached, the path 
 | 2026-10-29 | 2, piloted-pass | `pilot-c/pilot-report.html` | none: the user read pilot-c's close call as a pass; stage 3 waits for the user's word, with three design questions for the protocol (`log/02-pilot.md`, D-S8) |
 | 2026-10-29 | 3, drafting | `log/03-manuscript.md`, section "Step 2: references" (the three lists) | Step 2, references: the user adds the NHANES data items, attaches or fixes four PDFs, completes one record, and corrects ten record fields |
 | 2026-10-29 | 3, design stop | `log/03-manuscript.md`, section "3.2 The design proposal" (the Introduction's purpose draft in `manuscript/manuscript.qmd`) | The design stop: the user approves or changes the design; `protocol.md` follows |
+| 2026-10-29 | 3, draft at stop | `manuscript/manuscript.html` (draft mode, quick run of 100 replicates per cell; qmd `manuscript/manuscript.qmd`; log `log/03-manuscript.md`; protocol `protocol.md`) | The first draft: the user comments in revision rounds or declares the draft settled; seven `[TO CONFIRM]` and ten `[CITE]` markers are open |

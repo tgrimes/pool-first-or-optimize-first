@@ -100,3 +100,25 @@ SimulateMarkerData <- function(n, delta, sigma1, alpha0 = NA,
   x <- ifelse(observed, x_full, NA_real_)
   data.frame(d = d, x_full = x_full, z = z, observed = observed, x = x)
 }
+
+#' Expected missing fraction in each group
+#'
+#' Under the missingness model of `SimulateMarkerData()`, the expected share
+#' of group 0 and of group 1 with the marker missing.
+#'
+#' @param alpha0 Intercept of the missingness model (`NA` for none).
+#' @param delta,sigma1 The shape.
+#' @param b_z,b_d Coefficients of the missingness model.
+#' @return A named vector with `controls` and `cases`.
+#' @export
+MissingShares <- function(alpha0, delta, sigma1, b_z = 1, b_d = 0.5) {
+  if (is.na(alpha0)) return(c(controls = 0, cases = 0))
+  m0 <- stats::integrate(function(z) {
+    stats::plogis(alpha0 + b_z * z) * stats::dnorm(z, 0, sqrt(2))
+  }, -Inf, Inf)$value
+  m1 <- stats::integrate(function(z) {
+    stats::plogis(alpha0 + b_z * z + b_d) *
+      stats::dnorm(z, delta, sqrt(sigma1^2 + 1))
+  }, -Inf, Inf)$value
+  c(controls = m0, cases = m1)
+}
